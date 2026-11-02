@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Login — LeadsOSINT Private Portal</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2064%2064%22%3E%3Cdefs%3E%3ClinearGradient%20id%3D%22g%22%20x1%3D%220%25%22%20y1%3D%220%25%22%20x2%3D%22100%25%22%20y2%3D%22100%25%22%3E%3Cstop%20offset%3D%220%25%22%20stop-color%3D%22%237c3aed%22/%3E%3Cstop%20offset%3D%22100%25%22%20stop-color%3D%22%23a78bfa%22/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect%20width%3D%2264%22%20height%3D%2264%22%20rx%3D%2216%22%20fill%3D%22url%28%23g%29%22/%3E%3Cpath%20d%3D%22M35%2011%20L19%2035%20L31%2035%20L26%2053%20L45%2027%20L33%2027%20Z%22%20fill%3D%22%23ffffff%22/%3E%3C/svg%3E">
+<link rel="alternate icon" href="/favicon.ico">
+<style>
+:root {
+  --bg: #090b14;
+  --card: #13172e;
+  --card-bd: #2b325c;
+  --ac: #a78bfa;
+  --ac2: #7c3aed;
+  --ac3: #4c1d95;
+  --tx: #f1f5f9;
+  --mt: #94a3b8;
+  --rd: #f87171;
+  --gn: #34d399;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  background: radial-gradient(circle at 50% 20%, #1e1b4b 0%, var(--bg) 70%);
+  color: var(--tx);
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+.login-card {
+  width: 100%;
+  max-width: 420px;
+  background: rgba(19, 23, 46, 0.95);
+  border: 1px solid var(--card-bd);
+  border-radius: 20px;
+  padding: 40px 32px;
+  box-shadow: 0 20px 50px rgba(0,0,0,0.6), 0 0 40px rgba(124, 58, 237, 0.15);
+  backdrop-filter: blur(12px);
+}
+.logo-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 30px;
+  text-align: center;
+}
+.logo-icon {
+  width: 58px;
+  height: 58px;
+  background: linear-gradient(135deg, var(--ac2), var(--ac));
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.9rem;
+  box-shadow: 0 10px 25px rgba(124, 58, 237, 0.4);
+  margin-bottom: 14px;
+}
+h1 {
+  font-size: 1.5rem;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  color: #fff;
+}
+.subtitle {
+  font-size: 0.85rem;
+  color: var(--mt);
+  margin-top: 4px;
+}
+.badge-private {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: rgba(167, 139, 250, 0.12);
+  border: 1px solid rgba(167, 139, 250, 0.3);
+  color: var(--ac);
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 12px;
+  margin-top: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+}
+.form-group {
+  margin-bottom: 20px;
+}
+label {
+  display: block;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--mt);
+  margin-bottom: 8px;
+}
+input {
+  width: 100%;
+  padding: 13px 16px;
+  background: rgba(9, 11, 20, 0.8);
+  border: 1px solid var(--card-bd);
+  border-radius: 10px;
+  color: #fff;
+  font-size: 0.95rem;
+  transition: all 0.2s;
+  outline: none;
+}
+input:focus {
+  border-color: var(--ac);
+  box-shadow: 0 0 0 3px rgba(167, 139, 250, 0.2);
+}
+.btn-submit {
+  width: 100%;
+  padding: 14px;
+  background: linear-gradient(135deg, var(--ac2), var(--ac));
+  border: none;
+  border-radius: 10px;
+  color: #fff;
+  font-size: 0.98rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+  box-shadow: 0 8px 24px rgba(124, 58, 237, 0.35);
+  margin-top: 10px;
+}
+.btn-submit:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 30px rgba(124, 58, 237, 0.5);
+}
+.btn-submit:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+.alert {
+  display: none;
+  padding: 12px 14px;
+  border-radius: 9px;
+  font-size: 0.85rem;
+  margin-bottom: 20px;
+  line-height: 1.4;
+}
+.alert-err {
+  background: rgba(248, 113, 113, 0.12);
+  border: 1px solid rgba(248, 113, 113, 0.3);
+  color: var(--rd);
+}
+.notice {
+  text-align: center;
+  font-size: 0.78rem;
+  color: #64748b;
+  margin-top: 28px;
+  line-height: 1.5;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  padding-top: 18px;
+}
+.notice strong {
+  color: var(--mt);
+}
+
+@media (max-width: 480px) {
+  body {
+    padding: 12px;
+  }
+  .login-card {
+    padding: 26px 18px;
+    border-radius: 16px;
+  }
+  .logo-icon {
+    width: 48px;
+    height: 48px;
+    font-size: 1.5rem;
+    margin-bottom: 10px;
+  }
+  h1 {
+    font-size: 1.3rem;
+  }
+  input {
+    padding: 12px 14px;
+    font-size: 16px; /* iOS auto-zoom prevention */
+  }
+  .btn-submit {
+    padding: 12px;
+    font-size: 0.92rem;
+  }
+}
+
+</style>
+</head>
+<body>
+
+<div class="login-card">
+  <div class="logo-wrap">
+    <div class="logo-icon">⚡</div>
+    <h1>LeadsOSINT</h1>
+    <p class="subtitle">Bulk Intelligence & Deep People Search</p>
+    <div class="badge-private">🔒 Private Commercial Edition</div>
+  </div>
+
+  <div class="alert alert-err" id="alert-box"></div>
+
+  <form id="login-form">
+    <div class="form-group">
+      <label for="username">Username</label>
+      <input type="text" id="username" name="username" placeholder="Enter assigned username" required autofocus autocomplete="username">
+    </div>
+
+    <div class="form-group">
+      <label for="password">Password / Access Key</label>
+      <div style="position:relative;display:flex;align-items:center">
+        <input type="password" id="password" name="password" placeholder="••••••••••••" required autocomplete="current-password" style="padding-right:45px">
+        <button type="button" onclick="togglePasswordVisibility()" id="toggle-pw-btn" style="position:absolute;right:12px;background:none;border:none;color:var(--mt);cursor:pointer;font-size:1.1rem;padding:4px" title="Show/Hide Password">👁️</button>
+      </div>
+    </div>
+
+    <button type="submit" class="btn-submit" id="btn-login">Sign In</button>
+  </form>
+
+  <div class="notice">
+    <strong>Restricted Access</strong><br>
+    Accounts are privately provisioned by the Administrator.<br>
+    To obtain access or renew your plan, contact your Administrator directly.
+  </div>
+</div>
+
+<script>
+const form = document.getElementById('login-form');
+const btn = document.getElementById('btn-login');
+const alertBox = document.getElementById('alert-box');
+
+function togglePasswordVisibility() {
+  const inp = document.getElementById('password');
+  const btn = document.getElementById('toggle-pw-btn');
+  if (inp.type === 'password') {
+    inp.type = 'text';
+    btn.textContent = '🙈';
+  } else {
+    inp.type = 'password';
+    btn.textContent = '👁️';
+  }
+}
+
+form.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  alertBox.style.display = 'none';
+  btn.disabled = true;
+  btn.textContent = 'Verifying credentials...';
+
+  const username = document.getElementById('username').value.trim();
+  const password = document.getElementById('password').value;
+
+  try {
+    const res = await fetch('/api/auth/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username, password })
+    });
+    const data = await res.json();
+    if (res.ok && data.success) {
+      btn.textContent = 'Access Granted!';
+      window.location.href = data.redirect || '/';
+    } else {
+      alertBox.textContent = data.error || 'Authentication failed. Please verify credentials.';
+      alertBox.style.display = 'block';
+      btn.disabled = false;
+      btn.textContent = 'Sign In';
+    }
+  } catch (err) {
+    alertBox.textContent = 'Network or connection error. Please try again.';
+    alertBox.style.display = 'block';
+    btn.disabled = false;
+    btn.textContent = 'Sign In';
+  }
+});
+</script>
+
+</body>
+</html>

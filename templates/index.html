@@ -1,0 +1,3776 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>LeadsOSINT — Private Bulk People Search</title>
+  <link rel="icon" type="image/svg+xml"
+    href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2064%2064%22%3E%3Cdefs%3E%3ClinearGradient%20id%3D%22g%22%20x1%3D%220%25%22%20y1%3D%220%25%22%20x2%3D%22100%25%22%20y2%3D%22100%25%22%3E%3Cstop%20offset%3D%220%25%22%20stop-color%3D%22%237c3aed%22/%3E%3Cstop%20offset%3D%22100%25%22%20stop-color%3D%22%23a78bfa%22/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect%20width%3D%2264%22%20height%3D%2264%22%20rx%3D%2216%22%20fill%3D%22url%28%23g%29%22/%3E%3Cpath%20d%3D%22M35%2011%20L19%2035%20L31%2035%20L26%2053%20L45%2027%20L33%2027%20Z%22%20fill%3D%22%23ffffff%22/%3E%3C/svg%3E">
+  <link rel="alternate icon" href="/favicon.ico">
+  <style>
+    :root {
+      --bg: #090b14;
+      --s: #13172e;
+      --s2: #1e2448;
+      --s3: #2b3260;
+      --bd: #2c3461;
+      --ac: #a78bfa;
+      --ac2: #7c3aed;
+      --ac3: #4c1d95;
+      --tx: #f1f5f9;
+      --mt: #94a3b8;
+      --gn: #34d399;
+      --rd: #f87171;
+      --bl: #38bdf8;
+      --yw: #fbbf24;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--tx);
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    a {
+      color: var(--ac);
+      text-decoration: none;
+    }
+
+    /* ── Header ───────────────────────────────────────────── */
+    header {
+      background: linear-gradient(135deg, #13172e, #090b14);
+      border-bottom: 1px solid var(--bd);
+      padding: 12px 20px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      flex-shrink: 0;
+      z-index: 100;
+      flex-wrap: nowrap !important;
+      overflow-x: auto;
+      white-space: nowrap;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none; -ms-overflow-style: none;
+      
+    }
+
+    /* Complete Eradication of Horizontal Scrollbar Lines & Stepper Arrows */
+    *::-webkit-scrollbar-button {
+      display: none !important;
+      width: 0 !important;
+      height: 0 !important;
+      background: transparent !important;
+    }
+    header, .hdr-right {
+      scrollbar-width: none !important;
+      -ms-overflow-style: none !important;
+    }
+    header::-webkit-scrollbar,
+    header::-webkit-scrollbar-track,
+    header::-webkit-scrollbar-thumb,
+    header::-webkit-scrollbar-button,
+    /* Topbar Action Buttons Original Subtle Scrollbar Line (As Requested) */
+    .hdr-right {
+      margin-left: auto;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: nowrap !important;
+      overflow-x: auto;
+      white-space: nowrap;
+      -webkit-overflow-scrolling: touch;
+      padding: 4px 2px;
+      max-width: 100%;
+    }
+    .hdr-right::-webkit-scrollbar {
+      height: 4px;
+    }
+    .hdr-right::-webkit-scrollbar-track {
+      background: rgba(255, 255, 255, 0.05);
+    }
+    .hdr-right::-webkit-scrollbar-thumb {
+      background: var(--bd);
+    }
+
+
+
+    .logo-box {
+      width: 36px;
+      height: 36px;
+      background: linear-gradient(135deg, var(--ac2), var(--ac));
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+      box-shadow: 0 4px 15px rgba(124, 58, 237, 0.35);
+    }
+
+    .logo-txt h1 {
+      font-size: 1.15rem;
+      font-weight: 800;
+      color: #fff;
+      letter-spacing: -0.3px;
+    }
+
+    .logo-txt p {
+      font-size: .7rem;
+      color: var(--mt);
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+
+    .hdr-user-info {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-left: 12px;
+      flex-wrap: nowrap !important;
+      flex-shrink: 0;
+    }
+
+    .plan-pill, .timer-pill, .quota-pill {
+      flex-shrink: 0;
+      white-space: nowrap;
+    }
+
+    .plan-pill {
+      background: rgba(167, 139, 250, .12);
+      border: 1px solid rgba(167, 139, 250, .3);
+      color: var(--ac);
+      padding: 4px 10px;
+      border-radius: 12px;
+      font-size: .72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    .plan-pill.plan-free {
+      border-color: rgba(251, 191, 36, .4);
+      color: var(--yw);
+    }
+
+    .plan-pill.plan-daily {
+      border-color: rgba(56, 189, 248, .4);
+      color: var(--bl);
+    }
+
+    .plan-pill.plan-weekly {
+      border-color: rgba(52, 211, 153, .4);
+      color: var(--gn);
+    }
+
+    .plan-pill.plan-monthly {
+      border-color: rgba(167, 139, 250, .4);
+      color: var(--ac);
+    }
+
+    .timer-pill {
+      background: rgba(251, 191, 36, .1);
+      border: 1px solid rgba(251, 191, 36, .3);
+      color: var(--yw);
+      padding: 4px 10px;
+      border-radius: 12px;
+      font-size: .72rem;
+      font-weight: 700;
+      font-family: monospace;
+    }
+
+    .timer-pill.expired {
+      background: rgba(248, 113, 113, .1);
+      border-color: rgba(248, 113, 113, .4);
+      color: var(--rd);
+    }
+
+    .quota-pill {
+      background: var(--s2);
+      border: 1px solid var(--bd);
+      color: var(--mt);
+      padding: 4px 10px;
+      border-radius: 12px;
+      font-size: .72rem;
+      font-weight: 600;
+    }
+
+    .hdr-right {
+      margin-left: auto;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: nowrap !important;
+      overflow-x: auto;
+      white-space: nowrap;
+      -webkit-overflow-scrolling: touch;
+      padding: 4px 2px;
+      scrollbar-width: none; -ms-overflow-style: none;
+      
+      max-width: 100%;
+    }
+
+    .hdr-right::-webkit-scrollbar {
+      display: none;
+      width: 0;
+      height: 0;
+    }
+
+    .hdr-btn, .new-job-btn {
+      flex-shrink: 0;
+      white-space: nowrap;
+    }
+
+    .hdr-btn {
+      background: var(--s2);
+      border: 1px solid var(--bd);
+      color: var(--tx);
+      padding: 7px 12px;
+      border-radius: 8px;
+      font-size: .78rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: .2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .hdr-btn:hover {
+      border-color: var(--ac);
+      color: #fff;
+    }
+
+    .hdr-btn.admin-btn {
+      border-color: rgba(167, 139, 250, .4);
+      color: var(--ac);
+    }
+
+    .hdr-btn.admin-btn:hover {
+      background: var(--ac2);
+      color: #fff;
+    }
+
+    .hdr-btn.logout-btn {
+      color: var(--rd);
+      border-color: rgba(248, 113, 113, .3);
+    }
+
+    .hdr-btn.logout-btn:hover {
+      background: rgba(248, 113, 113, .1);
+    }
+
+    .badge-num {
+      background: var(--rd);
+      color: #fff;
+      border-radius: 10px;
+      padding: 1px 6px;
+      font-size: .65rem;
+      font-weight: 800;
+    }
+
+    .new-job-btn {
+      background: linear-gradient(135deg, var(--ac2), var(--ac));
+      color: #fff;
+      border: none;
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-size: .82rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: .2s;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      box-shadow: 0 4px 14px rgba(124, 58, 237, .35);
+    }
+
+    .new-job-btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 20px rgba(124, 58, 237, .5);
+    }
+
+    .mobile-menu-btn {
+      display: none;
+      background: var(--s2);
+      border: 1px solid var(--bd);
+      color: #fff;
+      padding: 7px 10px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 1rem;
+    }
+
+    /* ── Layout ───────────────────────────────────────────── */
+    .layout {
+      display: flex;
+      flex: 1;
+      overflow: hidden;
+      position: relative;
+    }
+
+    /* ── Sidebar ──────────────────────────────────────────── */
+    .sidebar {
+      width: 270px;
+      flex-shrink: 0;
+      background: var(--s);
+      border-right: 1px solid var(--bd);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      transition: width .25s cubic-bezier(0.4, 0, 0.2, 1), border .25s ease, transform .3s ease;
+      position: relative;
+    }
+
+    .sidebar.desktop-collapsed {
+      width: 0 !important;
+      min-width: 0 !important;
+      padding: 0 !important;
+      border-right: none !important;
+      overflow: hidden !important;
+    }
+
+    .sb-toggle-btn {
+      background: var(--s2);
+      border: 1px solid var(--bd);
+      color: var(--mt);
+      border-radius: 6px;
+      padding: 2px 7px;
+      cursor: pointer;
+      font-size: 0.72rem;
+      transition: .2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .sb-toggle-btn:hover {
+      background: var(--ac2);
+      color: #fff;
+      border-color: var(--ac);
+    }
+
+    .sb-expand-floating {
+      display: none;
+      position: absolute;
+      left: 16px;
+      top: 16px;
+      z-index: 90;
+      background: linear-gradient(135deg, var(--s2), var(--s));
+      border: 1px solid var(--ac);
+      color: var(--tx);
+      border-radius: 8px;
+      padding: 6px 12px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
+      transition: .2s;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .sb-expand-floating:hover {
+      background: var(--ac2);
+      color: #fff;
+      transform: translateY(-1px);
+    }
+
+    .sidebar-is-collapsed .sb-expand-floating {
+      display: flex;
+    }
+
+    .sidebar-is-collapsed .job-detail-hdr {
+      padding-left: 145px;
+      transition: padding-left .25s ease;
+    }
+
+    .sidebar-is-collapsed #panel-new {
+      padding-left: 145px;
+      transition: padding-left .25s ease;
+    }
+
+    .sb-hdr {
+      padding: 14px 16px 10px;
+      border-bottom: 1px solid var(--bd);
+      font-size: .72rem;
+      color: var(--mt);
+      text-transform: uppercase;
+      letter-spacing: .8px;
+      font-weight: 700;
+      flex-shrink: 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .sb-search-wrap {
+      padding: 8px 12px;
+      border-bottom: 1px solid var(--bd);
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+
+    .sb-search-input {
+      width: 100%;
+      background: var(--s2);
+      border: 1px solid var(--bd);
+      border-radius: 8px;
+      padding: 7px 28px 7px 10px;
+      color: #fff;
+      font-size: .8rem;
+      outline: none;
+    }
+
+    .sb-search-input:focus {
+      border-color: var(--ac);
+    }
+
+    .sb-search-clear {
+      position: absolute;
+      right: 20px;
+      background: none;
+      border: none;
+      color: var(--mt);
+      cursor: pointer;
+      font-size: .8rem;
+    }
+
+    .sb-jobs {
+      flex: 1;
+      overflow-y: auto;
+      padding: 8px;
+    }
+
+    .sb-jobs::-webkit-scrollbar {
+      width: 4px;
+    }
+
+    .sb-jobs::-webkit-scrollbar-thumb {
+      background: var(--bd);
+      border-radius: 2px;
+    }
+
+    .job-item {
+      padding: 12px 14px;
+      border-radius: 10px;
+      cursor: pointer;
+      margin-bottom: 5px;
+      border: 1px solid transparent;
+      transition: .2s;
+      position: relative;
+    }
+
+    .job-item:hover {
+      background: var(--s2);
+      border-color: var(--bd);
+    }
+
+    .job-item.active {
+      background: var(--s2);
+      border-color: var(--ac);
+    }
+
+    .ji-name {
+      font-size: .88rem;
+      font-weight: 600;
+      color: #fff;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      padding-right: 20px;
+    }
+
+    .ji-meta {
+      font-size: .72rem;
+      color: var(--mt);
+      margin-top: 4px;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .ji-user {
+      color: var(--ac);
+      font-weight: 600;
+    }
+
+    .ji-status {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .st-running {
+      background: var(--gn);
+      animation: blink 1s infinite;
+    }
+
+    .st-complete {
+      background: var(--ac);
+    }
+
+    .st-queued {
+      background: var(--yw);
+    }
+
+    .st-paused {
+      background: var(--bl);
+    }
+
+    .st-failed {
+      background: var(--rd);
+    }
+
+    .st-paused_network_error {
+      background: var(--rd);
+      animation: blink 0.6s infinite;
+    }
+
+    @keyframes blink {
+
+      0%,
+      100% {
+        opacity: 1
+      }
+
+      50% {
+        opacity: .3
+      }
+    }
+
+    .sb-empty {
+      padding: 30px 18px;
+      text-align: center;
+      color: var(--mt);
+      font-size: .85rem;
+      line-height: 1.6;
+    }
+
+    /* ── Main Area ────────────────────────────────────────── */
+    .main {
+      flex: 1;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      background: var(--bg);
+      position: relative;
+    }
+
+    .main::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    .main::-webkit-scrollbar-thumb {
+      background: var(--bd);
+      border-radius: 3px;
+    }
+
+    /* ── New Job Panel ────────────────────────────────────── */
+    #panel-new {
+      padding: 30px;
+      max-width: 860px;
+      margin: 0 auto;
+      width: 100%;
+    }
+
+    .panel-title {
+      font-size: 1.4rem;
+      font-weight: 800;
+      color: #fff;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .field-label {
+      font-size: .82rem;
+      font-weight: 700;
+      color: var(--mt);
+      text-transform: uppercase;
+      letter-spacing: .5px;
+      margin-bottom: 8px;
+    }
+
+    .job-name-input {
+      width: 100%;
+      padding: 12px 16px;
+      background: var(--s);
+      border: 1px solid var(--bd);
+      border-radius: 10px;
+      color: #fff;
+      font-size: .95rem;
+      margin-bottom: 22px;
+      outline: none;
+      transition: .2s;
+    }
+
+    .job-name-input:focus {
+      border-color: var(--ac);
+    }
+
+    .tabs {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+
+    .tab {
+      padding: 9px 18px;
+      border-radius: 8px;
+      font-size: .85rem;
+      font-weight: 700;
+      cursor: pointer;
+      border: 1px solid var(--bd);
+      background: var(--s);
+      color: var(--mt);
+      transition: .2s;
+    }
+
+    .tab.active {
+      background: var(--s2);
+      border-color: var(--ac);
+      color: #fff;
+    }
+
+    .tab-pane {
+      display: none;
+    }
+
+    .tab-pane.active {
+      display: block;
+    }
+
+    .leads-ta {
+      width: 100%;
+      height: 200px;
+      padding: 14px 16px;
+      background: var(--s);
+      border: 1px solid var(--bd);
+      border-radius: 10px;
+      color: #fff;
+      font-family: monospace;
+      font-size: .88rem;
+      line-height: 1.6;
+      resize: vertical;
+      outline: none;
+      transition: .2s;
+    }
+
+    .leads-ta:focus {
+      border-color: var(--ac);
+    }
+
+    .hint {
+      font-size: .78rem;
+      color: var(--mt);
+      margin-top: 10px;
+      line-height: 1.6;
+      background: var(--s2);
+      padding: 12px 16px;
+      border-radius: 8px;
+      border: 1px solid var(--bd);
+    }
+
+    .hint code {
+      color: var(--ac);
+      font-family: monospace;
+    }
+
+    .dropzone {
+      border: 2px dashed var(--bd);
+      border-radius: 12px;
+      padding: 40px 20px;
+      text-align: center;
+      cursor: pointer;
+      transition: .2s;
+      background: var(--s);
+      position: relative;
+    }
+
+    .dropzone:hover {
+      border-color: var(--ac);
+      background: var(--s2);
+    }
+
+    .dropzone input[type="file"] {
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      cursor: pointer;
+      width: 100%;
+      height: 100%;
+    }
+
+    .dz-icon {
+      font-size: 2.2rem;
+      margin-bottom: 8px;
+    }
+
+    .dz-title {
+      font-size: 1rem;
+      font-weight: 700;
+      color: #fff;
+    }
+
+    .dz-sub {
+      font-size: .8rem;
+      color: var(--mt);
+      margin-top: 4px;
+    }
+
+    .dz-file {
+      font-size: .85rem;
+      color: var(--gn);
+      font-weight: 700;
+      margin-top: 10px;
+    }
+
+    .err-msg {
+      color: var(--rd);
+      font-size: .85rem;
+      margin-top: 12px;
+      display: none;
+      background: rgba(248, 113, 113, .1);
+      border: 1px solid rgba(248, 113, 113, .3);
+      padding: 10px 14px;
+      border-radius: 8px;
+    }
+
+    .create-btn {
+      margin-top: 22px;
+      width: 100%;
+      padding: 14px;
+      background: linear-gradient(135deg, var(--ac2), var(--ac));
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: .2s;
+      box-shadow: 0 8px 24px rgba(124, 58, 237, .35);
+    }
+
+    .create-btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 12px 30px rgba(124, 58, 237, .5);
+    }
+
+    .create-btn:disabled {
+      opacity: .6;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    /* ── Job Detail Panel ─────────────────────────────────── */
+    #panel-job {
+      display: none;
+      flex-direction: column;
+      flex: 1;
+      overflow-y: auto;
+    }
+
+    .job-detail-hdr {
+      background: var(--s);
+      border-bottom: 1px solid var(--bd);
+      padding: 18px 26px;
+      flex-shrink: 0;
+    }
+
+    .jdh-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      flex-wrap: wrap;
+      margin-bottom: 8px;
+    }
+
+    .job-title-edit {
+      font-size: 1.3rem;
+      font-weight: 800;
+      color: #fff;
+      background: transparent;
+      border: 1px solid transparent;
+      border-radius: 8px;
+      padding: 4px 8px;
+      outline: none;
+      transition: .2s;
+      max-width: 400px;
+    }
+
+    .job-title-edit:focus {
+      background: var(--s2);
+      border-color: var(--bd);
+    }
+
+    .jdh-actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .act-btn {
+      padding: 7px 14px;
+      border-radius: 8px;
+      font-size: .8rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: .2s;
+      border: 1px solid var(--bd);
+      background: var(--s2);
+      color: var(--tx);
+    }
+
+    .act-btn:hover {
+      border-color: var(--ac);
+      color: #fff;
+    }
+
+    .act-btn.primary {
+      background: linear-gradient(135deg, var(--ac2), var(--ac));
+      color: #fff;
+      border: none;
+    }
+
+    .act-btn.success {
+      background: rgba(52, 211, 153, .15);
+      border-color: rgba(52, 211, 153, .4);
+      color: var(--gn);
+    }
+
+    .act-btn.success:hover {
+      background: var(--gn);
+      color: #000;
+    }
+
+    .act-btn.danger {
+      color: var(--rd);
+      border-color: rgba(248, 113, 113, .4);
+    }
+
+    .act-btn.danger:hover {
+      background: rgba(248, 113, 113, .15);
+    }
+
+    .act-btn.share-btn {
+      background: linear-gradient(135deg, #0284c7, #38bdf8);
+      color: #fff;
+      border: none;
+    }
+
+    .job-meta {
+      font-size: .8rem;
+      color: var(--mt);
+      display: flex;
+      gap: 14px;
+      flex-wrap: wrap;
+    }
+
+    .job-meta span {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .job-progress {
+      padding: 16px 26px;
+      background: var(--s2);
+      border-bottom: 1px solid var(--bd);
+      flex-shrink: 0;
+    }
+
+    .prog-bar-wrap {
+      width: 100%;
+      height: 8px;
+      background: var(--s);
+      border-radius: 4px;
+      overflow: hidden;
+      margin-bottom: 8px;
+    }
+
+    .prog-bar {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, var(--ac2), var(--ac));
+      transition: width .4s ease;
+    }
+
+    .prog-info {
+      display: flex;
+      justify-content: space-between;
+      font-size: .78rem;
+      color: var(--mt);
+      font-weight: 600;
+    }
+
+    .leads-area {
+      flex: 1;
+      padding: 22px 26px;
+    }
+
+    .leads-hdr {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 14px;
+    }
+
+    .leads-title {
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: #fff;
+    }
+
+    .lead-row {
+      background: var(--s);
+      border: 1px solid var(--bd);
+      border-radius: 10px;
+      padding: 12px 16px;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      transition: .2s;
+    }
+
+    .lead-row:hover {
+      border-color: rgba(167, 139, 250, .4);
+    }
+
+    .lr-num {
+      font-size: .8rem;
+      color: var(--mt);
+      width: 26px;
+      font-weight: 700;
+    }
+
+    .lr-info {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .lr-name {
+      font-size: .92rem;
+      font-weight: 700;
+      color: #fff;
+    }
+
+    .lr-loc {
+      font-size: .78rem;
+      color: var(--mt);
+      margin-top: 2px;
+    }
+
+    .lr-status {
+      padding: 4px 10px;
+      border-radius: 12px;
+      font-size: .72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    .lrs-queued {
+      background: rgba(251, 191, 36, .12);
+      color: var(--yw);
+    }
+
+    .lrs-running {
+      background: rgba(52, 211, 153, .15);
+      color: var(--gn);
+      animation: blink 1s infinite;
+    }
+
+    .lrs-done {
+      background: rgba(167, 139, 250, .15);
+      color: var(--ac);
+    }
+
+    .lrs-failed {
+      background: rgba(248, 113, 113, .15);
+      color: var(--rd);
+    }
+
+    .lrs-cancelled {
+      background: var(--s2);
+      color: var(--mt);
+    }
+
+    /* ── Live Log Console (Admin Only) ────────────────────── */
+    .logs-console-wrap {
+      background: #080a14;
+      border-top: 1px solid var(--bd);
+      display: none;
+      flex-direction: column;
+      flex-shrink: 0;
+      max-height: 240px;
+      transition: max-height .3s;
+    }
+
+    .logs-console-wrap.collapsed {
+      max-height: 42px;
+    }
+
+    .logs-hdr {
+      background: #12162b;
+      padding: 10px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .logs-title {
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: var(--ac);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .logs-actions {
+      display: flex;
+      gap: 8px;
+    }
+
+    .logs-btn {
+      background: var(--s2);
+      border: 1px solid var(--bd);
+      color: var(--tx);
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 0.72rem;
+      cursor: pointer;
+    }
+
+    .logs-btn:hover {
+      border-color: var(--ac);
+      color: #fff;
+    }
+
+    .logs-body {
+      flex: 1;
+      overflow-y: auto;
+      padding: 12px 20px;
+      font-family: Consolas, monospace;
+      font-size: 0.78rem;
+      line-height: 1.6;
+      color: #c4caf0;
+      min-height: 120px;
+    }
+
+    .logs-body::-webkit-scrollbar {
+      width: 5px;
+    }
+
+    .logs-body::-webkit-scrollbar-thumb {
+      background: var(--bd);
+    }
+
+    .log-entry {
+      margin-bottom: 3px;
+      word-break: break-all;
+    }
+
+    .log-entry.log-WARN {
+      color: var(--yw);
+    }
+
+    .log-entry.log-ERROR {
+      color: var(--rd);
+    }
+
+    .log-entry.log-SUCCESS {
+      color: var(--gn);
+    }
+
+    /* ── Modals ───────────────────────────────────────────── */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, .85);
+      z-index: 10000;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+      backdrop-filter: blur(6px);
+    }
+
+    .modal-overlay.open {
+      display: flex;
+    }
+
+    .modal-box {
+      background: var(--s);
+      border: 1px solid var(--bd);
+      border-radius: 18px;
+      max-width: 650px;
+      width: 100%;
+      max-height: 85vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      box-shadow: 0 15px 40px rgba(0, 0, 0, .6);
+    }
+
+    .modal-hdr {
+      background: linear-gradient(135deg, var(--s2), var(--s));
+      padding: 16px 24px;
+      border-bottom: 1px solid var(--bd);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .modal-hdr h3 {
+      color: #fff;
+      font-size: 1.15rem;
+      font-weight: 700;
+    }
+
+    .modal-close {
+      font-size: 1.3rem;
+      color: var(--mt);
+      cursor: pointer;
+    }
+
+    .modal-close:hover {
+      color: #fff;
+    }
+
+    .modal-body {
+      padding: 20px 24px;
+      overflow-y: auto;
+      flex: 1;
+    }
+
+    /* Modal Elements */
+    .user-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: .82rem;
+      margin-top: 12px;
+    }
+
+    .user-table th {
+      background: var(--s2);
+      color: var(--mt);
+      padding: 8px 10px;
+      text-align: left;
+    }
+
+    .user-table td {
+      padding: 10px;
+      border-bottom: 1px solid var(--bd);
+    }
+
+    .user-table tr:hover {
+      background: rgba(255, 255, 255, .02);
+    }
+
+    .form-row {
+      margin-bottom: 14px;
+    }
+
+    .form-row label {
+      display: block;
+      font-size: .8rem;
+      font-weight: 600;
+      color: var(--mt);
+      margin-bottom: 6px;
+    }
+
+    .form-row input,
+    .form-row select,
+    .form-row textarea {
+      width: 100%;
+      padding: 10px 12px;
+      background: var(--s2);
+      border: 1px solid var(--bd);
+      border-radius: 8px;
+      color: #fff;
+      font-size: .85rem;
+      outline: none;
+    }
+
+    .form-row input:focus,
+    .form-row select:focus,
+    .form-row textarea:focus {
+      border-color: var(--ac);
+    }
+
+    .msg-item {
+      background: var(--s2);
+      border: 1px solid var(--bd);
+      border-radius: 10px;
+      padding: 12px 14px;
+      margin-bottom: 10px;
+      font-size: .85rem;
+    }
+
+    .msg-hdr {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 6px;
+      font-size: .75rem;
+      color: var(--mt);
+    }
+
+    .msg-sender {
+      font-weight: 700;
+      color: var(--ac);
+    }
+
+    .msg-content {
+      color: var(--tx);
+      line-height: 1.5;
+      white-space: pre-wrap;
+    }
+
+    /* ── Toast ────────────────────────────────────────────── */
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      background: var(--s);
+      border: 1px solid var(--bd);
+      border-radius: 12px;
+      padding: 12px 20px;
+      font-size: .85rem;
+      z-index: 99999;
+      transform: translateY(60px);
+      opacity: 0;
+      transition: .3s;
+      max-width: 320px;
+      pointer-events: none;
+    }
+
+    .toast.show {
+      transform: translateY(0);
+      opacity: 1;
+    }
+
+    .toast.ok {
+      border-color: rgba(52, 211, 153, .4);
+      color: var(--gn);
+    }
+
+    .toast.err {
+      border-color: rgba(248, 113, 113, .4);
+      color: var(--rd);
+    }
+
+    /* ── Mobile Responsive ────────────────────────────────── */
+    
+    
+    /* ── Full Device Responsiveness (Mobile & Tablet) ── */
+    @media (max-width: 768px) {
+      header {
+        position: sticky !important;
+        top: 0 !important;
+        z-index: 1100 !important;
+        height: 54px !important;
+        padding: 8px 12px !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: space-between !important;
+        overflow: visible !important;
+      }
+      .mobile-menu-btn {
+        display: inline-flex !important;
+        z-index: 1110 !important;
+        font-size: 1.25rem !important;
+        width: 36px !important;
+        height: 36px !important;
+        border-radius: 9px !important;
+        align-items: center !important;
+        justify-content: center !important;
+        cursor: pointer !important;
+      }
+      .mobile-actions-toggle-btn {
+        display: inline-flex !important;
+        z-index: 1110 !important;
+        font-size: 1.25rem !important;
+        width: 36px !important;
+        height: 36px !important;
+        border-radius: 9px !important;
+        align-items: center !important;
+        justify-content: center !important;
+        cursor: pointer !important;
+        margin-left: auto !important;
+      }
+      
+      /* Left Jobs Sidebar: Opens beneath topbar */
+      .sidebar {
+        position: fixed !important;
+        top: 54px !important;
+        bottom: 0 !important;
+        left: 0 !important;
+        height: calc(100vh - 54px) !important;
+        z-index: 1000 !important;
+        transform: translateX(-100%) !important;
+        width: 290px !important;
+        max-width: 85vw !important;
+        box-shadow: 8px 0 35px rgba(0, 0, 0, 0.85) !important;
+        transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
+      }
+      .sidebar.open {
+        transform: translateX(0) !important;
+      }
+      /* Hide inner collapse button on mobile as per user specification */
+      .sb-toggle-btn, #sb-toggle-btn {
+        display: none !important;
+      }
+
+      /* Right Actions Menu: Opens beneath topbar from the right */
+      .hdr-right {
+        position: fixed !important;
+        top: 54px !important;
+        right: 0 !important;
+        bottom: 0 !important;
+        height: calc(100vh - 54px) !important;
+        width: 270px !important;
+        max-width: 85vw !important;
+        background: #101328 !important;
+        border-left: 1px solid var(--bd) !important;
+        box-shadow: -8px 0 35px rgba(0, 0, 0, 0.85) !important;
+        flex-direction: column !important;
+        align-items: stretch !important;
+        padding: 18px 14px !important;
+        gap: 10px !important;
+        z-index: 1000 !important;
+        transform: translateX(100%) !important;
+        transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
+        overflow-y: auto !important;
+        white-space: normal !important;
+      }
+      .hdr-right.open {
+        transform: translateX(0) !important;
+      }
+      .hdr-right .new-job-btn,
+      .hdr-right .hdr-btn {
+        width: 100% !important;
+        justify-content: flex-start !important;
+        padding: 11px 14px !important;
+        font-size: 0.86rem !important;
+        border-radius: 9px !important;
+      }
+
+      .hdr-user-info {
+        display: none !important;
+      }
+      #panel-new {
+        padding: 16px 12px !important;
+      }
+      .job-detail-hdr {
+        padding: 14px 12px !important;
+      }
+      .sidebar-is-collapsed .job-detail-hdr,
+      .sidebar-is-collapsed #panel-new {
+        padding-left: 12px !important;
+      }
+      .jdh-top {
+        flex-direction: column !important;
+        align-items: stretch !important;
+        gap: 12px !important;
+      }
+      .job-title-edit {
+        max-width: 100% !important;
+        width: 100% !important;
+        font-size: 1.15rem !important;
+      }
+      .jdh-actions {
+        display: grid !important;
+        grid-template-columns: repeat(auto-fit, minmax(105px, 1fr)) !important;
+        gap: 6px !important;
+        width: 100% !important;
+      }
+      .act-btn {
+        width: 100% !important;
+        text-align: center !important;
+        padding: 8px 6px !important;
+        font-size: 0.76rem !important;
+        justify-content: center !important;
+      }
+      .job-meta {
+        flex-wrap: wrap !important;
+        gap: 6px !important;
+        font-size: 0.75rem !important;
+      }
+      .leads-area {
+        padding: 14px 10px !important;
+      }
+      .lead-row {
+        padding: 10px 12px !important;
+        flex-wrap: wrap !important;
+        gap: 8px !important;
+      }
+      .lr-info {
+        min-width: 140px !important;
+      }
+      .modal-box {
+        max-width: 95vw !important;
+        width: 95vw !important;
+        margin: 12px auto !important;
+        max-height: 90vh !important;
+      }
+      .modal-hdr {
+        padding: 12px 14px !important;
+      }
+      .modal-body {
+        padding: 14px 12px !important;
+      }
+      .tabs {
+        overflow-x: auto !important;
+        -webkit-overflow-scrolling: touch !important;
+        white-space: nowrap !important;
+        padding-bottom: 6px !important;
+        scrollbar-width: none !important;
+      }
+      .admin-search-input {
+        min-width: 100% !important;
+      }
+      .user-table th,
+      .user-table td {
+        padding: 8px 6px !important;
+        font-size: 0.74rem !important;
+      }
+    }
+
+    @media (max-width: 640px) {
+      header {
+        padding: 8px 10px !important;
+        gap: 8px !important;
+      }
+      .logo-box {
+        width: 32px !important;
+        height: 32px !important;
+        font-size: 1.1rem !important;
+      }
+      .logo-txt h1 {
+        font-size: 1.05rem !important;
+      }
+      .logo-txt p {
+        display: none !important;
+      }
+      .mode-tabs {
+        display: grid !important;
+        grid-template-columns: 1fr 1fr !important;
+        gap: 8px !important;
+      }
+      .mode-tab {
+        width: 100% !important;
+        padding: 9px 6px !important;
+        font-size: 0.78rem !important;
+        justify-content: center !important;
+        text-align: center !important;
+      }
+      .leads-ta {
+        height: 160px !important;
+        font-size: 16px !important;
+      }
+      .dropzone {
+        padding: 20px 10px !important;
+      }
+      .lead-row {
+        flex-direction: column !important;
+        align-items: stretch !important;
+      }
+      .lr-status {
+        width: 100% !important;
+        justify-content: flex-end !important;
+      }
+    }
+
+    @media (max-width: 380px) {
+      .mode-tabs {
+        grid-template-columns: 1fr !important;
+      }
+      .jdh-actions {
+        grid-template-columns: 1fr 1fr !important;
+      }
+    }
+
+    /* Search Mode Selector */
+    .mode-tabs {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+    }
+
+    .mode-tab {
+      background: var(--s2);
+      border: 1px solid var(--bd);
+      color: var(--mt);
+      padding: 8px 14px;
+      border-radius: 8px;
+      font-size: .8rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: .2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .mode-tab:hover {
+      border-color: var(--ac);
+      color: #fff;
+    }
+
+    .mode-tab.active {
+      background: linear-gradient(135deg, rgba(124, 58, 237, .35), rgba(167, 139, 250, .2));
+      border-color: var(--ac);
+      color: #fff;
+      box-shadow: 0 2px 10px rgba(124, 58, 237, .25);
+    }
+
+    /* Frozen Mode */
+    .frozen-blur {
+      filter: blur(5px);
+      pointer-events: none;
+      user-select: none;
+    }
+
+    .frozen-btn-disabled {
+      opacity: 0.4 !important;
+      cursor: not-allowed !important;
+      pointer-events: none !important;
+    }
+
+    /* ── Back to Top Floating Button ──────────────────────── */
+    .back-to-top-btn {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      z-index: 1000;
+      background: rgba(30, 41, 59, 0.94);
+      border: 1px solid var(--ac);
+      color: #fff;
+      padding: 9px 16px;
+      border-radius: 30px;
+      font-size: 0.82rem;
+      font-weight: 700;
+      display: none;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(8px);
+      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .back-to-top-btn:hover {
+      background: var(--ac);
+      color: #fff;
+      transform: translateY(-3px);
+      box-shadow: 0 12px 28px rgba(124, 58, 237, 0.45);
+      border-color: #a78bfa;
+    }
+
+    .back-to-top-btn.visible {
+      display: inline-flex;
+      animation: fadeInBtt 0.25s ease forwards;
+    }
+
+    @keyframes fadeInBtt {
+      from { opacity: 0; transform: translateY(12px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  
+    /* Mobile Sidebar Overlay Backdrop */
+    .mobile-sidebar-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(4, 6, 15, 0.78);
+      backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
+      z-index: 950;
+      transition: opacity 0.25s ease;
+    }
+    .mobile-sidebar-overlay.active {
+      display: block;
+    }
+
+
+    /* Mobile Right Action Menu Toggle */
+    .mobile-actions-toggle-btn {
+      display: none;
+      background: var(--s2);
+      border: 1px solid var(--bd);
+      color: #fff;
+      font-size: 1.25rem;
+      width: 36px;
+      height: 36px;
+      border-radius: 9px;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      margin-left: auto;
+      flex-shrink: 0;
+      transition: all 0.2s;
+    }
+    .mobile-actions-toggle-btn:hover {
+      border-color: var(--ac);
+      background: var(--s);
+    }
+
+</style>
+</head>
+
+<body>
+
+  <!-- Header -->
+  <header>
+    <button class="mobile-menu-btn" onclick="toggleSidebar()">☰</button>
+    <div class="logo" onclick="showNewPanel()">
+      <div class="logo-box">⚡</div>
+      <div class="logo-txt">
+        <h1>LeadsOSINT</h1>
+        <p>Private Intelligence Edition</p>
+      </div>
+    </div>
+
+    <div class="hdr-user-info">
+      <div class="plan-pill" id="plan-pill">⭐ Loading...</div>
+      <div class="timer-pill" id="timer-pill">⏱ Calculating...</div>
+      <div class="quota-pill" id="quota-pill">📊 Quota: --</div>
+    </div>
+
+    <div class="hdr-right">
+      <button class="new-job-btn" id="hdr-new-job-btn" onclick="showNewPanel()">+ New Job</button>
+      <button class="hdr-btn" onclick="openMessagesModal()">
+        💬 Messages <span class="badge-num" id="msg-badge" style="display:none">0</span>
+      </button>
+      <button class="hdr-btn" onclick="openSupportModal()" id="btn-support" title="Contact Customer Support">
+        🎧 Support
+      </button>
+      <button class="hdr-btn" onclick="openTutorialModal()">📘 Guide</button>
+      <button class="hdr-btn admin-btn" id="admin-panel-btn" onclick="openAdminModal()" style="display:none">
+        ⚙️ Admin Center
+      </button>
+      <a href="/api/auth/logout" class="hdr-btn logout-btn" title="Sign out">🚪 Logout</a>
+    </div>
+    <button class="mobile-actions-toggle-btn" id="mobile-actions-toggle" onclick="toggleActionsMenu()" title="Open Navigation Menu">☰</button>
+  </header>
+
+  <!-- Approaching Limit Warning Banner -->
+  <div id="approaching-limit-banner"
+    style="display:none;background:linear-gradient(90deg,#78350f,#b45309);color:#fef3c7;padding:10px 20px;font-size:0.85rem;font-weight:600;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(251,191,36,0.3)">
+    <div style="display:flex;align-items:center;gap:8px">
+      <span>⚠️</span>
+      <span id="approaching-msg">Approaching Plan Limit: Less than 1 hour remaining or 85% of leads quota consumed.
+        Renew to avoid disruption.</span>
+    </div>
+    <a id="approaching-wa-btn" href="#" target="_blank"
+      style="background:#25d366;color:#fff;padding:5px 12px;border-radius:6px;text-decoration:none;font-size:0.78rem;font-weight:700">💬
+      Renew via WhatsApp</a>
+  </div>
+
+  <!-- Frozen Account Alert Banner -->
+  <div id="frozen-alert-banner"
+    style="display:none;background:linear-gradient(90deg,#7f1d1d,#991b1b);color:#fee2e2;padding:12px 20px;font-size:0.88rem;font-weight:700;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(248,113,113,0.4)">
+    <div style="display:flex;align-items:center;gap:10px">
+      <span style="font-size:1.3rem">🔒</span>
+      <div>
+        <div>ACCOUNT FROZEN: Subscription expired or plan lead limit reached.</div>
+        <div style="font-size:0.75rem;font-weight:400;color:#fca5a5;margin-top:2px">All past jobs and results are 100%
+          saved in your vault. Renew your plan to unfreeze and unlock full functionality.</div>
+      </div>
+    </div>
+    <a id="frozen-wa-btn" href="#" target="_blank"
+      style="background:#25d366;color:#fff;padding:8px 16px;border-radius:8px;text-decoration:none;font-size:0.82rem;font-weight:700;display:inline-flex;align-items:center;gap:6px">💬
+      Contact Admin to Renew</a>
+  </div>
+
+  <!-- Layout -->
+    <div id="mobile-sidebar-overlay" class="mobile-sidebar-overlay" onclick="closeAllDrawers()"></div>
+  <div class="layout">
+
+    <!-- Sidebar -->
+    <div class="sidebar" id="sidebar">
+      <div class="sb-hdr">
+        <div style="display:flex;align-items:center;gap:6px">
+          <span>Jobs</span>
+          <span id="sb-count" style="color:var(--mt);font-size:.7rem">0</span>
+        </div>
+        <button type="button" class="sb-toggle-btn" id="sb-toggle-btn" onclick="toggleSidebarDesktop()"
+          title="Collapse Jobs Sidebar">◀</button>
+      </div>
+      <div class="sb-search-wrap">
+        <input type="text" id="job-search" class="sb-search-input" placeholder="Search jobs…"
+          oninput="filterJobs(this.value)">
+        <button class="sb-search-clear" id="search-clear-btn" onclick="clearJobSearch()" style="display:none">✕</button>
+      </div>
+      <div class="sb-jobs" id="sb-jobs">
+        <div class="sb-empty">No jobs yet.<br>Click <strong>+ New Job</strong> to start.</div>
+      </div>
+    </div>
+
+    <!-- Main Area -->
+    <div class="main" id="main-area" onclick="closeAllDrawers()">
+      <button type="button" class="sb-expand-floating" id="sb-expand-floating" onclick="toggleSidebarDesktop()"
+        title="Expand Jobs Sidebar">
+        <span>▶</span> <span>Jobs Vault</span>
+      </button>
+
+      <!-- New Job Panel -->
+      <div id="panel-new" style="display:block">
+        <div class="panel-title">📋 Create New Search Job</div>
+
+        <div class="field-label">Search Mode</div>
+        <div class="mode-tabs">
+          <button type="button" class="mode-tab active" id="mode-tab-name" onclick="setSearchMode('name', this)">👤 Name
+            &amp; Location</button>
+          <button type="button" class="mode-tab" id="mode-tab-phone" onclick="setSearchMode('phone', this)">📞 Phone
+            Number</button>
+          <button type="button" class="mode-tab" id="mode-tab-email" onclick="setSearchMode('email', this)">✉️ Email
+            Address</button>
+          <button type="button" class="mode-tab" id="mode-tab-address" onclick="setSearchMode('address', this)">📍
+            Street Address</button>
+        </div>
+
+        <div class="field-label">Job Name <span style="color:var(--rd)">* </span></div>
+        <input type="text" class="job-name-input" id="new-job-name" name="job_title_input" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" required
+          placeholder="e.g. Outreach Batch — North Carolina">
+
+        <div class="tabs" style="align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px">
+          <div style="display:flex;gap:10px">
+            <div class="tab active" onclick="switchTab('paste')">📋 Paste Leads</div>
+            <div class="tab" onclick="switchTab('upload')">📂 Upload CSV</div>
+          </div>
+          <div style="font-size:0.75rem;color:var(--mt);display:inline-flex;align-items:center;gap:6px" title="Single batch limit: Maximum 500 leads per run. Run larger datasets in separate batches.">
+            <span>⚡ Max Batch:</span>
+            <span style="background:var(--s2);border:1px solid var(--bd);color:var(--ac);font-weight:700;padding:2px 8px;border-radius:10px">500 leads</span>
+          </div>
+        </div>
+        <div class="tab-panels">
+          <div class="tab-pane active" id="tab-paste">
+            <textarea class="leads-ta" id="leads-text" oninput="updatePasteCounter()"
+              placeholder="One lead per line:&#10;&#10;John Smith, Winston Salem&#10;Judith Markoe, Logan Circle&#10;Jane Doe, 1515 Q St NW, Washington DC&#10;Bob Johnson, Miami FL&#10;Sarah Connor, 27101"></textarea>
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-top:6px;font-size:0.75rem">
+              <span style="color:var(--mt)">One lead per line</span>
+              <span id="paste-lead-count" style="font-weight:700;color:var(--mt)">0 / 500 leads</span>
+            </div>
+            <div class="hint" id="mode-hint" style="margin-top:10px">
+              <strong>Supported Formats:</strong> &nbsp;
+              <code>Name, Location, Email, Phone</code><br>
+              ✨ <strong>Smart Location Resolver:</strong> Areas like <em>"Winston Salem"</em> or <em>"Logan Circle"</em>
+              and street addresses are automatically converted to valid City, State!
+            </div>
+          </div>
+          <div class="tab-pane" id="tab-upload">
+            <div class="dropzone" id="dropzone">
+              <input type="file" id="csv-file" accept=".csv,.txt" onchange="fileChosen(this)">
+              <div class="dz-icon">📂</div>
+              <div class="dz-title">Drop CSV here or click to browse</div>
+              <div class="dz-sub">.csv or .txt · Name, Location per row (Max 500 leads)</div>
+              <div class="dz-file" id="dz-filename">No file selected</div>
+            </div>
+            <div id="dz-count-pill"
+              style="display:none;margin-top:10px;padding:8px 12px;border-radius:8px;font-size:0.8rem;line-height:1.4">
+            </div>
+            <div class="hint" style="margin-top:14px">
+              <strong>Supported CSV Columns:</strong>&nbsp;
+              <code>First Name</code>&nbsp;·&nbsp;
+              <code>Last Name</code>&nbsp;·&nbsp;
+              <code>Name</code>&nbsp;·&nbsp;
+              <code>Location</code>&nbsp;·&nbsp;
+              <code>City</code>&nbsp;·&nbsp;
+              <code>State</code>&nbsp;·&nbsp;
+              <code>Phone</code>&nbsp;·&nbsp;
+              <code>Email</code>
+            </div>
+          </div>
+        </div>
+
+        <div class="err-msg" id="create-err"></div>
+
+        <button class="create-btn" id="create-btn" onclick="createJob()">
+          🚀 Create Job &amp; Start Processing
+        </button>
+      </div>
+
+      <!-- Job Detail Panel -->
+      <div id="panel-job">
+        <div class="job-detail-hdr">
+          <div class="jdh-top">
+            <input type="text" class="job-title-edit" id="job-title-edit" placeholder="Job name..."
+              onblur="renameJob()">
+            <div class="jdh-actions">
+              <button class="act-btn share-btn" id="btn-share" onclick="shareCurrentJob()">🔗 Share Result</button>
+              <button class="act-btn primary" id="btn-start-all" onclick="startAll()" style="display:none">▶ Start
+                All</button>
+              <button class="act-btn primary" id="btn-redo-all" onclick="redoAll()" style="display:none">🔄 Re-do
+                All</button>
+              <button class="act-btn" id="btn-pause" onclick="pauseJob()" style="display:none">⏸ Pause</button>
+              <button class="act-btn" id="btn-resume" onclick="resumeJob()" style="display:none">▶ Resume</button>
+              <button class="act-btn success" id="btn-retry-failed" onclick="retryFailed()" style="display:none">⚡ Retry
+                Failed</button>
+              <button class="act-btn danger" id="btn-cancel-all" onclick="cancelAll()" style="display:none">✕
+                Cancel</button>
+              <button class="act-btn success" id="btn-open-report" onclick="openReport()" style="display:none">📊 Open
+                Report</button>
+              <button class="act-btn danger" id="btn-delete" onclick="deleteJob()">🗑 Delete</button>
+            </div>
+          </div>
+          <div class="job-meta" id="job-meta"></div>
+        </div>
+
+        <div class="job-progress" id="job-progress">
+          <div class="prog-bar-wrap">
+            <div class="prog-bar" id="prog-bar"></div>
+          </div>
+          <div class="prog-info">
+            <span id="prog-current">Ready</span>
+            <span id="prog-count">0 / 0</span>
+          </div>
+        </div>
+
+        <div class="leads-area">
+          <div class="leads-hdr">
+            <div class="leads-title" id="leads-title">Leads</div>
+          </div>
+          <div id="leads-list"></div>
+        </div>
+
+        <!-- Live Logs Console (Only visible to Admin) -->
+        <div class="logs-console-wrap" id="logs-console-wrap">
+          <div class="logs-hdr">
+            <div class="logs-title">💻 Live Execution Logs (Admin Only)</div>
+            <div class="logs-actions">
+              <button class="logs-btn" onclick="clearLogsUI()">Clear</button>
+              <button class="logs-btn" id="logs-toggle-btn" onclick="toggleLogsUI()">Collapse</button>
+            </div>
+          </div>
+          <div class="logs-body" id="logs-body">
+            <div class="log-entry log-INFO">[00:00:00] [INFO] Live log console initialized.</div>
+          </div>
+        </div>
+
+      </div>
+
+    </div><!-- /main -->
+  </div><!-- /layout -->
+
+  <!-- Modals -->
+
+  <!-- 1. Admin Control Center Modal -->
+  <div class="modal-overlay" id="admin-modal" onclick="if(event.target===this)closeModal('admin-modal')">
+    <div class="modal-box" style="max-width:850px">
+      <div class="modal-hdr">
+        <h3>⚙️ Admin Control Center</h3>
+        <span class="modal-close" onclick="closeModal('admin-modal')">✕</span>
+      </div>
+      <div class="modal-body">
+        <div class="tabs">
+          <div class="tab active" onclick="switchAdminTab('users')">👥 User Accounts</div>
+          <div class="tab" onclick="switchAdminTab('customer-jobs')">📁 Customer Jobs</div>
+          <div class="tab" onclick="switchAdminTab('new-user')">➕ Create User</div>
+          <div class="tab" onclick="switchAdminTab('broadcast')">📢 Broadcast Message</div>
+          <div class="tab" onclick="switchAdminTab('support')">⚙️ Support Channels</div>
+          <div class="tab" onclick="switchAdminTab('security')">🔐 Admin Security</div>
+        </div>
+
+        <!-- Users Tab -->
+        <div id="admin-tab-users" class="tab-pane active">
+          <div
+            style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;gap:10px;flex-wrap:wrap">
+            <input type="text" id="admin-user-search" class="admin-search-input"
+              placeholder="🔍 Search users by username, access key, status..." oninput="filterAdminUsersTable()"
+              style="flex:1;min-width:220px;background:var(--s2);border:1px solid var(--bd);color:#fff;padding:8px 14px;border-radius:8px;font-size:.85rem;outline:none">
+            <div style="display:flex;gap:8px;align-items:center">
+              <span id="admin-user-count"
+                style="font-size:0.75rem;color:var(--mt);font-weight:700;background:var(--s2);padding:4px 10px;border-radius:12px;border:1px solid var(--bd)">--
+                users</span>
+              <button class="act-btn" onclick="loadAdminUsers()">🔄 Refresh</button>
+            </div>
+          </div>
+          <div style="overflow-x:auto;-webkit-overflow-scrolling:touch">
+            <table class="user-table">
+              <thead>
+                <tr>
+                  <th>User</th>
+                  <th>Access Key</th>
+                  <th>Allocated</th>
+                  <th>Used</th>
+                  <th>Remaining</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="admin-users-tbody">
+                <tr>
+                  <td colspan="7" style="text-align:center">Loading...</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Customer Jobs Tab -->
+        <div id="admin-tab-customer-jobs" class="tab-pane">
+          <div
+            style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;gap:10px;flex-wrap:wrap">
+            <input type="text" id="admin-job-search" class="admin-search-input"
+              placeholder="🔍 Search customer jobs by name, customer, ID, status..." oninput="filterAdminJobsTable()"
+              style="flex:1;min-width:220px;background:var(--s2);border:1px solid var(--bd);color:#fff;padding:8px 14px;border-radius:8px;font-size:.85rem;outline:none">
+            <div style="display:flex;gap:8px;align-items:center">
+              <span id="admin-job-count"
+                style="font-size:0.75rem;color:var(--mt);font-weight:700;background:var(--s2);padding:4px 10px;border-radius:12px;border:1px solid var(--bd)">--
+                jobs</span>
+              <button class="act-btn" onclick="loadAdminCustomerJobs()">🔄 Refresh</button>
+            </div>
+          </div>
+          <div style="overflow-x:auto;-webkit-overflow-scrolling:touch">
+            <table class="user-table">
+              <thead>
+                <tr>
+                  <th>Job Name</th>
+                  <th>Customer</th>
+                  <th>Progress</th>
+                  <th>Status</th>
+                  <th>Created</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody id="admin-jobs-tbody">
+                <tr>
+                  <td colspan="6" style="text-align:center">Loading customer jobs...</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Create User Tab -->
+        <div id="admin-tab-new-user" class="tab-pane">
+          <form id="new-user-form" onsubmit="submitNewUser(event)">
+            <div class="form-row">
+              <label>Username</label>
+              <input type="text" id="nu-username" required placeholder="customer_username">
+            </div>
+            <div class="form-row">
+              <label>Access Key / Password</label>
+              <div style="position:relative;display:flex;align-items:center">
+                <input type="password" id="nu-password" required placeholder="Customer password / access key"
+                  style="padding-right:40px">
+                <button type="button" onclick="toggleNewUserPwVisibility()" id="nu-pw-btn"
+                  style="position:absolute;right:10px;background:none;border:none;cursor:pointer;font-size:1.1rem;color:var(--mt)"
+                  title="Toggle Password">👁️</button>
+              </div>
+            </div>
+            <div class="form-row">
+              <label>Paid Lead Allowance (Quick Presets)</label>
+              <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px">
+                <button type="button" class="act-btn primary" onclick="selectLeadPreset(50, this)">50 Leads</button>
+                <button type="button" class="act-btn" onclick="selectLeadPreset(100, this)">100 Leads</button>
+                <button type="button" class="act-btn" onclick="selectLeadPreset(150, this)">150 Leads</button>
+                <button type="button" class="act-btn" onclick="selectLeadPreset(200, this)">200 Leads</button>
+                <button type="button" class="act-btn" onclick="selectLeadPreset(250, this)">250 Leads</button>
+                <button type="button" class="act-btn" onclick="selectLeadPreset(500, this)">500 Leads</button>
+                <button type="button" class="act-btn" onclick="selectLeadPreset(1000, this)">1,000 Leads</button>
+              </div>
+              <label style="font-size:0.75rem;color:var(--mt)">Or enter exact custom lead count:</label>
+              <input type="number" id="nu-leads" min="1" value="50" required
+                placeholder="e.g. 50, 75, 100, 150, 300, 1000">
+            </div>
+            <button type="submit" class="create-btn" style="margin-top:10px">Create User Account</button>
+          </form>
+        </div>
+
+        <!-- Broadcast Tab -->
+        <div id="admin-tab-broadcast" class="tab-pane">
+          <div class="form-row">
+            <label>Recipient</label>
+            <select id="bc-receiver">
+              <option value="0">📢 Broadcast to All Users</option>
+            </select>
+          </div>
+          <div class="form-row">
+            <label>Message Content</label>
+            <textarea id="bc-content" rows="4"
+              placeholder="Important announcement, maintenance notice, renewal info..."></textarea>
+          </div>
+          <button class="create-btn" onclick="sendAdminMessage()">Send Announcement</button>
+        </div>
+
+        <!-- Support Channels Tab -->
+        <div id="admin-tab-support" class="tab-pane">
+          <div style="background:var(--s2);border:1px solid var(--bd);border-radius:12px;padding:22px;max-width:620px;margin:0 auto">
+            <h4 style="color:#fff;margin-bottom:8px">⚙️ Customer Support Channels Configuration</h4>
+            <p style="color:var(--mt);font-size:0.85rem;margin-bottom:18px;line-height:1.5">
+              Configure support channels for your users. In-App Messaging is always available. You can enable or disable WhatsApp Live Chat support at any time.
+            </p>
+            
+            <div style="margin-bottom:18px;display:flex;align-items:center;gap:12px;background:rgba(255,255,255,0.03);padding:14px 18px;border-radius:10px;border:1px solid var(--bd)">
+              <input type="checkbox" id="admin-support-wa-toggle" style="width:20px;height:20px;cursor:pointer">
+              <label for="admin-support-wa-toggle" style="color:#fff;font-weight:700;font-size:0.92rem;cursor:pointer">
+                Enable WhatsApp Support for Users
+              </label>
+            </div>
+
+            <div class="form-row">
+              <label>WhatsApp Phone Number or Direct URL</label>
+              <input type="text" id="admin-support-wa-input" placeholder="e.g. +1234567890 or WhatsApp custom link" style="width:100%">
+              <small style="color:var(--mt);font-size:0.75rem;margin-top:5px;display:block">
+                Enter your WhatsApp number with country code. If left blank, the system default support link will be used.
+              </small>
+            </div>
+
+            <button type="button" class="act-btn primary" style="width:100%;margin-top:16px;padding:10px" onclick="saveAdminSupportSettings()">
+              💾 Save Support Settings
+            </button>
+          </div>
+        </div>
+
+        <!-- Admin Security Tab -->
+        <div id="admin-tab-security" class="tab-pane">
+          <div style="background:var(--s2);border:1px solid var(--bd);border-radius:12px;padding:22px;max-width:620px;margin:0 auto">
+            <h4 style="color:#fff;margin-bottom:8px">🔐 Admin Account Credentials</h4>
+            <p style="color:var(--mt);font-size:0.85rem;margin-bottom:18px;line-height:1.5">
+              Change your Admin username or password. Your current password is required for security verification.
+            </p>
+
+            <div class="form-row">
+              <label>Current Admin Password *</label>
+              <div style="position:relative;display:flex;align-items:center">
+                <input type="password" id="admin-sec-curr-pw" placeholder="Enter current admin password" style="width:100%;padding-right:40px">
+                <button type="button" onclick="togglePasswordVisibility('admin-sec-curr-pw', this)"
+                  style="position:absolute;right:10px;background:none;border:none;cursor:pointer;font-size:1.1rem;color:var(--mt)"
+                  title="Toggle Password">👁️</button>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <label>New Admin Username (Leave blank to keep current)</label>
+              <input type="text" id="admin-sec-username" placeholder="e.g. admin or custom username" style="width:100%">
+            </div>
+
+            <div class="form-row">
+              <label>New Admin Password</label>
+              <div style="position:relative;display:flex;align-items:center">
+                <input type="password" id="admin-sec-new-pw" placeholder="Enter new strong password" style="width:100%;padding-right:40px">
+                <button type="button" onclick="togglePasswordVisibility('admin-sec-new-pw', this)"
+                  style="position:absolute;right:10px;background:none;border:none;cursor:pointer;font-size:1.1rem;color:var(--mt)"
+                  title="Toggle Password">👁️</button>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <label>Confirm New Password</label>
+              <div style="position:relative;display:flex;align-items:center">
+                <input type="password" id="admin-sec-confirm-pw" placeholder="Re-enter new password" style="width:100%;padding-right:40px">
+                <button type="button" onclick="togglePasswordVisibility('admin-sec-confirm-pw', this)"
+                  style="position:absolute;right:10px;background:none;border:none;cursor:pointer;font-size:1.1rem;color:var(--mt)"
+                  title="Toggle Password">👁️</button>
+              </div>
+            </div>
+
+            <button type="button" class="act-btn primary" style="width:100%;margin-top:16px;padding:10px" onclick="updateAdminCredentials()">
+              🔒 Update Admin Credentials
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 1b. Customer Job Inspect Modal -->
+  <div class="modal-overlay" id="job-inspect-modal" onclick="if(event.target===this)closeModal('job-inspect-modal')">
+    <div class="modal-box" style="max-width:800px">
+      <div class="modal-hdr">
+        <h3 id="inspect-job-title">🔍 Customer Job Inspection</h3>
+        <span class="modal-close" onclick="closeModal('job-inspect-modal')">✕</span>
+      </div>
+      <div class="modal-body">
+        <div
+          style="display:flex;justify-content:space-between;align-items:center;background:var(--s2);padding:14px 18px;border-radius:10px;border:1px solid var(--bd);margin-bottom:18px;flex-wrap:wrap;gap:10px">
+          <div>
+            <div style="font-size:0.75rem;color:var(--mt)">CUSTOMER &amp; JOB ID</div>
+            <div style="font-weight:700;color:var(--ac);font-size:0.95rem" id="inspect-owner">@customer · ID: --------
+            </div>
+          </div>
+          <div>
+            <div style="font-size:0.75rem;color:var(--mt)">PROGRESS</div>
+            <div style="font-weight:700;color:#fff;font-size:0.95rem" id="inspect-progress">0 / 0 Leads</div>
+          </div>
+          <div>
+            <div style="font-size:0.75rem;color:var(--mt)">STATUS</div>
+            <div id="inspect-status-badge"><span class="lrs-queued">QUEUED</span></div>
+          </div>
+          <div>
+            <a id="inspect-report-btn" href="#" target="_blank" class="act-btn success"
+              style="text-decoration:none;display:inline-flex;align-items:center;gap:6px">📊 View Full Report</a>
+          </div>
+        </div>
+        <div class="field-label">Search Records in this Job</div>
+        <div id="inspect-leads-list"
+          style="max-height:360px;overflow-y:auto;display:flex;flex-direction:column;gap:8px">
+          <div style="color:var(--mt);font-size:0.85rem">Loading records...</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2. Messages Modal -->
+  <div class="modal-overlay" id="messages-modal" onclick="if(event.target===this)closeModal('messages-modal')">
+    <div class="modal-box">
+      <div class="modal-hdr">
+        <div style="display:flex;align-items:center;gap:10px">
+          <h3>💬 Notifications &amp; Messages</h3>
+          <span class="badge-num" id="modal-msg-unread-count" style="display:none;background:var(--ac);font-size:0.75rem">0</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <button type="button" class="act-btn" id="btn-mark-all-read" style="padding:4px 10px;font-size:0.75rem;background:var(--s2);border:1px solid var(--bd);color:var(--ac);cursor:pointer;border-radius:6px" onclick="markAllMessagesRead()" title="Mark all messages as read">✓ Mark All Read</button>
+          <span class="modal-close" onclick="closeModal('messages-modal')">✕</span>
+        </div>
+      </div>
+      <div class="modal-body">
+        <div id="messages-list" style="margin-bottom:18px;max-height:280px;overflow-y:auto">
+          <div style="color:var(--mt);font-size:.85rem">No messages yet.</div>
+        </div>
+        <div class="form-row">
+          <label>Message Admin</label>
+          <textarea id="user-reply-content" rows="3"
+            placeholder="Need renewal, support, or extra leads? Type here..."></textarea>
+        </div>
+        <button class="act-btn primary" style="width:100%" onclick="sendUserMessage()">Send to Admin</button>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- Customer Support Modal -->
+  <div class="modal-overlay" id="support-modal" onclick="if(event.target===this)closeModal('support-modal')">
+    <div class="modal-box" style="max-width:520px">
+      <div class="modal-hdr">
+        <h3>🎧 Contact Customer Support</h3>
+        <span class="modal-close" onclick="closeModal('support-modal')">✕</span>
+      </div>
+      <div class="modal-body">
+        <p style="color:var(--mt);font-size:0.88rem;margin-bottom:18px;line-height:1.5">
+          Have questions, need extra lead credits, custom bulk plans, or technical assistance? Choose your preferred channel to connect with our support team:
+        </p>
+
+        <!-- Channel 1: In-App Message (Always active) -->
+        <div style="background:var(--s2);border:1px solid var(--bd);border-radius:12px;padding:16px;margin-bottom:14px;display:flex;align-items:center;justify-content:space-between;gap:12px">
+          <div>
+            <div style="font-weight:700;color:#fff;font-size:0.95rem;display:flex;align-items:center;gap:6px">
+              💬 In-App Direct Message
+            </div>
+            <div style="color:var(--mt);font-size:0.8rem;margin-top:3px">Send a message directly to Admin inside LeadsOSINT</div>
+          </div>
+          <button type="button" class="act-btn primary" style="flex-shrink:0;padding:8px 14px;font-size:0.8rem" onclick="closeModal('support-modal'); openMessagesModal();">
+            Open Chat
+          </button>
+        </div>
+
+        <!-- Channel 2: WhatsApp Support (Toggle controlled by Admin) -->
+        <div id="support-wa-card" style="background:var(--s2);border:1px solid var(--bd);border-radius:12px;padding:16px;margin-bottom:14px;display:flex;align-items:center;justify-content:space-between;gap:12px">
+          <div>
+            <div style="font-weight:700;color:#34d399;font-size:0.95rem;display:flex;align-items:center;gap:6px">
+              📱 WhatsApp Live Support
+            </div>
+            <div id="support-wa-status" style="color:var(--mt);font-size:0.8rem;margin-top:3px">Connect on WhatsApp for real-time priority support</div>
+          </div>
+          <a id="support-wa-btn" href="#" target="_blank" class="act-btn" style="background:#25d366;color:#fff;text-decoration:none;font-weight:700;flex-shrink:0;padding:8px 14px;font-size:0.8rem;display:inline-flex;align-items:center;gap:4px">
+            Chat on WhatsApp
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3. Guide & Tutorial Modal -->
+  <div class="modal-overlay" id="tutorial-modal" onclick="if(event.target===this)closeModal('tutorial-modal')">
+    <div class="modal-box" style="max-width:700px">
+      <div class="modal-hdr">
+        <h3>📘 LeadsOSINT User Guide &amp; Tutorial</h3>
+        <span class="modal-close" onclick="closeModal('tutorial-modal')">✕</span>
+      </div>
+      <div class="modal-body" style="font-size:.88rem;line-height:1.7;color:#cbd5e1">
+        <h4 style="color:#fff;margin-bottom:6px">1. How to Format Your Search Input</h4>
+        <p style="margin-bottom:12px">Select your search mode (Name, Phone, Email, or Address), then enter leads one per
+          line or upload a CSV file:</p>
+        <ul style="margin-left:20px;margin-bottom:16px">
+          <li><code>John Doe, New York NY</code> — standard City, State.</li>
+          <li><code>Judith Markoe, Logan Circle</code> — neighborhood name (auto-translates to Washington, DC).</li>
+          <li><code>John Smith, Winston Salem</code> — major city without state (auto-translates to Winston-Salem, NC).
+          </li>
+          <li><code>Sarah Connor, 1515 Q St NW, Washington DC</code> — street addresses are auto-cleaned.</li>
+          <li><code>Mike Brown, 27101</code> — direct 5-digit ZIP code.</li>
+        </ul>
+
+        <h4 style="color:#fff;margin-bottom:6px">2. "FREE Background Report" Narrative &amp; 1-Click Copy</h4>
+        <p style="margin-bottom:12px">Every person profile card automatically extracts the full public background
+          narrative, including exact birth month/year, move-in timelines, relatives with ages, carrier names, and
+          previous addresses. Use the purple <strong>📋 Copy Report Text</strong> button to copy the entire story into
+          your clipboard in 1 click.</p>
+
+        <h4 style="color:#fff;margin-bottom:6px">3. Sharing Results</h4>
+        <p style="margin-bottom:12px">Click the <strong>🔗 Share</strong> button on any job or result page to generate a
+          secure read-only link. Shared links remain active while your account is in good standing and automatically freeze if your account is paused or leads are depleted.</p>
+
+        <h4 style="color:#fff;margin-bottom:6px">4. Plan Quotas &amp; Limits</h4>
+        <p>Jobs respect your assigned plan tier limits. To upgrade your plan or extend your subscription duration,
+          contact your Administrator directly via the <strong>💬 Messages</strong> tab.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- 4. Share Link Modal -->
+  <div class="modal-overlay" id="share-link-modal" onclick="if(event.target===this)closeModal('share-link-modal')">
+    <div class="modal-box" style="max-width:480px">
+      <div class="modal-hdr">
+        <h3>🔗 Share Result Link</h3>
+        <span class="modal-close" onclick="closeModal('share-link-modal')">✕</span>
+      </div>
+      <div class="modal-body">
+        <p style="color:var(--mt);font-size:.85rem;margin-bottom:14px">Anyone with this link can view these results in
+          read-only mode.<br><strong style="color:var(--ac)">⚡ Active while account is in good standing. Automatically freezes if account is paused or leads are depleted.</strong></p>
+        <div style="display:flex;gap:8px;margin-bottom:16px">
+          <input type="text" id="share-link-input" readonly
+            style="flex:1;background:var(--s2);border:1px solid var(--bd);border-radius:8px;padding:9px 12px;color:#fff;font-size:.85rem">
+          <button class="act-btn primary" onclick="copyShareModalLink()">Copy</button>
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <a id="sh-wa" href="#" target="_blank" class="act-btn"
+            style="flex:1;text-align:center;background:#16a34a;color:#fff;border:none">📱 WhatsApp</a>
+          <a id="sh-tg" href="#" target="_blank" class="act-btn"
+            style="flex:1;text-align:center;background:#0284c7;color:#fff;border:none">✈️ Telegram</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div class="toast" id="toast"></div>
+
+  <script>
+    let currentJobId = null;
+    let currentJob = null;
+    let pollTimer = null;
+    let currentUser = null;
+    let countdownInterval = null;
+
+    // ── Mobile Sidebar ─────────────────────────────────────
+    
+    function toggleSidebar() {
+      const sb = document.getElementById('sidebar');
+      const overlay = document.getElementById('mobile-sidebar-overlay');
+      const btn = document.querySelector('.mobile-menu-btn');
+      closeActionsMenu();
+      const isOpen = sb.classList.toggle('open');
+      if (overlay) overlay.classList.toggle('active', isOpen);
+      if (btn) btn.textContent = isOpen ? '✕' : '☰';
+    }
+
+    function toggleActionsMenu() {
+      const hr = document.getElementById('hdr-right');
+      const overlay = document.getElementById('mobile-sidebar-overlay');
+      const btn = document.getElementById('mobile-actions-toggle');
+      closeSidebarOnMobile();
+      const isOpen = hr.classList.toggle('open');
+      if (overlay) overlay.classList.toggle('active', isOpen);
+      if (btn) btn.textContent = isOpen ? '✕' : '☰';
+    }
+
+    function closeSidebarOnMobile() {
+      const sb = document.getElementById('sidebar');
+      const btn = document.querySelector('.mobile-menu-btn');
+      if (sb) sb.classList.remove('open');
+      if (btn) btn.textContent = '☰';
+      checkOverlayActive();
+    }
+
+    function closeActionsMenu() {
+      const hr = document.getElementById('hdr-right');
+      const btn = document.getElementById('mobile-actions-toggle');
+      if (hr) hr.classList.remove('open');
+      if (btn) btn.textContent = '☰';
+      checkOverlayActive();
+    }
+
+    function closeAllDrawers() {
+      closeSidebarOnMobile();
+      closeActionsMenu();
+      const overlay = document.getElementById('mobile-sidebar-overlay');
+      if (overlay) overlay.classList.remove('active');
+    }
+
+    function checkOverlayActive() {
+      const sb = document.getElementById('sidebar');
+      const hr = document.getElementById('hdr-right');
+      const overlay = document.getElementById('mobile-sidebar-overlay');
+      const anyOpen = (sb && sb.classList.contains('open')) || (hr && hr.classList.contains('open'));
+      if (overlay) overlay.classList.toggle('active', anyOpen);
+    }
+
+
+    // ── Search Mode Selection ──────────────────────────────
+    let currentSearchMode = 'name';
+    function setSearchMode(mode, btn) {
+      currentSearchMode = mode;
+      document.querySelectorAll('.mode-tab').forEach(b => b.classList.remove('active'));
+      if (btn) btn.classList.add('active');
+      const ta = document.getElementById('leads-text');
+      const hint = document.getElementById('mode-hint');
+
+      if (mode === 'name') {
+        ta.placeholder = "One lead per line:\n\nJohn Smith, Winston Salem\nJudith Markoe, Logan Circle\nJane Doe, 1515 Q St NW, Washington DC\nBob Johnson, Miami FL\nSarah Connor, 27101";
+        hint.innerHTML = `<strong>Supported Formats:</strong> <code>Name, Location, Social Link, Email, Phone</code><br>✨ <strong>Smart Location Resolver:</strong> Areas like <em>"Winston Salem"</em> or <em>"Logan Circle"</em> and street addresses are automatically converted to valid City, State!`;
+      } else if (mode === 'phone') {
+        ta.placeholder = "One phone number per line:\n\n202-555-0193\n312-555-0144\n4155552671\n(704) 555-0182";
+        hint.innerHTML = `<strong>Phone Lookup Mode:</strong> Enter 10-digit US telephone numbers with or without dashes. System runs direct reverse phone intelligence.`;
+      } else if (mode === 'email') {
+        ta.placeholder = "One email address per line:\n\njohn.smith@example.com\njudy.markoe@domain.org\nsarah.c@gmail.com";
+        hint.innerHTML = `<strong>Email Lookup Mode:</strong> Enter email addresses. System traces associated registered identities and profiles.`;
+      } else if (mode === 'address') {
+        ta.placeholder = "One street address per line:\n\n1515 Q St NW, Washington DC\n742 Evergreen Terrace, Springfield OR\n350 5th Ave, New York NY";
+        hint.innerHTML = `<strong>Address Lookup Mode:</strong> Enter full street address and city/state to locate all current and historical residents.`;
+      }
+    }
+
+    // ── Modals Helper ──────────────────────────────────────
+    function openModal(id) {
+      const modal = document.getElementById(id);
+      if (modal) {
+        modal.classList.add('open');
+        const mb = modal.querySelector('.modal-body');
+        if (mb) {
+          mb.removeEventListener('scroll', checkScrollTopVisibility);
+          mb.addEventListener('scroll', checkScrollTopVisibility, { passive: true });
+        }
+      }
+      setTimeout(checkScrollTopVisibility, 50);
+    }
+    function closeModal(id) {
+      document.getElementById(id).classList.remove('open');
+      if (id === 'admin-modal') stopAdminLiveSync();
+      setTimeout(checkScrollTopVisibility, 50);
+    }
+
+    // ── User Bar & Countdown ───────────────────────────────
+    function renderUserBar(user) {
+      const planEl = document.getElementById('plan-pill');
+      if (planEl) {
+        if (user.role === 'admin') {
+          planEl.textContent = '🛡️ ADMIN (Unlimited)';
+          planEl.className = 'plan-pill plan-monthly';
+        } else {
+          planEl.textContent = `⭐ ${user.plan || (user.total_allocated + ' Leads')}`.toUpperCase();
+          planEl.className = 'plan-pill plan-weekly';
+        }
+      }
+
+      const balEl = document.getElementById('timer-pill');
+      if (balEl) {
+        if (user.role === 'admin') {
+          balEl.textContent = '⚡ Unlimited Leads';
+          balEl.className = 'timer-pill';
+        } else {
+          const rem = user.leads_remaining != null ? user.leads_remaining : Math.max(0, (user.total_allocated || 50) - (user.total_usage || 0));
+          if (rem > 0) {
+            balEl.textContent = `⚡ ${rem} / ${user.total_allocated || 50} Leads Left`;
+            balEl.className = 'timer-pill';
+          } else {
+            balEl.textContent = '🔒 0 Leads Left (Depleted)';
+            balEl.className = 'timer-pill expired';
+          }
+        }
+      }
+
+      const quotaEl = document.getElementById('quota-pill');
+      if (quotaEl) {
+        if (user.role === 'admin') {
+          quotaEl.textContent = '📊 Unlimited Quota';
+        } else {
+          quotaEl.textContent = `📊 Used: ${user.total_usage || 0} / ${user.total_allocated || 50} Leads`;
+        }
+      }
+
+      // Handle Approaching Limit Banner
+      const appBanner = document.getElementById('approaching-limit-banner');
+      const appBtn = document.getElementById('approaching-wa-btn');
+      const appMsg = document.getElementById('approaching-msg');
+      if (appBanner && user.is_approaching_limit && !user.is_frozen && user.role !== 'admin') {
+        appBanner.style.display = 'flex';
+        if (appMsg) appMsg.textContent = `Approaching Plan Limit: Only ${user.leads_remaining} leads remaining. Contact Admin on WhatsApp to top up your credits.`;
+        if (appBtn && user.whatsapp_url) appBtn.href = user.whatsapp_url;
+      } else if (appBanner) {
+        appBanner.style.display = 'none';
+      }
+
+      // Handle Frozen Account Banner & Action Locking
+      const frzBanner = document.getElementById('frozen-alert-banner');
+      const frzBtn = document.getElementById('frozen-wa-btn');
+      const createBtn = document.getElementById('create-btn');
+      const newJobBtn = document.getElementById('hdr-new-job-btn');
+      const jobPanel = document.getElementById('panel-job');
+
+      if (user.is_frozen && user.role !== 'admin') {
+        if (frzBanner) frzBanner.style.display = 'flex';
+        if (frzBtn && user.whatsapp_url) frzBtn.href = user.whatsapp_url;
+        if (createBtn) {
+          createBtn.disabled = true;
+          createBtn.textContent = '🔒 Account Frozen — Contact Admin to Top Up';
+        }
+        if (newJobBtn) newJobBtn.classList.add('frozen-btn-disabled');
+        if (jobPanel) jobPanel.classList.add('frozen-blur');
+      } else {
+        if (frzBanner) frzBanner.style.display = 'none';
+        if (createBtn && !createBtn.dataset.creating) {
+          createBtn.disabled = false;
+          createBtn.textContent = '🚀 Create Job & Start Processing';
+        }
+        if (newJobBtn) newJobBtn.classList.remove('frozen-btn-disabled');
+        if (jobPanel) jobPanel.classList.remove('frozen-blur');
+      }
+    }
+
+    function startCountdownTimer(secondsLeft) {
+      // Maintained for backward compatibility — Lead credit balance replaces timer
+    }
+
+    // ── User Profile & Auth ────────────────────────────────
+    async function fetchMe() {
+      try {
+        const res = await fetch('/api/auth/me');
+        if (res.status === 401) {
+          window.location.href = '/login';
+          return;
+        }
+        currentUser = await res.json();
+        renderUserBar(currentUser);
+        startCountdownTimer(currentUser.seconds_left);
+
+        if (currentUser.role === 'admin') {
+          const logsWrap = document.getElementById('logs-console-wrap');
+          if (logsWrap) logsWrap.style.display = 'flex';
+          const adminBtn = document.getElementById('admin-panel-btn');
+          if (adminBtn) adminBtn.style.display = 'inline-flex';
+          setInterval(fetchLogs, 1500);
+          fetchLogs();
+        } else {
+          const logsWrap = document.getElementById('logs-console-wrap');
+          if (logsWrap) logsWrap.style.display = 'none';
+        }
+        checkNewMessages();
+        setInterval(checkNewMessages, 20000);
+      } catch (e) { }
+    }
+
+    // ── Tab switching ──────────────────────────────────────
+    function switchTab(tab) {
+      document.querySelectorAll('.tabs .tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+      if (tab === 'paste') {
+        document.querySelector('.tabs .tab:nth-child(1)').classList.add('active');
+        document.getElementById('tab-paste').classList.add('active');
+      } else {
+        document.querySelector('.tabs .tab:nth-child(2)').classList.add('active');
+        document.getElementById('tab-upload').classList.add('active');
+      }
+    }
+
+    // ── Input Limit & File Handling ────────────────────────
+    let selectedFile = null;
+    let selectedFileLeadCount = 0;
+
+    function updatePasteCounter() {
+      const ta = document.getElementById('leads-text');
+      const counter = document.getElementById('paste-lead-count');
+      if (!ta || !counter) return;
+      const lines = ta.value.split('\n').filter(l => l.trim().length > 0 && !l.trim().startsWith('#'));
+      const count = lines.length;
+      if (count === 0) {
+        counter.textContent = '0 / 500 leads';
+        counter.style.color = 'var(--mt)';
+      } else if (count <= 500) {
+        counter.textContent = `✓ ${count} / 500 leads`;
+        counter.style.color = 'var(--gn)';
+      } else {
+        counter.textContent = `⚠️ ${count} / 500 leads (exceeds single batch limit by ${count - 500})`;
+        counter.style.color = '#f87171';
+      }
+    }
+
+    function processSelectedCsvFile(file) {
+      selectedFile = file;
+      const fnEl = document.getElementById('dz-filename');
+      const pill = document.getElementById('dz-count-pill');
+      if (!file) {
+        selectedFileLeadCount = 0;
+        if (fnEl) fnEl.textContent = 'No file selected';
+        if (pill) pill.style.display = 'none';
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = function (e) {
+        const text = e.target.result;
+        const rawLines = text.split(/\r?\n/).filter(l => l.trim().length > 0);
+        let count = rawLines.length;
+        if (count > 0) {
+          const first = rawLines[0].toLowerCase();
+          if (first.includes('name') || first.includes('first') || first.includes('location') || first.includes('city') || first.includes('phone') || first.includes('email')) {
+            count = Math.max(0, count - 1);
+          }
+        }
+        selectedFileLeadCount = count;
+
+        if (count <= 500) {
+          if (fnEl) fnEl.textContent = `✓ ${file.name} (${(file.size / 1024).toFixed(1)} KB)`;
+          if (pill) {
+            pill.style.display = 'block';
+            pill.style.background = 'rgba(34,197,94,0.15)';
+            pill.style.color = 'var(--gn)';
+            pill.style.border = '1px solid rgba(34,197,94,0.3)';
+            pill.innerHTML = `✓ <strong>${count} leads detected</strong> in CSV (Within 500 single batch limit).`;
+          }
+        } else {
+          if (fnEl) fnEl.textContent = `⚠️ ${file.name} (${(file.size / 1024).toFixed(1)} KB)`;
+          if (pill) {
+            pill.style.display = 'block';
+            pill.style.background = 'rgba(248,113,113,0.15)';
+            pill.style.color = '#f87171';
+            pill.style.border = '1px solid rgba(248,113,113,0.3)';
+            pill.innerHTML = `⚠️ <strong>${count} leads detected</strong> (Exceeds maximum 500 batch limit). The first 500 leads will be auto-processed, or you can split your file.`;
+          }
+        }
+      };
+      reader.readAsText(file.slice(0, 500000));
+    }
+
+    function fileChosen(input) {
+      if (input.files && input.files[0]) {
+        processSelectedCsvFile(input.files[0]);
+      }
+    }
+
+    const dropzone = document.getElementById('dropzone');
+    if (dropzone) {
+      dropzone.addEventListener('dragover', e => { e.preventDefault(); dropzone.style.borderColor = 'var(--ac)'; });
+      dropzone.addEventListener('dragleave', () => { dropzone.style.borderColor = 'var(--bd)'; });
+      dropzone.addEventListener('drop', e => {
+        e.preventDefault(); dropzone.style.borderColor = 'var(--bd)';
+        if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+          processSelectedCsvFile(e.dataTransfer.files[0]);
+        }
+      });
+    }
+
+    function trimLeadsToBatchLimit(limit = 500) {
+      const ta = document.getElementById('leads-text');
+      const lines = ta.value.split('\n').filter(l => l.trim().length > 0 && !l.trim().startsWith('#'));
+      if (lines.length > limit) {
+        ta.value = lines.slice(0, limit).join('\n');
+        updatePasteCounter();
+        showToast(`List trimmed to first ${limit} leads. Starting job...`, 'ok');
+        createJob();
+      }
+    }
+
+    function trimLeadsToBalance(allowedCount) {
+      const ta = document.getElementById('leads-text');
+      const lines = ta.value.split('\n').filter(l => l.trim().length > 0);
+      if (lines.length > allowedCount) {
+        ta.value = lines.slice(0, allowedCount).join('\n');
+        updatePasteCounter();
+        showToast(`List trimmed to your exact balance of ${allowedCount} leads. Starting job...`, 'ok');
+        createJob();
+      }
+    }
+
+    async function createJob() {
+      const btn = document.getElementById('create-btn');
+      const err = document.getElementById('create-err');
+      err.style.display = 'none';
+
+      const name = document.getElementById('new-job-name').value.trim();
+      if (!name) {
+        err.textContent = 'Job Name is required. Please provide a name for this search batch.';
+        err.style.display = 'block';
+        document.getElementById('new-job-name').focus();
+        return;
+      }
+
+      const isUpload = document.getElementById('tab-upload').classList.contains('active');
+
+      // Check batch limit on client side for Paste mode
+      if (!isUpload) {
+        const text = document.getElementById('leads-text').value.trim();
+        if (!text) {
+          err.textContent = 'Please enter at least one lead';
+          err.style.display = 'block';
+          return;
+        }
+        const lines = text.split('\n').filter(l => l.trim().length > 0 && !l.trim().startsWith('#'));
+        if (lines.length > 500 && (!currentUser || currentUser.role !== 'admin')) {
+          err.innerHTML = `⚠️ <strong>Batch Limit Exceeded:</strong> You submitted <strong>${lines.length} leads</strong>, but the maximum single batch limit is <strong>500 leads</strong>.<br><br>
+            <button type="button" class="act-btn primary" onclick="trimLeadsToBatchLimit(500)" style="margin-right:8px;padding:6px 14px">✂️ Auto-Trim List to First 500 Leads &amp; Run</button>`;
+          err.style.display = 'block';
+          return;
+        }
+      }
+
+      btn.disabled = true;
+      btn.textContent = 'Creating job...';
+
+      try {
+        let res, data;
+        if (isUpload && selectedFile) {
+          const fd = new FormData();
+          fd.append('file', selectedFile);
+          fd.append('name', name);
+          if (selectedFileLeadCount > 500) fd.append('auto_trim_batch', 'true');
+          res = await fetch('/api/jobs/upload', { method: 'POST', body: fd });
+          data = await res.json();
+        } else {
+          const text = document.getElementById('leads-text').value.trim();
+          res = await fetch('/api/jobs', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ leads_text: text, name })
+          });
+          data = await res.json();
+        }
+
+        if (!res.ok) {
+          if (data && data.can_trim_batch) {
+            err.innerHTML = `⚠️ <strong>${escapeHtml(data.error)}</strong><br><br>
+              <button type="button" class="act-btn primary" onclick="trimLeadsToBatchLimit(500)" style="margin-right:8px;padding:6px 14px">✂️ Auto-Trim to 500 Leads &amp; Run</button>`;
+            err.style.display = 'block';
+            return;
+          }
+          if (data && data.can_trim && data.leads_remaining > 0) {
+            err.innerHTML = `⚠️ <strong>Insufficient Balance:</strong> You requested <strong>${data.leads_requested} leads</strong>, but only have <strong>${data.leads_remaining} leads</strong> left in your balance.<br><br>
+              <button type="button" class="act-btn primary" onclick="trimLeadsToBalance(${data.leads_remaining})" style="margin-right:8px;padding:6px 14px">✂️ Auto-Trim List to ${data.leads_remaining} Leads &amp; Run</button>
+              <a href="${data.whatsapp_url || '#'}" target="_blank" class="act-btn" style="background:#16a34a;color:#fff;text-decoration:none;display:inline-block;padding:6px 14px">💬 Top-Up Leads on WhatsApp</a>`;
+            err.style.display = 'block';
+            return;
+          }
+          throw new Error(data.error || 'Failed to create job');
+        }
+
+        document.getElementById('leads-text').value = '';
+        document.getElementById('new-job-name').value = '';
+        updatePasteCounter();
+        selectedFile = null;
+        selectedFileLeadCount = 0;
+        document.getElementById('dz-filename').textContent = 'No file selected';
+        const pill = document.getElementById('dz-count-pill');
+        if (pill) pill.style.display = 'none';
+
+        showToast(`Job started! Processing ${data.total} leads.`, 'ok');
+        fetchMe(); // update quota
+        await refreshJobsList();
+        selectJob(data.id);
+      } catch (e) {
+        err.textContent = e.message;
+        err.style.display = 'block';
+      } finally {
+        btn.disabled = false;
+        btn.textContent = '🚀 Create Job & Start Processing';
+      }
+    }
+
+    // ── Panel Switching ────────────────────────────────────
+    function showNewPanel() {
+      const jn = document.getElementById('new-job-name');
+      if (jn) jn.value = '';
+      document.getElementById('panel-new').style.display = 'block';
+      document.getElementById('panel-job').style.display = 'none';
+      if (pollTimer) clearInterval(pollTimer);
+      document.querySelectorAll('.job-item').forEach(el => el.classList.remove('active'));
+      closeSidebarOnMobile();
+    }
+
+    function showJobPanel() {
+      document.getElementById('panel-new').style.display = 'none';
+      document.getElementById('panel-job').style.display = 'flex';
+      closeSidebarOnMobile();
+    }
+
+    // ── Jobs list ──────────────────────────────────────────
+    async function refreshJobsList() {
+      try {
+        const res = await fetch('/api/jobs');
+        if (!res.ok) return;
+        const jobs = await res.json();
+        renderJobsSidebar(jobs);
+        document.getElementById('sb-count').textContent = jobs.length;
+      } catch (e) { }
+    }
+
+    let _lastJobsJson = '';
+    function renderJobsSidebar(jobs) {
+      const sb = document.getElementById('sb-jobs');
+      if (!jobs.length) {
+        sb.innerHTML = '<div class="sb-empty">No jobs yet.<br>Click <strong>+ New Job</strong> to start.</div>';
+        _lastJobsJson = '';
+        return;
+      }
+      const currentJson = JSON.stringify(jobs.map(j => ({ id: j.id, status: j.status, done: j.done, total: j.total, name: j.name, currentId: (j.id === currentJobId) })));
+      if (currentJson === _lastJobsJson && document.querySelectorAll('.job-item').length === jobs.length) {
+        return; // Zero DOM churn if list state has not changed
+      }
+      _lastJobsJson = currentJson;
+
+      sb.innerHTML = jobs.map(job => {
+        const stClass = `st-${job.status}`;
+        const pct = job.total ? Math.round(job.done / job.total * 100) : 0;
+        const userTag = (currentUser && currentUser.role === 'admin' && job.username)
+          ? `<span class="ji-user">👤 ${job.username}</span>` : '';
+        return `
+<div class="job-item ${job.id === currentJobId ? 'active' : ''}"
+     data-id="${job.id}" data-name="${(job.name || job.id).toLowerCase()}" onclick="selectJob('${job.id}')">
+  <div class="ji-status ${stClass}"></div>
+  <div class="ji-name">${escapeHtml(job.name || job.id)}</div>
+  <div class="ji-meta">
+    <span>${job.total} leads · ${pct}%</span>
+    ${userTag}
+  </div>
+</div>`;
+      }).join('');
+    }
+
+    // ── Job detail ─────────────────────────────────────────
+    async function selectJob(jobId) {
+      currentJobId = jobId;
+      closeSidebarOnMobile();
+      showJobPanel();
+      document.querySelectorAll('.job-item').forEach(el => {
+        el.classList.toggle('active', el.dataset.id === jobId);
+      });
+      await loadJobDetail(jobId);
+      if (pollTimer) clearInterval(pollTimer);
+      if (currentJob && (currentJob.status === 'running' || currentJob.status === 'queued')) {
+        pollTimer = setInterval(() => pollJobStatus(jobId), 2500);
+      }
+    }
+
+    async function loadJobDetail(jobId) {
+      try {
+        const res = await fetch(`/api/jobs/${jobId}`);
+        if (!res.ok) return;
+        _consecutiveNetworkErrors = 0;
+        currentJob = await res.json();
+        renderJobDetail(currentJob);
+      } catch (e) {
+        _consecutiveNetworkErrors++;
+        if (_consecutiveNetworkErrors >= 3) {
+          showToast('⚠️ Connection is unstable or slow. Retrying...', 'err');
+        }
+      }
+    }
+
+    async function pollJobStatus(jobId) {
+      if (jobId !== currentJobId) return;
+      try {
+        const res = await fetch(`/api/jobs/${jobId}/status`);
+        if (!res.ok) return;
+        _consecutiveNetworkErrors = 0;
+        const s = await res.json();
+        if (currentJob) {
+          Object.assign(currentJob, s);
+          renderJobDetail(currentJob);
+          // If job has concluded or paused, stop polling to avoid unnecessary network & DOM churn
+          if (s.status === 'complete' || s.status === 'cancelled' || s.status === 'failed' || s.status === 'paused') {
+            if (pollTimer) {
+              clearInterval(pollTimer);
+              pollTimer = null;
+            }
+          }
+        }
+      } catch (e) {
+        _consecutiveNetworkErrors++;
+        if (_consecutiveNetworkErrors >= 3) {
+          showToast('⚠️ Connection is unstable or slow. Retrying...', 'err');
+        }
+      }
+    }
+
+    function renderJobDetail(job) {
+      document.getElementById('job-title-edit').value = job.name || job.id;
+
+      const pct = job.total ? Math.round(job.done / job.total * 100) : 0;
+      document.getElementById('prog-bar').style.width = `${pct}%`;
+      document.getElementById('prog-count').textContent = `${job.done} / ${job.total} (${pct}%)`;
+      document.getElementById('prog-current').textContent = job.current || (job.status === 'complete' ? 'Completed' : 'Ready');
+
+      let metaHtml = `<span>Status: <strong>${job.status.toUpperCase()}</strong></span>`;
+      if (job.eta) metaHtml += `<span>ETA: ${job.eta}</span>`;
+      if (job.speed) metaHtml += `<span>Speed: ${job.speed}</span>`;
+      if (currentUser && currentUser.role === 'admin' && job.username) {
+        metaHtml += `<span>Owner: <strong>${job.username}</strong></span>`;
+      }
+      document.getElementById('job-meta').innerHTML = metaHtml;
+
+      const btnStartAll = document.getElementById('btn-start-all');
+      const btnRedoAll = document.getElementById('btn-redo-all');
+      const btnPause = document.getElementById('btn-pause');
+      const btnResume = document.getElementById('btn-resume');
+      const btnRetryFailed = document.getElementById('btn-retry-failed');
+      const btnCancelAll = document.getElementById('btn-cancel-all');
+      const btnOpenReport = document.getElementById('btn-open-report');
+
+      const isRunning = job.status === 'running';
+      const isPaused = job.status === 'paused' || job.status === 'paused_network_error';
+      const isDone = job.status === 'complete' || job.status === 'done';
+      const isStopped = isDone || isPaused || job.status === 'cancelled' || job.status === 'failed';
+
+      btnStartAll.style.display = (job.status === 'queued') ? 'inline-block' : 'none';
+      btnRedoAll.style.display = isStopped ? 'inline-block' : 'none';
+      btnPause.style.display = isRunning ? 'inline-block' : 'none';
+      btnResume.style.display = isPaused ? 'inline-block' : 'none';
+      btnRetryFailed.style.display = (job.leads && job.leads.some(l => l.status === 'failed')) ? 'inline-block' : 'none';
+      btnCancelAll.style.display = (isRunning || isPaused) ? 'inline-block' : 'none';
+      btnOpenReport.style.display = (isDone || job.done > 0 || isStopped) ? 'inline-block' : 'none';
+
+      renderLeadsList(job);
+    }
+
+    function renderLeadsList(job) {
+      const container = document.getElementById('leads-list');
+      if (!job.leads || !job.leads.length) {
+        container.innerHTML = '<div style="color:var(--mt)">No leads in this job.</div>';
+        return;
+      }
+      container.innerHTML = job.leads.map((lead, idx) => {
+        const reportLink = lead.folder_name ? `/results/${job.id}/${lead.folder_name}/report.html` : '';
+        const nameHtml = reportLink
+          ? `<a href="${reportLink}" target="_blank" style="color:#fff;text-decoration:none;font-weight:700" onmouseover="this.style.textDecoration='underline'" onmouseout="this.style.textDecoration='none'">${escapeHtml(lead.name)}</a>`
+          : `<span style="color:#fff;font-weight:700">${escapeHtml(lead.name)}</span>`;
+
+        let statusHtml = '';
+        if (lead.status === 'done') {
+          statusHtml = `
+            <span style="background:rgba(52,211,153,0.15);color:#34d399;border:1px solid rgba(52,211,153,0.3);padding:4px 10px;border-radius:6px;font-size:0.75rem;font-weight:700;display:inline-flex;align-items:center;gap:4px">
+              ✅ Found (${lead.count || 0})
+            </span>
+            ${reportLink ? `<a href="${reportLink}" target="_blank" style="background:#059669;color:#fff;padding:5px 12px;border-radius:6px;font-size:0.75rem;font-weight:700;text-decoration:none;display:inline-flex;align-items:center;gap:4px;margin-left:8px;box-shadow:0 2px 8px rgba(5,150,105,0.3)">📄 View Report</a>` : ''}
+          `;
+        } else if (lead.status === 'none') {
+          statusHtml = `
+            <span style="background:rgba(239,68,68,0.12);color:#fca5a5;border:1px solid rgba(239,68,68,0.3);padding:4px 10px;border-radius:6px;font-size:0.75rem;font-weight:700;display:inline-flex;align-items:center;gap:4px">
+              ⚪ No Records Found
+            </span>
+            ${reportLink ? `<a href="${reportLink}" target="_blank" style="background:#2563eb;color:#fff;padding:5px 12px;border-radius:6px;font-size:0.75rem;font-weight:700;text-decoration:none;display:inline-flex;align-items:center;gap:4px;margin-left:8px;box-shadow:0 2px 8px rgba(37,99,235,0.3)">📄 View Report</a>` : ''}
+          `;
+        } else if (lead.status === 'running') {
+          statusHtml = `<span style="background:rgba(96,165,250,0.15);color:#60a5fa;border:1px solid rgba(96,165,250,0.3);padding:4px 10px;border-radius:6px;font-size:0.75rem;font-weight:700">⚙️ Searching...</span>`;
+        } else if (lead.status === 'failed') {
+          statusHtml = `<span style="background:rgba(248,113,113,0.15);color:#f87171;border:1px solid rgba(248,113,113,0.3);padding:4px 10px;border-radius:6px;font-size:0.75rem;font-weight:700">❌ Failed</span>`;
+        } else if (lead.status === 'cancelled') {
+          statusHtml = `<span style="background:rgba(148,163,184,0.15);color:#94a3b8;border:1px solid rgba(148,163,184,0.3);padding:4px 10px;border-radius:6px;font-size:0.75rem;font-weight:700">✕ Cancelled</span>`;
+        } else {
+          statusHtml = `<span style="background:rgba(148,163,184,0.1);color:#94a3b8;border:1px solid rgba(148,163,184,0.2);padding:4px 10px;border-radius:6px;font-size:0.75rem;font-weight:700">⏳ Queued</span>`;
+        }
+
+        return `
+<div class="lead-row" style="display:flex;align-items:center;justify-content:space-between;padding:12px 18px;background:rgba(255,255,255,0.02);border:1px solid var(--bd);border-radius:10px;margin-bottom:8px">
+  <div style="display:flex;align-items:center;gap:14px;min-width:0">
+    <div class="lr-num" style="color:var(--mt);font-weight:700;font-size:0.85rem">#${idx + 1}</div>
+    <div class="lr-info" style="min-width:0">
+      <div class="lr-name" style="font-size:0.95rem">${nameHtml}</div>
+      <div class="lr-loc" style="font-size:0.8rem;color:var(--mt);margin-top:2px">📍 ${escapeHtml(lead.location || 'USA')}</div>
+    </div>
+  </div>
+  <div class="lr-status" style="display:flex;align-items:center">${statusHtml}</div>
+</div>`;
+      }).join('');
+    }
+
+    
+    // ── Network Quality & Connectivity Monitoring ─────────
+    let _consecutiveNetworkErrors = 0;
+    window.addEventListener('offline', () => {
+      showToast('⚠️ No internet connection detected. Please check your network.', 'err');
+    });
+    window.addEventListener('online', () => {
+      showToast('✅ Internet connection restored.', 'ok');
+    });
+
+    // ── Job Actions ────────────────────────────────────────
+    async function renameJob() {
+      const val = document.getElementById('job-title-edit').value.trim();
+      if (!currentJobId || !val) return;
+      await fetch(`/api/jobs/${currentJobId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: val })
+      });
+      refreshJobsList();
+    }
+
+    async function pauseJob() {
+      if (!confirm('⏸ Are you sure you want to pause this search job? You can resume it anytime.')) return;
+      await fetch(`/api/jobs/${currentJobId}/pause`, { method: 'POST' });
+      showToast('Job paused', 'ok');
+      loadJobDetail(currentJobId);
+    }
+    async function resumeJob() {
+      if (!confirm('▶ Resume search job from where it stopped?')) return;
+      await fetch(`/api/jobs/${currentJobId}/resume`, { method: 'POST' });
+      showToast('Resuming job...', 'ok');
+      loadJobDetail(currentJobId);
+    }
+    async function cancelAll() {
+      if (!confirm('✕ Are you sure you want to cancel this job? In-progress and queued leads will be stopped.')) return;
+      await fetch(`/api/jobs/${currentJobId}/cancel`, { method: 'POST' });
+      showToast('Job cancelled', 'ok');
+      loadJobDetail(currentJobId);
+    }
+    async function retryFailed() {
+      await fetch(`/api/jobs/${currentJobId}/retry-failed`, { method: 'POST' });
+      loadJobDetail(currentJobId);
+    }
+    async function redoAll() {
+      if (!confirm('Re-run all searches for this job?')) return;
+      await fetch(`/api/jobs/${currentJobId}/redo-all`, { method: 'POST' });
+      loadJobDetail(currentJobId);
+    }
+    async function deleteJob() {
+      if (!confirm('⚠️ Are you sure you want to permanently delete this job and all associated search records? This action cannot be undone.')) return;
+      await fetch(`/api/jobs/${currentJobId}`, { method: 'DELETE' });
+      showToast('Job deleted permanently', 'ok');
+      showNewPanel();
+      refreshJobsList();
+    }
+    function openReport() {
+      if (!currentJobId) return;
+      window.open('/results/' + currentJobId, '_blank');
+    }
+    async function shareCurrentJob() {
+      if (!currentJobId) return;
+      try {
+        const res = await fetch(`/api/jobs/${currentJobId}/share`, { method: 'POST' });
+        const data = await res.json();
+        if (res.ok && data.share_url) {
+          document.getElementById('share-link-input').value = data.share_url;
+          const encoded = encodeURIComponent(data.share_url);
+          const text = encodeURIComponent('LeadsOSINT Shared Results: ' + (currentJob ? currentJob.name : currentJobId));
+          document.getElementById('sh-wa').href = `https://api.whatsapp.com/send?text=${text}%20${encoded}`;
+          document.getElementById('sh-tg').href = `https://t.me/share/url?url=${encoded}&text=${text}`;
+          openModal('share-link-modal');
+        } else {
+          showToast(data.error || 'Failed to generate share link', 'err');
+        }
+      } catch (e) {
+        showToast('Network error while sharing', 'err');
+      }
+    }
+    function copyShareModalLink() {
+      const inp = document.getElementById('share-link-input');
+      navigator.clipboard.writeText(inp.value).then(() => showToast('Share link copied to clipboard!', 'ok'));
+    }
+
+    // ── Messages / Notifications ───────────────────────────
+    function openMessagesModal() {
+      openModal('messages-modal');
+      loadMessages();
+    }
+    
+    // ── Customer Support Modal Functions ─────────────────────────
+    async function openSupportModal() {
+      openModal('support-modal');
+      try {
+        const res = await fetch('/api/settings/support');
+        if (res.ok) {
+          const data = await res.json();
+          const waCard = document.getElementById('support-wa-card');
+          const waBtn = document.getElementById('support-wa-btn');
+          const waStatus = document.getElementById('support-wa-status');
+          if (data.whatsapp_enabled) {
+            waCard.style.display = 'flex';
+            waBtn.style.display = 'inline-flex';
+            waBtn.href = data.whatsapp_url || '#';
+            waStatus.textContent = 'Connect on WhatsApp for real-time priority support';
+          } else {
+            waBtn.style.display = 'none';
+            waStatus.textContent = 'WhatsApp support is currently offline. Please use In-App Messaging above.';
+          }
+        }
+      } catch (e) { }
+    }
+
+    // ── Admin Support Settings ───────────────────────────────────
+    async function loadAdminSupportSettings() {
+      try {
+        const res = await fetch('/api/settings/support');
+        if (res.ok) {
+          const data = await res.json();
+          document.getElementById('admin-support-wa-toggle').checked = !!data.whatsapp_enabled;
+          document.getElementById('admin-support-wa-input').value = data.whatsapp_number || '';
+        }
+      } catch (e) { }
+    }
+
+    async function saveAdminSupportSettings() {
+      const enabled = document.getElementById('admin-support-wa-toggle').checked;
+      const number = document.getElementById('admin-support-wa-input').value.trim();
+      try {
+        const res = await fetch('/api/admin/settings/support', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ whatsapp_enabled: enabled, whatsapp_number: number })
+        });
+        const d = await res.json();
+        if (res.ok) {
+          showToast('Customer support settings saved successfully!', 'ok');
+        } else {
+          showToast(d.error || 'Failed to save settings', 'err');
+        }
+      } catch (e) {
+        showToast('Network error saving settings', 'err');
+      }
+    }
+
+    // ── Admin Security (Change Credentials) ─────────────────────
+    async function updateAdminCredentials() {
+      const currPw = document.getElementById('admin-sec-curr-pw').value;
+      const username = document.getElementById('admin-sec-username').value.trim();
+      const newPw = document.getElementById('admin-sec-new-pw').value;
+      const confirmPw = document.getElementById('admin-sec-confirm-pw').value;
+
+      if (!currPw) {
+        showToast('Please enter your current password', 'err');
+        return;
+      }
+      if (newPw && newPw !== confirmPw) {
+        showToast('New passwords do not match!', 'err');
+        return;
+      }
+      if (!username && !newPw) {
+        showToast('Please specify a new username or new password', 'err');
+        return;
+      }
+
+      try {
+        const res = await fetch('/api/auth/change-credentials', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            current_password: currPw,
+            new_username: username || undefined,
+            new_password: newPw || undefined
+          })
+        });
+        const d = await res.json();
+        if (res.ok) {
+          showToast('Credentials updated successfully!', 'ok');
+          document.getElementById('admin-sec-curr-pw').value = '';
+          document.getElementById('admin-sec-new-pw').value = '';
+          document.getElementById('admin-sec-confirm-pw').value = '';
+          setTimeout(() => location.reload(), 1500);
+        } else {
+          showToast(d.error || 'Failed to update credentials', 'err');
+        }
+      } catch (e) {
+        showToast('Network error updating credentials', 'err');
+      }
+    }
+
+    // ── Messaging Enhancements (Mark as Read / Mark All) ────────
+    async function markMessageRead(mid) {
+      try {
+        const res = await fetch(`/api/messages/${mid}/read`, { method: 'POST' });
+        if (res.ok) {
+          loadMessages();
+          checkNewMessages();
+        }
+      } catch (e) { }
+    }
+
+    async function markAllMessagesRead() {
+      try {
+        const res = await fetch('/api/messages/mark-all-read', { method: 'POST' });
+        if (res.ok) {
+          showToast('All messages marked as read', 'ok');
+          loadMessages();
+          checkNewMessages();
+        }
+      } catch (e) { }
+    }
+
+    // ── Enhanced startAll with Network Pre-flight ───────────────
+    async function startAll() {
+      if (!currentJobId) return;
+      try {
+        const netCheck = await fetch('/api/network-status').then(r => r.json()).catch(() => ({ status: 'online' }));
+        if (netCheck.status === 'offline') {
+          alert('❌ No Internet Connection Detected.\n\nLeadsOSINT requires an active internet connection to execute searches. Please connect to the internet and try again.');
+          return;
+        }
+        if (netCheck.status === 'unstable') {
+          const proceed = confirm('⚠️ Unstable / Poor Network Detected (High Latency)\n\nRunning searches with an unstable connection may cause queries to time out or fail. If you proceed despite this warning, failed searches will count against your quota as agreed.\n\nClick OK to Proceed Anyway, or Cancel to wait for network to stabilize.');
+          if (!proceed) return;
+        }
+      } catch (e) { }
+
+      await fetch(`/api/jobs/${currentJobId}/resume`, { method: 'POST' });
+      showToast('Starting search job...', 'ok');
+      loadJobDetail(currentJobId);
+    }
+
+    async function loadMessages() {
+      try {
+        const res = await fetch('/api/messages');
+        if (!res.ok) return;
+        const msgs = await res.json();
+        const container = document.getElementById('messages-list');
+        if (!msgs.length) {
+          container.innerHTML = '<div style="color:var(--mt);font-size:.85rem">No messages yet.</div>';
+          return;
+        }
+        const myUsername = currentUser ? currentUser.username : '';
+        const unreadCount = msgs.filter(m => !m.is_read && m.sender_username !== myUsername).length;
+        const unreadModalBadge = document.getElementById('modal-msg-unread-count');
+        if (unreadModalBadge) {
+          unreadModalBadge.textContent = `${unreadCount} unread`;
+          unreadModalBadge.style.display = unreadCount > 0 ? 'inline-block' : 'none';
+        }
+
+        container.innerHTML = msgs.map(m => {
+          const isUnread = !m.is_read && m.sender_username !== myUsername;
+          const unreadPill = isUnread ? `<span style="background:rgba(96,165,250,0.2);color:#60a5fa;border:1px solid rgba(96,165,250,0.4);border-radius:4px;padding:1px 6px;font-size:0.7rem;font-weight:700">NEW</span>` : '';
+          const markReadBtn = isUnread ? `<button type="button" style="background:transparent;border:1px solid var(--bd);color:var(--ac);font-size:0.7rem;padding:2px 8px;border-radius:4px;cursor:pointer;margin-left:auto" onclick="markMessageRead(${m.id}); event.stopPropagation();">Mark Read</button>` : '';
+          return `
+<div class="msg-item" style="${isUnread ? 'border-left:3px solid var(--ac);background:rgba(167,139,250,0.05);' : ''}">
+  <div class="msg-hdr" style="display:flex;align-items:center;gap:8px">
+    <span class="msg-sender">${escapeHtml(m.sender_username)}</span>
+    ${unreadPill}
+    <span style="font-size:0.75rem;color:var(--mt)">${m.created_at.replace('T', ' ').substring(0, 16)}</span>
+    ${markReadBtn}
+  </div>
+  <div class="msg-content" style="margin-top:6px">${escapeHtml(m.content)}</div>
+</div>`;
+        }).join('');
+      } catch (e) { }
+    }
+    async function sendUserMessage() {
+      const content = document.getElementById('user-reply-content').value.trim();
+      if (!content) return;
+      try {
+        const res = await fetch('/api/messages', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ content })
+        });
+        if (res.ok) {
+          document.getElementById('user-reply-content').value = '';
+          showToast('Message sent to Admin!', 'ok');
+          loadMessages();
+        }
+      } catch (e) { }
+    }
+    async function checkNewMessages() {
+      try {
+        const res = await fetch('/api/messages');
+        if (!res.ok) return;
+        const msgs = await res.json();
+        const unread = msgs.filter(m => !m.is_read && m.sender_username !== (currentUser ? currentUser.username : '')).length;
+        const badge = document.getElementById('msg-badge');
+        if (badge) {
+          badge.textContent = unread;
+          badge.style.display = unread > 0 ? 'inline-block' : 'none';
+        }
+      } catch (e) { }
+    }
+
+    // ── Admin Center ───────────────────────────────────────
+    let adminLiveSyncInterval = null;
+
+    function openAdminModal() {
+      openModal('admin-modal');
+      loadAdminUsers();
+      startAdminLiveSync();
+    }
+
+    function startAdminLiveSync() {
+      if (adminLiveSyncInterval) clearInterval(adminLiveSyncInterval);
+      adminLiveSyncInterval = setInterval(() => {
+        const modal = document.getElementById('admin-modal');
+        if (!modal || !modal.classList.contains('open')) {
+          stopAdminLiveSync();
+          return;
+        }
+        const usersTab = document.getElementById('admin-tab-users');
+        const jobsTab = document.getElementById('admin-tab-customer-jobs');
+        if (usersTab && usersTab.classList.contains('active')) {
+          loadAdminUsers(true);
+        } else if (jobsTab && jobsTab.classList.contains('active')) {
+          loadAdminCustomerJobs(true);
+        }
+      }, 3500);
+    }
+
+    function stopAdminLiveSync() {
+      if (adminLiveSyncInterval) {
+        clearInterval(adminLiveSyncInterval);
+        adminLiveSyncInterval = null;
+      }
+    }
+
+    function switchAdminTab(t) {
+      document.querySelectorAll('#admin-modal .tab').forEach(el => el.classList.remove('active'));
+      document.querySelectorAll('#admin-modal .tab-pane').forEach(el => el.classList.remove('active'));
+      if (t === 'users') {
+        document.querySelector('#admin-modal .tab:nth-child(1)').classList.add('active');
+        document.getElementById('admin-tab-users').classList.add('active');
+        loadAdminUsers();
+      } else if (t === 'customer-jobs') {
+        document.querySelector('#admin-modal .tab:nth-child(2)').classList.add('active');
+        document.getElementById('admin-tab-customer-jobs').classList.add('active');
+        loadAdminCustomerJobs();
+      } else if (t === 'new-user') {
+        document.querySelector('#admin-modal .tab:nth-child(3)').classList.add('active');
+        document.getElementById('admin-tab-new-user').classList.add('active');
+      } else if (t === 'broadcast') {
+        document.querySelector('#admin-modal .tab:nth-child(4)').classList.add('active');
+        document.getElementById('admin-tab-broadcast').classList.add('active');
+      } else if (t === 'support') {
+        document.querySelector('#admin-modal .tab:nth-child(5)').classList.add('active');
+        document.getElementById('admin-tab-support').classList.add('active');
+        loadAdminSupportSettings();
+      } else if (t === 'security') {
+        document.querySelector('#admin-modal .tab:nth-child(6)').classList.add('active');
+        document.getElementById('admin-tab-security').classList.add('active');
+      }
+    }
+
+    function filterAdminUsersTable() {
+      const q = (document.getElementById('admin-user-search')?.value || '').toLowerCase().trim();
+      const rows = document.querySelectorAll('#admin-users-tbody tr');
+      let visible = 0;
+      let total = 0;
+      rows.forEach(r => {
+        if (r.children.length === 1 && r.children[0].colSpan > 1) return;
+        total++;
+        const txt = r.textContent.toLowerCase();
+        if (!q || txt.includes(q)) {
+          r.style.display = '';
+          visible++;
+        } else {
+          r.style.display = 'none';
+        }
+      });
+      const badge = document.getElementById('admin-user-count');
+      if (badge) {
+        if (!q) {
+          badge.textContent = `${total} user${total === 1 ? '' : 's'}`;
+        } else {
+          badge.textContent = `${visible} of ${total} match`;
+        }
+      }
+    }
+
+    function filterAdminJobsTable() {
+      const q = (document.getElementById('admin-job-search')?.value || '').toLowerCase().trim();
+      const rows = document.querySelectorAll('#admin-jobs-tbody tr');
+      let visible = 0;
+      let total = 0;
+      rows.forEach(r => {
+        if (r.children.length === 1 && r.children[0].colSpan > 1) return;
+        total++;
+        const txt = r.textContent.toLowerCase();
+        if (!q || txt.includes(q)) {
+          r.style.display = '';
+          visible++;
+        } else {
+          r.style.display = 'none';
+        }
+      });
+      const badge = document.getElementById('admin-job-count');
+      if (badge) {
+        if (!q) {
+          badge.textContent = `${total} job${total === 1 ? '' : 's'}`;
+        } else {
+          badge.textContent = `${visible} of ${total} match`;
+        }
+      }
+    }
+
+    function toggleUserPw(uid) {
+      const m = document.getElementById('pw-' + uid);
+      const p = document.getElementById('pwp-' + uid);
+      if (!m || !p) return;
+      if (p.style.display === 'none') {
+        p.style.display = 'inline';
+        m.style.display = 'none';
+      } else {
+        p.style.display = 'none';
+        m.style.display = 'inline';
+      }
+    }
+    function copySingleText(val, label) {
+      navigator.clipboard.writeText(val).then(() => {
+        showToast(label + ' copied to clipboard!', 'ok');
+      });
+    }
+
+    function togglePasswordVisibility(fieldId, btnEl) {
+      const inp = document.getElementById(fieldId);
+      if (!inp) return;
+      if (inp.type === 'password') {
+        inp.type = 'text';
+        if (btnEl) btnEl.textContent = '🙈';
+      } else {
+        inp.type = 'password';
+        if (btnEl) btnEl.textContent = '👁️';
+      }
+    }
+
+    function toggleNewUserPwVisibility() {
+      const inp = document.getElementById('nu-password');
+      const btn = document.getElementById('nu-pw-btn');
+      if (!inp || !btn) return;
+      if (inp.type === 'password') {
+        inp.type = 'text';
+        btn.textContent = '🙈';
+      } else {
+        inp.type = 'password';
+        btn.textContent = '👁️';
+      }
+    }
+
+    function selectLeadPreset(amount, btn) {
+      document.getElementById('nu-leads').value = amount;
+      document.querySelectorAll('#admin-tab-new-user .act-btn').forEach(b => b.classList.remove('primary'));
+      if (btn) btn.classList.add('primary');
+    }
+
+    async function loadAdminUsers(isSilent = false) {
+      try {
+        const res = await fetch('/api/admin/users');
+        if (!res.ok) return;
+        const users = await res.json();
+        const tbody = document.getElementById('admin-users-tbody');
+        const select = document.getElementById('bc-receiver');
+
+        if (select) {
+          const currentVal = select.value;
+          select.innerHTML = '<option value="0">📢 Broadcast to All Users</option>' +
+            users.filter(u => u.role !== 'admin').map(u => `<option value="${u.id}">${escapeHtml(u.username)} (${u.plan_total_limit || 50} leads)</option>`).join('');
+          if (currentVal) select.value = currentVal;
+        }
+
+        if (!users.length) {
+          tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:var(--mt)">No user accounts registered.</td></tr>';
+          filterAdminUsersTable();
+          return;
+        }
+
+        tbody.innerHTML = users.map(u => {
+          const allocated = u.plan_total_limit || 50;
+          const used = u.total_usage || 0;
+          const remaining = Math.max(0, allocated - used);
+
+          const isPaused = u.status === 'paused' || u.status === 'terminated';
+          const isFrozen = (remaining <= 0 || u.status === 'frozen') && u.role !== 'admin';
+
+          let statusBadge = '';
+          if (u.role === 'admin') {
+            statusBadge = `<span style="display:inline-flex;align-items:center;gap:4px;font-size:0.75rem;font-weight:700;color:var(--gn);background:rgba(34,197,94,0.15);padding:3px 8px;border-radius:10px;white-space:nowrap">🛡️ Admin</span>`;
+          } else if (isFrozen) {
+            statusBadge = `<span style="display:inline-flex;align-items:center;gap:4px;font-size:0.75rem;font-weight:700;color:#f87171;background:rgba(248,113,113,0.18);border:1px solid rgba(248,113,113,0.3);padding:3px 8px;border-radius:10px;white-space:nowrap" title="Balance depleted. Account auto-frozen.">❄️ Frozen</span>`;
+          } else if (isPaused) {
+            statusBadge = `<span style="display:inline-flex;align-items:center;gap:4px;font-size:0.75rem;font-weight:700;color:#fbbf24;background:rgba(251,191,36,0.15);border:1px solid rgba(251,191,36,0.3);padding:3px 8px;border-radius:10px;white-space:nowrap">⏸️ Paused</span>`;
+          } else {
+            statusBadge = `<span style="display:inline-flex;align-items:center;gap:4px;font-size:0.75rem;font-weight:700;color:var(--gn);background:rgba(34,197,94,0.15);border:1px solid rgba(34,197,94,0.3);padding:3px 8px;border-radius:10px;white-space:nowrap">● Active</span>`;
+          }
+
+          const pauseBtn = isPaused
+            ? `<button class="act-btn success" style="padding:3px 8px;font-size:.7rem" onclick="setUserStatus(${u.id},'active')">Resume</button>`
+            : (isFrozen
+              ? `<button class="act-btn success" style="padding:3px 8px;font-size:.7rem" onclick="setUserStatus(${u.id},'active')">Unfreeze</button>`
+              : `<button class="act-btn" style="padding:3px 8px;font-size:.7rem" onclick="setUserStatus(${u.id},'paused')">Pause</button>`);
+
+          const delBtn = `<button class="act-btn danger" style="padding:3px 8px;font-size:.7rem" onclick="deleteUserAcct(${u.id})" title="Permanently delete user account">🗑 Delete</button>`;
+
+          const passCell = u.access_key
+            ? `<div style="display:flex;align-items:center;gap:4px">
+             <span class="pw-masked" id="pw-${u.id}">••••••••</span>
+             <span class="pw-plain" id="pwp-${u.id}" style="display:none;font-family:monospace;color:var(--ac);font-weight:700">${escapeHtml(u.access_key)}</span>
+             <button class="act-btn" style="padding:2px 6px;font-size:.65rem" onclick="toggleUserPw(${u.id})" title="View/Hide Password">👁️</button>
+             <button class="act-btn" style="padding:2px 6px;font-size:.65rem" onclick="copySingleText('${escapeHtml(u.access_key)}', 'Password')" title="Copy Password">📋</button>
+           </div>`
+            : '<span style="color:var(--mt)">—</span>';
+
+          const addBtn = `<button class="act-btn primary" style="padding:3px 8px;font-size:.7rem" onclick="promptAddLeads(${u.id}, '${escapeHtml(u.username)}')">➕ Leads</button>`;
+
+          return `
+<tr>
+  <td><strong>${escapeHtml(u.username)}</strong> ${u.role === 'admin' ? '🛡️' : ''}</td>
+  <td>${passCell}</td>
+  <td><strong style="color:var(--bl)">${allocated}</strong></td>
+  <td>${used}</td>
+  <td><strong style="color:${remaining > 0 ? 'var(--gn)' : 'var(--rd)'}">${remaining}</strong></td>
+  <td>${statusBadge}</td>
+  <td style="white-space:nowrap">
+    ${u.role !== 'admin' ? `${addBtn} ${pauseBtn} ${delBtn}` : '—'}
+  </td>
+</tr>`;
+        }).join('');
+
+        filterAdminUsersTable();
+      } catch (e) { }
+    }
+
+    async function promptAddLeads(uid, username) {
+      const val = prompt(`Enter number of leads to ADD for user @${username}:\n(e.g. 50, 100, 150, 500)`, '50');
+      if (!val) return;
+      const leads = parseInt(val);
+      if (isNaN(leads) || leads <= 0) {
+        showToast('Please enter a valid positive number of leads', 'err');
+        return;
+      }
+      try {
+        const res = await fetch(`/api/admin/users/${uid}/add-leads`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ leads })
+        });
+        const d = await res.json();
+        if (res.ok) {
+          showToast(`Added ${leads} leads to @${username}! New total: ${d.new_total}`, 'ok');
+          loadAdminUsers();
+          fetchMe();
+        } else {
+          showToast(d.error || 'Failed to add leads', 'err');
+        }
+      } catch (e) {
+        showToast('Network error while adding leads', 'err');
+      }
+    }
+
+    async function loadAdminCustomerJobs(isSilent = false) {
+      try {
+        const res = await fetch('/api/jobs');
+        if (!res.ok) return;
+        const allJobs = await res.json();
+        const tbody = document.getElementById('admin-jobs-tbody');
+        const custJobs = allJobs.filter(j => j.username !== 'admin');
+        if (!custJobs.length) {
+          tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--mt)">No customer jobs submitted yet.</td></tr>';
+          filterAdminJobsTable();
+          return;
+        }
+        tbody.innerHTML = custJobs.map(j => {
+          const createdStr = j.created ? j.created.replace('T', ' ').substring(0, 16) : '—';
+          return `
+<tr>
+  <td><strong>${escapeHtml(j.name || j.id)}</strong><br><span style="font-size:.7rem;color:var(--mt)">ID: ${j.id}</span></td>
+  <td><span style="color:var(--ac);font-weight:700">@${escapeHtml(j.username)}</span></td>
+  <td>${j.done} / ${j.total}</td>
+  <td><span class="lrs-${j.status}" style="padding:2px 8px;border-radius:10px;font-size:.7rem">${j.status}</span></td>
+  <td style="font-size:.75rem">${createdStr}</td>
+  <td>
+    <button class="act-btn" style="padding:4px 8px;font-size:.72rem" onclick="inspectCustomerJob('${j.id}')">🔍 Inspect</button>
+  </td>
+</tr>`;
+        }).join('');
+
+        filterAdminJobsTable();
+      } catch (e) { }
+    }
+
+    async function inspectCustomerJob(jobId) {
+      try {
+        const res = await fetch(`/api/jobs/${jobId}/status`);
+        if (!res.ok) { showToast('Could not load job details', 'err'); return; }
+        const job = await res.json();
+
+        document.getElementById('inspect-job-title').textContent = `🔍 Job: ${job.name || job.id}`;
+        document.getElementById('inspect-owner').textContent = `@${job.username || 'customer'} · ID: ${job.id}`;
+        document.getElementById('inspect-progress').textContent = `${job.done || 0} / ${job.total || 0} Leads`;
+
+        const stEl = document.getElementById('inspect-status-badge');
+        stEl.innerHTML = `<span class="lrs-${job.status}" style="padding:4px 10px;border-radius:12px;font-size:0.75rem;font-weight:700">${(job.status || '').toUpperCase()}</span>`;
+
+        const rptBtn = document.getElementById('inspect-report-btn');
+        rptBtn.href = `/results/${job.id}`;
+        rptBtn.style.display = (job.done > 0) ? 'inline-flex' : 'none';
+
+        const listEl = document.getElementById('inspect-leads-list');
+        if (!job.leads || !job.leads.length) {
+          listEl.innerHTML = '<div style="color:var(--mt);font-size:0.85rem">No leads in this job.</div>';
+        } else {
+          listEl.innerHTML = job.leads.map((l, idx) => {
+            const reportLink = l.folder_name ? `/results/${job.id}/${l.folder_name}/report.html` : '';
+            const linkHtml = reportLink ? `<a href="${reportLink}" target="_blank" style="color:var(--ac);text-decoration:underline">Report ↗</a>` : '';
+            return `
+<div style="background:var(--s);padding:10px 14px;border-radius:8px;border:1px solid var(--bd);display:flex;align-items:center;justify-content:space-between;gap:10px">
+  <div style="display:flex;align-items:center;gap:10px">
+    <span style="color:var(--mt);font-size:0.78rem;font-weight:700">#${idx + 1}</span>
+    <div>
+      <div style="font-weight:700;color:#fff;font-size:0.88rem">${escapeHtml(l.name)}</div>
+      <div style="font-size:0.75rem;color:var(--mt)">📍 ${escapeHtml(l.location || 'USA')}</div>
+    </div>
+  </div>
+  <div style="display:flex;align-items:center;gap:8px">
+    <span class="lrs-${l.status}" style="padding:2px 8px;border-radius:8px;font-size:0.7rem">${l.status}</span>
+    ${linkHtml}
+  </div>
+</div>`;
+          }).join('');
+        }
+        openModal('job-inspect-modal');
+      } catch (e) {
+        showToast('Failed to inspect job: ' + (e.message || e), 'err');
+      }
+    }
+
+    async function setUserStatus(uid, status) {
+      if (status === 'paused' && !confirm('Are you sure you want to PAUSE this customer account?')) return;
+      if (status === 'terminated' && !confirm('Are you sure you want to TERMINATE this customer account?')) return;
+      await fetch(`/api/admin/users/${uid}/status`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status })
+      });
+      showToast(`Account status updated to ${status}`, 'ok');
+      loadAdminUsers();
+    }
+    async function deleteUserAcct(uid) {
+      if (!confirm('⚠️ Permanently delete this user account? This cannot be undone.')) return;
+      await fetch(`/api/admin/users/${uid}`, { method: 'DELETE' });
+      showToast('User account deleted permanently', 'ok');
+      loadAdminUsers();
+    }
+    async function submitNewUser(e) {
+      e.preventDefault();
+      const username = document.getElementById('nu-username').value.trim();
+      const password = document.getElementById('nu-password').value.trim();
+      const leadsVal = document.getElementById('nu-leads').value;
+      const leads_allocated = leadsVal ? parseInt(leadsVal) : 50;
+
+      try {
+        const res = await fetch('/api/admin/users', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username, password, leads_allocated })
+        });
+        const data = await res.json();
+        if (res.ok) {
+          showToast(`User ${username} created with ${leads_allocated} leads!`, 'ok');
+          document.getElementById('new-user-form').reset();
+          document.getElementById('nu-leads').value = '50';
+          switchAdminTab('users');
+          loadAdminUsers();
+        } else {
+          showToast(data.error || 'Failed to create user', 'err');
+        }
+      } catch (err) {
+        showToast('Network error', 'err');
+      }
+    }
+    async function sendAdminMessage() {
+      const receiver_id = parseInt(document.getElementById('bc-receiver').value);
+      const content = document.getElementById('bc-content').value.trim();
+      if (!content) return;
+      try {
+        const res = await fetch('/api/messages', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ receiver_id, content })
+        });
+        if (res.ok) {
+          document.getElementById('bc-content').value = '';
+          showToast('Announcement broadcasted successfully!', 'ok');
+        }
+      } catch (e) { }
+    }
+
+    // ── Tutorial Modal ─────────────────────────────────────
+    function openTutorialModal() { openModal('tutorial-modal'); }
+
+    // ── Search & Filter ────────────────────────────────────
+    function filterJobs(query) {
+      const q = query.trim().toLowerCase();
+      const clearBtn = document.getElementById('search-clear-btn');
+      if (clearBtn) clearBtn.style.display = q ? 'inline-block' : 'none';
+
+      document.querySelectorAll('#sb-jobs .job-item').forEach(item => {
+        const name = (item.dataset.name || '').toLowerCase();
+        const id = (item.dataset.id || '').toLowerCase();
+        item.style.display = (!q || name.includes(q) || id.includes(q)) ? 'block' : 'none';
+      });
+    }
+    function clearJobSearch() {
+      const inp = document.getElementById('job-search');
+      if (inp) inp.value = '';
+      document.getElementById('search-clear-btn').style.display = 'none';
+      filterJobs('');
+    }
+
+    // ── Toast & Helpers ────────────────────────────────────
+    function showToast(msg, type = 'ok') {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.className = `toast ${type} show`;
+      setTimeout(() => t.classList.remove('show'), 3500);
+    }
+    function escapeHtml(str) {
+      return (str || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    }
+
+    // ── Live Logs (Admin Only) ─────────────────────────────
+    let lastLogCount = 0;
+    async function fetchLogs() {
+      try {
+        const res = await fetch('/api/logs');
+        if (!res.ok) return;
+        const logs = await res.json();
+        if (logs.length === lastLogCount) return;
+        lastLogCount = logs.length;
+        const body = document.getElementById('logs-body');
+        if (!body) return;
+        body.innerHTML = logs.map(l => {
+          const cls = `log-${l.level || 'INFO'}`;
+          return `<div class="log-entry ${cls}">[${l.timestamp}] [${l.level}] ${escapeHtml(l.message)}</div>`;
+        }).join('');
+        body.scrollTop = body.scrollHeight;
+      } catch (e) { }
+    }
+    function clearLogsUI() {
+      const body = document.getElementById('logs-body');
+      if (body) body.innerHTML = '<div class="log-entry log-INFO">[Logs cleared]</div>';
+    }
+    function toggleLogsUI() {
+      const wrap = document.querySelector('.logs-console-wrap');
+      const btn = document.getElementById('logs-toggle-btn');
+      if (!wrap || !btn) return;
+      wrap.classList.toggle('collapsed');
+      btn.textContent = wrap.classList.contains('collapsed') ? 'Expand' : 'Collapse';
+    }
+
+    // ── Desktop Sidebar Collapse Toggle ───────────────────
+    function toggleSidebarDesktop() {
+      const sb = document.getElementById('sidebar');
+      const layout = document.querySelector('.layout');
+      const isCollapsed = sb.classList.toggle('desktop-collapsed');
+      layout.classList.toggle('sidebar-is-collapsed', isCollapsed);
+      localStorage.setItem('sidebar_desktop_collapsed', isCollapsed ? '1' : '0');
+      const btn = document.getElementById('sb-toggle-btn');
+      if (btn) btn.textContent = isCollapsed ? '▶' : '◀';
+    }
+
+    function initSidebarPreference() {
+      const saved = localStorage.getItem('sidebar_desktop_collapsed');
+      if (saved === '1' && window.innerWidth > 768) {
+        document.getElementById('sidebar')?.classList.add('desktop-collapsed');
+        document.querySelector('.layout')?.classList.add('sidebar-is-collapsed');
+        const btn = document.getElementById('sb-toggle-btn');
+        if (btn) btn.textContent = '▶';
+      }
+    }
+
+    // ── Back to Top Functionality ─────────────────────────
+    function scrollToTop() {
+      // 1. Scroll window and document
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      document.documentElement.scrollTo({ top: 0, behavior: 'smooth' });
+      document.body.scrollTo({ top: 0, behavior: 'smooth' });
+
+      // 2. Scroll main containers
+      const mainEl = document.querySelector('.main');
+      if (mainEl) mainEl.scrollTo({ top: 0, behavior: 'smooth' });
+
+      const pjEl = document.getElementById('panel-job');
+      if (pjEl) pjEl.scrollTo({ top: 0, behavior: 'smooth' });
+
+      const pnEl = document.getElementById('panel-new');
+      if (pnEl) pnEl.scrollTo({ top: 0, behavior: 'smooth' });
+
+      // 3. Scroll open modals and lists
+      document.querySelectorAll('.modal-overlay.open .modal-body').forEach(m => {
+        m.scrollTo({ top: 0, behavior: 'smooth' });
+      });
+      document.querySelectorAll('#inspect-leads-list, #messages-list').forEach(l => {
+        l.scrollTo({ top: 0, behavior: 'smooth' });
+      });
+    }
+
+    function checkScrollTopVisibility() {
+      const btt = document.getElementById('back-to-top-btn');
+      if (!btt) return;
+
+      const winScrolled = window.scrollY || document.documentElement.scrollTop || document.body.scrollTop || 0;
+      const mainEl = document.querySelector('.main');
+      const mainScrolled = mainEl ? mainEl.scrollTop : 0;
+      const pjEl = document.getElementById('panel-job');
+      const pjScrolled = pjEl ? pjEl.scrollTop : 0;
+
+      let modalScrolled = 0;
+      const openModalBody = document.querySelector('.modal-overlay.open .modal-body');
+      if (openModalBody) modalScrolled = openModalBody.scrollTop;
+
+      if (winScrolled > 250 || mainScrolled > 250 || pjScrolled > 250 || modalScrolled > 250) {
+        btt.classList.add('visible');
+      } else {
+        btt.classList.remove('visible');
+      }
+    }
+
+    window.addEventListener('scroll', checkScrollTopVisibility, { passive: true });
+    document.addEventListener('scroll', checkScrollTopVisibility, { passive: true });
+
+    // ── Initialize ─────────────────────────────────────────
+    (async function init() {
+      initSidebarPreference();
+      const jnInit = document.getElementById('new-job-name');
+      if (jnInit) jnInit.value = '';
+      setTimeout(() => {
+        const jn = document.getElementById('new-job-name');
+        if (jn && (jn.value === 'admin' || !jn.value.trim())) jn.value = '';
+      }, 100);
+
+      const mainEl = document.querySelector('.main');
+      if (mainEl) mainEl.addEventListener('scroll', checkScrollTopVisibility, { passive: true });
+      const pjEl = document.getElementById('panel-job');
+      if (pjEl) pjEl.addEventListener('scroll', checkScrollTopVisibility, { passive: true });
+      document.querySelectorAll('.modal-body').forEach(mb => {
+        mb.addEventListener('scroll', checkScrollTopVisibility, { passive: true });
+      });
+
+      await fetchMe();
+      await refreshJobsList();
+      setInterval(refreshJobsList, 5000);
+    })();
+  </script>
+
+  <!-- Floating Back to Top Button -->
+  <button id="back-to-top-btn" class="back-to-top-btn" onclick="scrollToTop()" title="Back to top">
+    <span>↑</span>
+    <span>Back to Top</span>
+  </button>
+
+</body>
+
+</html>

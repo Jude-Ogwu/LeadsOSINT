@@ -1,0 +1,15 @@
+__pycache__/
+*.py[cod]
+*$py.class
+*.log
+.env
+output/
+*.db
+*.sqlite3
+*.sqlite
+fsp_real_app.css
+scratch_*.py
+test_bd_output.html
+test_phoenix_output.html
+test_ss.png
+test_styled_ss.py
