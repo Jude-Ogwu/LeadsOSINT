@@ -219,8 +219,9 @@ def bd_fetch(url, retries=4):
     return None
 
 
-def bd_fetch_profile(url, retries=4):
-    """Fetch profile detail page via Bright Data Web Unlocker."""
+def bd_fetch_profile(url, retries=5):
+    """Fetch profile detail page via Bright Data Web Unlocker.
+    Uses exponential backoff; sleeps longer on bot-check / robots.txt hits."""
     for attempt in range(retries):
         try:
             r = BD_SESSION.post(
@@ -232,6 +233,12 @@ def bd_fetch_profile(url, retries=4):
             brd_err = r.headers.get('x-brd-err-msg') or r.headers.get('x-brd-error')
             if brd_err:
                 log_event(f"❌ Bright Data Error: {brd_err}", "ERROR")
+                # Bot-check / robots.txt: longer backoff to let BD rotate IPs
+                bot_hit = any(k in brd_err.lower() for k in ('robot', 'bot-check', 'challenge', 'forbidden', 'restricted'))
+                delay = (8 * (attempt + 1)) if bot_hit else (2 ** attempt * 1.5)
+                log_event(f"[BrightData] Backing off {delay:.0f}s before retry {attempt+2}...", "WARN")
+                time.sleep(delay)
+                continue
             body = r.text
             if (r.status_code == 200
                     and not is_rejected_scrape_body(body)
@@ -243,7 +250,7 @@ def bd_fetch_profile(url, retries=4):
                 log_event(f"[BrightData] Profile attempt {attempt+1}: HTTP {r.status_code}, len={len(body)} - rotating...", "WARN")
         except Exception as e:
             log_event(f"[BrightData] Profile attempt {attempt+1} error: {e}", "WARN")
-        time.sleep(1.5)
+        time.sleep(2 ** attempt * 1.5)  # exponential backoff: 1.5s, 3s, 6s, 12s, 24s
     return None
 
 
@@ -3030,7 +3037,33 @@ def process_lead(job_id, lead_idx):
                     res['_profile_html'] = phtml
                     log_event(f"[P2] ✅ Profile enriched: {len(res.get('phones',[]))} phones, {len(res.get('emails',[]))} emails extracted")
                 else:
-                    log_event(f"[P2] Profile page unavailable via provider — using search card fallback", "WARN")
+                    log_event(f"[P2] BD profile failed — trying direct HTTP fallback for {res['name']}", "WARN")
+                    try:
+                        direct_r = HTTP_SESSION.get(purl, headers={
+                            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+                            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
+                            'Accept-Language': 'en-US,en;q=0.9',
+                            'Referer': 'https://www.fastpeoplesearch.com/',
+                        }, timeout=30, verify=False)
+                        if direct_r.status_code == 200 and len(direct_r.text) > 5000 and not is_rejected_scrape_body(direct_r.text):
+                            phtml_direct = direct_r.text
+                            pdata = _parse_profile(phtml_direct)
+                            if pdata.get('phones') or pdata.get('emails'):
+                                if pdata.get('phones'):     res['phones']     = pdata['phones']
+                                if pdata.get('emails'):     res['emails']      = pdata['emails']
+                                if pdata.get('associates'): res['associates']  = pdata['associates']
+                                if pdata.get('employment'): res['employment']  = pdata['employment']
+                                if pdata.get('free_background_report'): res['free_background_report'] = pdata['free_background_report']
+                                if pdata.get('addresses') and len(pdata['addresses']) > len(res.get('addresses',[])):
+                                    res['addresses'] = pdata['addresses']
+                                res['_profile_html'] = phtml_direct
+                                log_event(f"[P2] ✅ Direct HTTP fallback enriched: {len(res.get('phones',[]))} phones, {len(res.get('emails',[]))} emails")
+                            else:
+                                log_event(f"[P2] Profile page unavailable via provider or direct — using search card fallback", "WARN")
+                        else:
+                            log_event(f"[P2] Direct HTTP fallback also failed (status={direct_r.status_code}) — using search card fallback", "WARN")
+                    except Exception as direct_e:
+                        log_event(f"[P2] Direct HTTP fallback error: {direct_e} — using search card fallback", "WARN")
 
         # Enrich ALL results with authentic detail profile HTML for 100% real full-page screenshots
         if len(results) > 1:
