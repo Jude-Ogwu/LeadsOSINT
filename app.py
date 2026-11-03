@@ -155,6 +155,8 @@ def clean(s):
 
 # -- HTTP Session with Connection Pooling (Massive Speed Enhancement) ---------
 HTTP_SESSION = requests.Session()
+# Disable automatic proxy detection from env vars (fixes PythonAnywhere 403 proxy block on outbound requests)
+HTTP_SESSION.trust_env = False
 adapter = requests.adapters.HTTPAdapter(pool_connections=50, pool_maxsize=50, max_retries=0)
 HTTP_SESSION.mount('http://', adapter)
 HTTP_SESSION.mount('https://', adapter)
