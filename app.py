@@ -1772,7 +1772,8 @@ def _get_social_label(url):
 
 # -- HTML report generation -------------------------------------
 def build_lead_report(lead_name, location, results, lead_folder, lead_safe,
-                      job_id='', lead_idx=0, social_link='', email='', phone=''):
+                      job_id='', lead_idx=0, social_link='', email='', phone='',
+                      is_shared=False, is_lead_share=False, share_token=None):
     active_cards   = ''
     archived_cards = ''
 
@@ -1889,7 +1890,7 @@ def build_lead_report(lead_name, location, results, lead_folder, lead_safe,
             bg_report_html = ''
 
         action_row = ''
-        if job_id:
+        if job_id and not is_shared:
             if is_archived:
                 action_row = f'''
   <div class="res-actions arch-mode">
@@ -1968,7 +1969,72 @@ def build_lead_report(lead_name, location, results, lead_folder, lead_safe,
     active_count = sum(1 for r in results if not r.get('archived', False))
     ts = datetime.now().strftime('%B %d, %Y · %I:%M %p')
 
-    back_href = f"/results/{job_id}" if job_id else "../index.html"
+    if is_lead_share:
+        back_btn_html = '<span class="back" style="pointer-events:none;background:rgba(167,139,250,0.12);border-color:rgba(167,139,250,0.3);color:var(--ac);font-weight:600">🔒 Confidential OSINT Lead</span>'
+    elif is_shared and share_token:
+        back_btn_html = f'<a href="/share/{share_token}" class="back">← Back to Job</a>'
+    else:
+        back_href = f"/results/{job_id}" if job_id else "../index.html"
+        back_btn_html = f'<a href="{back_href}" class="back" onclick="if(window.location.protocol===\'file:\'){{this.href=\'../index.html\'}}">← Back to Job</a>'
+
+    if is_shared:
+        lead_top_actions = f'''
+    {social_top_btn}
+    {email_top_btn}
+    {phone_top_btn}'''
+        lead_ro_css = '''
+<style>
+.res-actions, .redo-report-btn, .redo-lead-btn,
+button[onclick*="openShareModal"], button[onclick*="redo"],
+button[onclick*="Delete"], button[onclick*="delete"],
+button[onclick*="archive"], button[onclick*="unarchive"],
+#share-modal, #confirm-overlay, .share-modal, .confirm-overlay {
+  display: none !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
+</style>'''
+        lead_modals_html = ''
+    else:
+        lead_top_actions = f'''
+    <button class="social-top-btn" style="background:linear-gradient(135deg,#0284c7,#38bdf8);color:#fff;cursor:pointer;border:none" onclick="openShareModal()" title="Share Result">🔗 Share</button>
+    <button class="social-top-btn" style="background:linear-gradient(135deg,#6d28d9,#a78bfa);color:#fff;cursor:pointer;border:none" onclick="redoReportLead('{job_id}', {lead_idx})" title="Re-run search for this lead">🔄 Re-do Search</button>
+    {social_top_btn}
+    {email_top_btn}
+    {phone_top_btn}'''
+        lead_ro_css = ''
+        lead_modals_html = f'''
+<div class="confirm-overlay" id="confirm-overlay">
+  <div class="confirm-box">
+    <h3>🗑 Delete This Result?</h3>
+    <p>This will permanently remove the result and its screenshot.<br>This <strong>cannot be undone</strong>.</p>
+    <div class="confirm-btns">
+      <button class="cb-cancel" onclick="closeConfirm()">Cancel</button>
+      <button class="cb-delete" id="cb-confirm-btn" onclick="doDelete()">Delete Permanently</button>
+    </div>
+  </div>
+</div>
+
+<div class="share-modal" id="share-modal" onclick="if(event.target===this)closeShareModal()">
+  <div class="share-box">
+    <div class="share-hdr">
+      <h3>🔗 Share Result Link</h3>
+      <span class="share-close" onclick="closeShareModal()">✕</span>
+    </div>
+    <p>Anyone with this direct link can view these results in read-only mode.<br><strong style="color:var(--ac)">⚡ Active while account is in good standing. Automatically freezes if account is paused or leads are depleted.</strong></p>
+    <div class="share-input-wrap">
+      <input type="text" id="share-url-input" readonly value="" placeholder="Generating link...">
+      <button class="share-copy-btn" onclick="copyShareLink()">Copy</button>
+    </div>
+    <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap">
+      <button class="res-btn" onclick="resetLeadShareLink()" style="flex:1;background:rgba(239,68,68,0.15);border:1px solid #ef4444;color:#fca5a5;padding:8px 12px;border-radius:8px;font-size:.82rem;font-weight:700;cursor:pointer" title="Revokes old share link and generates a brand new one">🔄 Reset / Revoke Link</button>
+    </div>
+    <div class="share-socials">
+      <a id="share-wa" href="#" target="_blank" class="soc-btn soc-wa">📱 WhatsApp</a>
+      <a id="share-tg" href="#" target="_blank" class="soc-btn soc-tg">✈️ Telegram</a>
+    </div>
+  </div>
+</div>'''
 
     return f'''<!DOCTYPE html>
 <html lang="en"><head>
@@ -2168,17 +2234,14 @@ body{{font-family:"Segoe UI",system-ui,sans-serif;background:var(--bg);color:var
   .modal-wrap{{max-width:100%;margin:4px auto 16px auto}}
   .modal-img{{width:100%;max-width:100%}}
 }}
+{lead_ro_css}
 </style></head><body>
 <div class="topbar">
-  <a href="{back_href}" class="back" onclick="if(window.location.protocol===\'file:\'){{this.href=\'../index.html\'}}">← Back to Job</a>
+  {back_btn_html}
   <div class="ttl"><h1>🔍 {lead_name}</h1>
     <p>Location: {location or "Not specified"} · {ts}</p></div>
   <div style="display:flex;gap:8px;margin-left:auto;flex-wrap:wrap">
-    <button class="social-top-btn" style="background:linear-gradient(135deg,#0284c7,#38bdf8);color:#fff;cursor:pointer;border:none" onclick="openShareModal()" title="Share Result">🔗 Share</button>
-    <button class="social-top-btn" style="background:linear-gradient(135deg,#6d28d9,#a78bfa);color:#fff;cursor:pointer;border:none" onclick="redoReportLead('{job_id}', {lead_idx})" title="Re-run search for this lead">🔄 Re-do Search</button>
-    {social_top_btn}
-    {email_top_btn}
-    {phone_top_btn}
+    {lead_top_actions}
   </div>
 </div>
 <div class="stats">
@@ -2223,39 +2286,7 @@ body{{font-family:"Segoe UI",system-ui,sans-serif;background:var(--bg);color:var
     <img id="modal-img" src="" class="modal-img" onclick="event.stopPropagation()">
   </div>
 </div>
-<div class="confirm-overlay" id="confirm-overlay">
-  <div class="confirm-box">
-    <h3>🗑 Delete This Result?</h3>
-    <p>This will permanently remove the result and its screenshot.<br>This <strong>cannot be undone</strong>.</p>
-    <div class="confirm-btns">
-      <button class="cb-cancel" onclick="closeConfirm()">Cancel</button>
-      <button class="cb-delete" id="cb-confirm-btn" onclick="doDelete()">Delete Permanently</button>
-    </div>
-  </div>
-</div>
-
-
-
-<div class="share-modal" id="share-modal" onclick="if(event.target===this)closeShareModal()">
-  <div class="share-box">
-    <div class="share-hdr">
-      <h3>🔗 Share Result Link</h3>
-      <span class="share-close" onclick="closeShareModal()">✕</span>
-    </div>
-    <p>Anyone with this direct link can view these results in read-only mode.<br><strong style="color:var(--ac)">⚡ Active while account is in good standing. Automatically freezes if account is paused or leads are depleted.</strong></p>
-    <div class="share-input-wrap">
-      <input type="text" id="share-url-input" readonly value="" placeholder="Generating link...">
-      <button class="share-copy-btn" onclick="copyShareLink()">Copy</button>
-    </div>
-    <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap">
-      <button class="res-btn" onclick="resetLeadShareLink()" style="flex:1;background:rgba(239,68,68,0.15);border:1px solid #ef4444;color:#fca5a5;padding:8px 12px;border-radius:8px;font-size:.82rem;font-weight:700;cursor:pointer" title="Revokes old share link and generates a brand new one">🔄 Reset / Revoke Link</button>
-    </div>
-    <div class="share-socials">
-      <a id="share-wa" href="#" target="_blank" class="soc-btn soc-wa">📱 WhatsApp</a>
-      <a id="share-tg" href="#" target="_blank" class="soc-btn soc-tg">✈️ Telegram</a>
-    </div>
-  </div>
-</div>
+{lead_modals_html}
 
 <script>
 const JOB_ID   = '{job_id}';
@@ -2271,10 +2302,11 @@ window.addEventListener('scroll', () => {{
   }}
 }});
 
-let _reportShareToken = '';
+let _reportShareToken = '{share_token or ""}';
 
 async function openShareModal() {{
   document.getElementById('share-modal').classList.add('open');
+  updateLeadShareLink();
   const inp = document.getElementById('share-url-input');
   if (!_reportShareToken) {{
     inp.value = 'Generating secure share link...';
@@ -2283,10 +2315,10 @@ async function openShareModal() {{
       const d = await r.json();
       if (d.share_token) {{
         _reportShareToken = d.share_token;
+        updateLeadShareLink();
       }}
     }} catch(e) {{}}
   }}
-  updateLeadShareLink();
 }}
 
 function updateLeadShareLink() {{
@@ -2294,7 +2326,7 @@ function updateLeadShareLink() {{
   let url = window.location.href;
   if (_reportShareToken) {{
     const folder = '{lead_safe}';
-    url = window.location.origin + '/share/' + _reportShareToken + '/' + folder + '/report.html';
+    url = window.location.origin + '/share/lead/' + _reportShareToken + '/' + folder + '/report.html';
   }}
   inp.value = url;
   const encodedUrl = encodeURIComponent(url);
@@ -2551,6 +2583,16 @@ window.addEventListener('scroll', () => {{
 
 
 def build_job_index(job, is_shared=False, share_token=None):
+    if not is_shared:
+        if not job.get('share_token'):
+            try:
+                job['share_token'] = database.get_or_create_share_token(
+                    job['id'], job.get('user_id', 1), job.get('username', 'admin'),
+                    job.get('name', job['id']), job.get('status', 'complete'),
+                    job.get('total', 0), job.get('done', 0), job.get('folder', '')
+                )
+            except Exception:
+                pass
     cards = ''
     for idx, lead in enumerate(job.get('leads', [])):
         status  = lead.get('status', 'queued')
@@ -2646,21 +2688,23 @@ def build_job_index(job, is_shared=False, share_token=None):
 const JOB_ID = \'{job["id"]}\';
 let currentShareToken = \'{job.get("share_token", "")}\';
 
-async function openReportShareModal() {{
+function openReportShareModal() {{
   const modal = document.getElementById('report-share-modal');
+  if (!modal) return;
   modal.classList.add('open');
-  const inp = document.getElementById('report-share-input');
-  if (!currentShareToken) {{
-    inp.value = 'Generating share link...';
-    try {{
-      const r = await fetch('/api/jobs/' + JOB_ID + '/share', {{method: 'POST'}});
-      const d = await r.json();
-      if (d.share_token) {{
-        currentShareToken = d.share_token;
-      }}
-    }} catch(e) {{}}
-  }}
   updateShareLinks();
+  if (!currentShareToken) {{
+    const inp = document.getElementById('report-share-input');
+    if (inp) inp.value = 'Generating share link...';
+    fetch('/api/jobs/' + JOB_ID + '/share', {{method: 'POST'}})
+      .then(r => r.json())
+      .then(d => {{
+        if (d.share_token) {{
+          currentShareToken = d.share_token;
+          updateShareLinks();
+        }}
+      }}).catch(() => {{}});
+  }}
 }}
 
 function updateShareLinks() {{
@@ -3307,7 +3351,6 @@ def api_post_message():
 
 # -- Sharing -------------------------------------------------------------------
 @app.route('/api/jobs/<job_id>/share', methods=['POST'])
-@login_required
 def api_share_job(job_id):
     job = jobs.get(job_id)
     if not job:
@@ -3471,14 +3514,7 @@ def view_shared_job(share_token):
         }
     return build_job_index(job, is_shared=True, share_token=share_token)
 
-@app.route('/share/<share_token>/<path:subpath>')
-def serve_shared_subpath(share_token, subpath):
-    job_rec, status = database.get_job_by_share_token(share_token)
-    if status == 'frozen':
-        return render_template_string(FROZEN_SHARE_TEMPLATE, whatsapp_url=database.WHATSAPP_SUPPORT_URL), 403
-    if not job_rec or status != 'valid':
-        return abort(404)
-
+def _resolve_job_and_folder(job_rec):
     job = jobs.get(job_rec['id'])
     job_folder = job.get('folder') if (job and job.get('folder')) else job_rec.get('folder', '')
     if not job_folder or not os.path.exists(job_folder):
@@ -3487,68 +3523,181 @@ def serve_shared_subpath(share_token, subpath):
                 if job_rec['id'].upper() in entry.upper():
                     job_folder = os.path.join(OUT_DIR, entry)
                     break
-    job_folder = os.path.abspath(job_folder) if job_folder else ''
-    safe_subpath = subpath.replace('..', '').lstrip('/').lstrip('\\')
-    target_path = os.path.abspath(os.path.join(job_folder, safe_subpath)) if job_folder else ''
+    return job, os.path.abspath(job_folder) if job_folder else ''
 
-    if not target_path or not os.path.exists(target_path):
-        cand = os.path.abspath(os.path.join(OUT_DIR, safe_subpath))
-        if os.path.exists(cand):
-            target_path = cand
-        elif job_folder and os.path.exists(job_folder):
-            for sub in os.listdir(job_folder):
-                cand2 = os.path.abspath(os.path.join(job_folder, sub, safe_subpath))
-                if os.path.exists(cand2):
-                    target_path = cand2
-                    break
-
-    if not target_path or not os.path.exists(target_path):
+@app.route('/share/<share_token>/<path:subpath>')
+def serve_shared_subpath(share_token, subpath):
+    job_rec, status = database.get_job_by_share_token(share_token)
+    if status == 'frozen':
+        return render_template_string(FROZEN_SHARE_TEMPLATE, whatsapp_url=database.WHATSAPP_SUPPORT_URL), 403
+    if not job_rec or status != 'valid':
         return abort(404)
 
-    if os.path.isdir(target_path):
-        target_path = os.path.join(target_path, 'report.html')
-        if not os.path.exists(target_path):
-            return abort(404)
+    job, job_folder = _resolve_job_and_folder(job_rec)
+    safe_subpath = subpath.replace('..', '').lstrip('/').lstrip('\\')
 
-    if target_path.endswith('.html'):
-        with open(target_path, 'r', encoding='utf-8') as f:
-            html = f.read()
+    # Image asset handling
+    if safe_subpath.lower().endswith(('.png', '.jpg', '.jpeg', '.webp', '.svg', '.gif')):
+        if job_folder:
+            cand = os.path.join(job_folder, safe_subpath)
+            if os.path.exists(cand):
+                return send_file(cand)
+            if os.path.isdir(job_folder):
+                for sub in os.listdir(job_folder):
+                    cand2 = os.path.join(job_folder, sub, safe_subpath)
+                    if os.path.isfile(cand2):
+                        return send_file(cand2)
+        cand_out = os.path.join(OUT_DIR, safe_subpath)
+        if os.path.exists(cand_out):
+            return send_file(cand_out)
+        return abort(404)
 
-        # Rewrite Back button to return to shared dossier index
-        html = re.sub(
-            r'<a\s+[^>]*class="back"[^>]*>.*?</a>',
-            f'<a href="/share/{share_token}" class="back">← Back to Dossier</a>',
-            html,
-            flags=re.DOTALL
+    # Lead report HTML in Job Share (has ← Back to Job button)
+    folder_part = safe_subpath.split('/')[0] if '/' in safe_subpath else safe_subpath
+    if folder_part.endswith('.html'):
+        folder_part = ''
+    
+    lead_found = None
+    lead_idx = 0
+    if job and job.get('leads'):
+        for idx, l in enumerate(job['leads']):
+            if l.get('folder_name') == folder_part or (folder_part and folder_part in l.get('folder_name', '')):
+                lead_found = l
+                lead_idx = idx
+                break
+
+    lead_dir = os.path.join(job_folder, folder_part) if (job_folder and folder_part) else ''
+    djson = os.path.join(lead_dir, 'data.json') if lead_dir else ''
+    results = []
+    if djson and os.path.exists(djson):
+        try:
+            with open(djson, 'r', encoding='utf-8') as df:
+                dj = json.load(df)
+                results = dj.get('results', [])
+        except Exception:
+            pass
+    
+    if lead_found or (djson and os.path.exists(djson)):
+        lname = lead_found.get('name', folder_part) if lead_found else folder_part
+        loc = lead_found.get('location', '') if lead_found else ''
+        soc = lead_found.get('social_link', '') if lead_found else ''
+        em = lead_found.get('email', '') if lead_found else ''
+        ph = lead_found.get('phone', '') if lead_found else ''
+        html = build_lead_report(
+            lname, loc, results, lead_dir or '', folder_part,
+            job_id=job_rec['id'], lead_idx=lead_idx,
+            social_link=soc, email=em, phone=ph,
+            is_shared=True, is_lead_share=False, share_token=share_token
         )
-        # Strip edit/delete/share actions
-        html = re.sub(r'<button[^>]*redoReportLead[^>]*>.*?</button>', '', html, flags=re.DOTALL)
-        html = re.sub(r'<button[^>]*openShareModal[^>]*>.*?</button>', '', html, flags=re.DOTALL)
-        html = re.sub(r'<div\s+class="share-modal"[^>]*>.*?</div>\s*(?=</body>|\Z)', '', html, flags=re.DOTALL)
-        html = re.sub(r'<div class="res-actions[^"]*">.*?</div>\s*(?=</details>|\Z)', '', html, flags=re.DOTALL)
-        html = re.sub(r'<button[^>]*(?:archiveResult|unarchiveResult|confirmDelete|deleteResult)[^>]*>.*?</button>', '', html, flags=re.DOTALL)
+        resp = make_response(html)
+        resp.headers['Content-Type'] = 'text/html; charset=utf-8'
+        resp.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+        return resp
 
-        ro_css = """
-<style>
-.res-actions, .redo-report-btn, .redo-lead-btn,
-button[onclick*="openShareModal"], button[onclick*="redo"],
-button[onclick*="Delete"], button[onclick*="delete"],
-button[onclick*="archive"], button[onclick*="unarchive"],
-#share-modal, #confirm-overlay, .share-modal, .confirm-overlay {
-  display: none !important;
-  visibility: hidden !important;
-  pointer-events: none !important;
-}
-</style>
-"""
-        if '</head>' in html:
-            html = html.replace('</head>', f'{ro_css}\n</head>')
-        else:
-            html = ro_css + html
+    target_path = os.path.join(job_folder, safe_subpath) if job_folder else ''
+    if target_path and os.path.exists(target_path):
+        if target_path.endswith('.html'):
+            with open(target_path, 'r', encoding='utf-8') as f:
+                html = f.read()
+            html = re.sub(r'<a\s+[^>]*class="back"[^>]*>.*?</a>', f'<a href="/share/{share_token}" class="back">← Back to Job</a>', html, flags=re.DOTALL)
+            html = re.sub(r'<button[^>]*redoReportLead[^>]*>.*?</button>', '', html, flags=re.DOTALL)
+            html = re.sub(r'<button[^>]*openShareModal[^>]*>.*?</button>', '', html, flags=re.DOTALL)
+            html = re.sub(r'<div\s+class="share-modal"[^>]*>.*?</div>\s*(?=</body>|\Z)', '', html, flags=re.DOTALL)
+            html = re.sub(r'<div class="res-actions[^"]*">.*?</div>\s*(?=</details>|\Z)', '', html, flags=re.DOTALL)
+            html = re.sub(r'<button[^>]*(?:archiveResult|unarchiveResult|confirmDelete|deleteResult)[^>]*>.*?</button>', '', html, flags=re.DOTALL)
+            resp = make_response(html)
+            resp.headers['Content-Type'] = 'text/html; charset=utf-8'
+            resp.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+            return resp
+        return send_file(target_path)
+    return abort(404)
 
-        return html
+@app.route('/share/lead/<share_token>/<path:subpath>')
+def serve_shared_single_lead(share_token, subpath):
+    job_rec, status = database.get_job_by_share_token(share_token)
+    if status == 'frozen':
+        return render_template_string(FROZEN_SHARE_TEMPLATE, whatsapp_url=database.WHATSAPP_SUPPORT_URL), 403
+    if not job_rec or status != 'valid':
+        return abort(404)
 
-    return send_file(target_path)
+    job, job_folder = _resolve_job_and_folder(job_rec)
+    safe_subpath = subpath.replace('..', '').lstrip('/').lstrip('\\')
+
+    # Image asset handling
+    if safe_subpath.lower().endswith(('.png', '.jpg', '.jpeg', '.webp', '.svg', '.gif')):
+        if job_folder:
+            cand = os.path.join(job_folder, safe_subpath)
+            if os.path.exists(cand):
+                return send_file(cand)
+            if os.path.isdir(job_folder):
+                for sub in os.listdir(job_folder):
+                    cand2 = os.path.join(job_folder, sub, safe_subpath)
+                    if os.path.isfile(cand2):
+                        return send_file(cand2)
+        cand_out = os.path.join(OUT_DIR, safe_subpath)
+        if os.path.exists(cand_out):
+            return send_file(cand_out)
+        return abort(404)
+
+    # Single Lead Share HTML: strictly NO Back to Job button and zero action buttons
+    folder_part = safe_subpath.split('/')[0] if '/' in safe_subpath else safe_subpath
+    if folder_part.endswith('.html'):
+        folder_part = ''
+    
+    lead_found = None
+    lead_idx = 0
+    if job and job.get('leads'):
+        for idx, l in enumerate(job['leads']):
+            if l.get('folder_name') == folder_part or (folder_part and folder_part in l.get('folder_name', '')):
+                lead_found = l
+                lead_idx = idx
+                break
+
+    lead_dir = os.path.join(job_folder, folder_part) if (job_folder and folder_part) else ''
+    djson = os.path.join(lead_dir, 'data.json') if lead_dir else ''
+    results = []
+    if djson and os.path.exists(djson):
+        try:
+            with open(djson, 'r', encoding='utf-8') as df:
+                dj = json.load(df)
+                results = dj.get('results', [])
+        except Exception:
+            pass
+    
+    if lead_found or (djson and os.path.exists(djson)):
+        lname = lead_found.get('name', folder_part) if lead_found else folder_part
+        loc = lead_found.get('location', '') if lead_found else ''
+        soc = lead_found.get('social_link', '') if lead_found else ''
+        em = lead_found.get('email', '') if lead_found else ''
+        ph = lead_found.get('phone', '') if lead_found else ''
+        html = build_lead_report(
+            lname, loc, results, lead_dir or '', folder_part,
+            job_id=job_rec['id'], lead_idx=lead_idx,
+            social_link=soc, email=em, phone=ph,
+            is_shared=True, is_lead_share=True, share_token=share_token
+        )
+        resp = make_response(html)
+        resp.headers['Content-Type'] = 'text/html; charset=utf-8'
+        resp.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+        return resp
+
+    target_path = os.path.join(job_folder, safe_subpath) if job_folder else ''
+    if target_path and os.path.exists(target_path):
+        if target_path.endswith('.html'):
+            with open(target_path, 'r', encoding='utf-8') as f:
+                html = f.read()
+            html = re.sub(r'<a\s+[^>]*class="back"[^>]*>.*?</a>', '<span class="back" style="pointer-events:none;background:rgba(167,139,250,0.12);border-color:rgba(167,139,250,0.3);color:var(--ac);font-weight:600">🔒 Confidential OSINT Lead</span>', html, flags=re.DOTALL)
+            html = re.sub(r'<button[^>]*redoReportLead[^>]*>.*?</button>', '', html, flags=re.DOTALL)
+            html = re.sub(r'<button[^>]*openShareModal[^>]*>.*?</button>', '', html, flags=re.DOTALL)
+            html = re.sub(r'<div\s+class="share-modal"[^>]*>.*?</div>\s*(?=</body>|\Z)', '', html, flags=re.DOTALL)
+            html = re.sub(r'<div class="res-actions[^"]*">.*?</div>\s*(?=</details>|\Z)', '', html, flags=re.DOTALL)
+            html = re.sub(r'<button[^>]*(?:archiveResult|unarchiveResult|confirmDelete|deleteResult)[^>]*>.*?</button>', '', html, flags=re.DOTALL)
+            resp = make_response(html)
+            resp.headers['Content-Type'] = 'text/html; charset=utf-8'
+            resp.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+            return resp
+        return send_file(target_path)
+    return abort(404)
 
 # -- Network Status Health Check ------------------------------------------------
 @app.route('/api/network-status', methods=['GET'])
@@ -4120,44 +4269,34 @@ def unarchive_result_api(job_id, lead_idx, result_idx):
 def results_page(job_id):
     load_jobs()
     job = jobs.get(job_id)
-    if job:
-        regenerate_index(job_id)
-        idx = job.get('index_path', '')
-        if idx and os.path.exists(idx):
-            return send_file(idx)
-        jfolder = job.get('folder', '')
-        if jfolder:
-            f_idx = os.path.join(jfolder, 'index.html')
-            if os.path.exists(f_idx):
-                return send_file(f_idx)
-        return build_job_index(job)
-
-    # Direct filesystem check: look for any directory matching *job_id* in OUT_DIR
-    if os.path.exists(OUT_DIR):
+    if not job and os.path.exists(OUT_DIR):
         for entry in os.listdir(OUT_DIR):
             if job_id.upper() in entry.upper():
                 cand = os.path.join(OUT_DIR, entry)
                 if os.path.isdir(cand):
                     load_jobs()
                     job = jobs.get(job_id)
-                    if job:
-                        regenerate_index(job_id)
-                        f_idx = os.path.join(cand, 'index.html')
-                        if os.path.exists(f_idx):
-                            return send_file(f_idx)
-                        return build_job_index(job)
+                    break
+    if not job:
+        return 'Job not found', 404
 
-    # Fallback: if job_id was actually a lead folder name or report path
-    safe = job_id.replace('..', '').lstrip('/').lstrip('\\')
-    for j in reversed(list(jobs.values())):
-        candidate = os.path.join(j.get('folder', ''), safe)
-        if os.path.exists(candidate):
-            if os.path.isdir(candidate):
-                report_file = os.path.join(candidate, 'report.html')
-                if os.path.exists(report_file):
-                    return send_file(report_file)
-            return send_file(candidate)
-    return 'Job not found', 404
+    if not job.get('share_token'):
+        try:
+            job['share_token'] = database.get_or_create_share_token(
+                job['id'], job.get('user_id', 1), job.get('username', 'admin'),
+                job.get('name', job['id']), job.get('status', 'complete'),
+                job.get('total', 0), job.get('done', 0), job.get('folder', '')
+            )
+        except Exception:
+            pass
+
+    html_content = build_job_index(job, is_shared=False)
+    resp = make_response(html_content)
+    resp.headers['Content-Type'] = 'text/html; charset=utf-8'
+    resp.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate, max-age=0'
+    resp.headers['Pragma'] = 'no-cache'
+    resp.headers['Expires'] = '0'
+    return resp
 
 @app.route('/results/<job_id>/<path:subpath>')
 def results_subpath(job_id, subpath):
@@ -4170,6 +4309,46 @@ def results_subpath(job_id, subpath):
     if job_id not in jobs:
         load_jobs()
     job = jobs.get(job_id)
+
+    # Dynamic render of lead report HTML
+    if safe.endswith('.html'):
+        folder_part = safe.split('/')[0] if '/' in safe else ''
+        if folder_part and job:
+            for idx, lead in enumerate(job.get('leads', [])):
+                if lead.get('folder_name') == folder_part or folder_part in lead.get('folder_name', ''):
+                    jfolder = job.get('folder', '')
+                    lfolder = os.path.join(jfolder, folder_part) if jfolder else ''
+                    results = []
+                    djson = os.path.join(lfolder, 'data.json') if lfolder else ''
+                    if djson and os.path.exists(djson):
+                        try:
+                            with open(djson, 'r', encoding='utf-8') as df:
+                                dj = json.load(df)
+                                results = dj.get('results', [])
+                        except Exception:
+                            pass
+                    if not job.get('share_token'):
+                        try:
+                            job['share_token'] = database.get_or_create_share_token(
+                                job['id'], job.get('user_id', 1), job.get('username', 'admin'),
+                                job.get('name', job['id']), job.get('status', 'complete'),
+                                job.get('total', 0), job.get('done', 0), job.get('folder', '')
+                            )
+                        except Exception:
+                            pass
+                    html = build_lead_report(
+                        lead['name'], lead.get('location', ''), results, lfolder or '', folder_part,
+                        job_id=job['id'], lead_idx=idx,
+                        social_link=lead.get('social_link', ''),
+                        email=lead.get('email', ''),
+                        phone=lead.get('phone', ''),
+                        is_shared=False,
+                        share_token=job.get('share_token', '')
+                    )
+                    resp = make_response(html)
+                    resp.headers['Content-Type'] = 'text/html; charset=utf-8'
+                    resp.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+                    return resp
     if job and job.get('folder'):
         c1 = os.path.join(job['folder'], safe)
         if os.path.exists(c1):

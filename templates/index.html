@@ -1285,7 +1285,7 @@
     
     
     /* ── Full Device Responsiveness (Mobile & Tablet) ── */
-    @media (max-width: 1100px) {
+    @media (max-width: 1200px) {
       header {
         position: sticky !important;
         top: 0 !important;
@@ -2496,15 +2496,13 @@
             </div>
           </div>
         </div>
-          </div>
-        </div>
 
         <h4 style="color:var(--ac);margin-bottom:6px;font-size:1rem">1. The 4 Search Modes</h4>
         <p style="margin-bottom:10px">LeadsOSINT supports 4 dedicated intelligence search engines. Select the tab that matches your query data:</p>
         <ul style="margin-left:20px;margin-bottom:16px">
           <li><strong>👤 Name &amp; Location:</strong> Enter full name and city/state or ZIP code (e.g. <code>Michael Brown, Atlanta GA</code>). Full 10/10 verified public records are parsed with address timelines, phones, and email linkages.</li>
           <li><strong>📞 Phone Number:</strong> Reverse lookup by 10-digit US phone (e.g. <code>305-555-0199</code>). Identifies registered owners, carrier types, and resident history.</li>
-          <li><strong>✉️ Email Address:</strong> Reverse email intelligence (e.g. <code>david.miller@gmail.com</code>). Performs live record enrichment via That's Them reverse engines to locate verified individuals and residential locations.</li>
+          <li><strong>✉️ Email Address:</strong> Reverse email intelligence (e.g. <code>david.miller@gmail.com</code>). <em>Important Notice:</em> Unlike Name/Address searches which pull full historical dossiers, Reverse Email search specifically identifies and outlines the person or couple of people associated with or possibly owning the searched email address, along with their linked residential locations and contact records.</li>
           <li><strong>📍 Street Address:</strong> Property and resident lookup (e.g. <code>1515 Q St NW, Washington DC</code>). Reveals all current and past occupants.</li>
         </ul>
 
@@ -2648,7 +2646,7 @@
         hint.innerHTML = `<strong>Phone Lookup Mode:</strong> Enter 10-digit US telephone numbers with or without dashes. System runs direct reverse phone intelligence.`;
       } else if (mode === 'email') {
         ta.placeholder = "One email address per line:\n\njohn.smith@example.com\njudy.markoe@domain.org\nsarah.c@gmail.com";
-        hint.innerHTML = `<strong>Email Lookup Mode:</strong> Enter email addresses. System traces associated registered identities and profiles.`;
+        hint.innerHTML = `<strong>✉️ Email Lookup Mode:</strong> Enter email addresses (one per line).<br><span style="color:#fde047;font-weight:700">ℹ️ Important Notice:</span> Unlike Name or Address searches which pull full historical dossiers and public records, Reverse Email search is specifically designed to <strong>identify and outline the person or couple of people associated with or possibly owning the searched email address</strong>, along with their linked location and contact records.`;
       } else if (mode === 'address') {
         ta.placeholder = "One street address per line:\n\n1515 Q St NW, Washington DC\n742 Evergreen Terrace, Springfield OR\n350 5th Ave, New York NY";
         hint.innerHTML = `<strong>Address Lookup Mode:</strong> Enter full street address and city/state to locate all current and historical residents.`;
@@ -3241,7 +3239,7 @@
       container.innerHTML = job.leads.map((lead, idx) => {
         const reportLink = lead.folder_name ? `/results/${job.id}/${lead.folder_name}/report.html` : '';
         const nameHtml = reportLink
-          ? `<a href="${reportLink}" target="_blank" style="color:#fff;text-decoration:none;font-weight:700" onmouseover="this.style.textDecoration='underline'" onmouseout="this.style.textDecoration='none'">${escapeHtml(lead.name)}</a>`
+          ? `<a href="${reportLink}" style="color:#fff;text-decoration:none;font-weight:700" onmouseover="this.style.textDecoration='underline'" onmouseout="this.style.textDecoration='none'">${escapeHtml(lead.name)}</a>`
           : `<span style="color:#fff;font-weight:700">${escapeHtml(lead.name)}</span>`;
 
         let statusHtml = '';
@@ -3341,7 +3339,7 @@
     }
     function openReport() {
       if (!currentJobId) return;
-      window.open('/results/' + currentJobId, '_blank');
+      window.location.href = '/results/' + currentJobId;
     }
     async function shareCurrentJob() {
       if (!currentJobId) return;
