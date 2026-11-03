@@ -3291,7 +3291,7 @@ def api_me():
         'leads_remaining': leads_remaining,
         'is_frozen': is_frozen,
         'is_approaching_limit': is_approaching_limit,
-        'whatsapp_url': database.WHATSAPP_SUPPORT_URL
+        'whatsapp_url': database.get_support_settings().get('whatsapp_url') or database.WHATSAPP_SUPPORT_URL
     })
 
 # -- Admin User Management -----------------------------------------------------
@@ -3893,7 +3893,7 @@ def _create_job_from_leads(leads, name='', autostart=True, user=None, auto_trim_
                 'leads_requested': len(leads),
                 'leads_remaining': remaining,
                 'can_trim': (remaining > 0 and len(leads) > remaining),
-                'whatsapp_url': database.WHATSAPP_SUPPORT_URL
+                'whatsapp_url': database.get_support_settings().get('whatsapp_url') or database.WHATSAPP_SUPPORT_URL
             }), 403
         database.record_user_usage(user['id'], len(leads))
         user_id = user['id']

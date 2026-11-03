@@ -1925,9 +1925,15 @@
       <span id="approaching-msg">Approaching Plan Limit: Less than 1 hour remaining or 85% of leads quota consumed.
         Renew to avoid disruption.</span>
     </div>
-    <a id="approaching-wa-btn" href="#" target="_blank"
-      style="background:#25d366;color:#fff;padding:5px 12px;border-radius:6px;text-decoration:none;font-size:0.78rem;font-weight:700">💬
-      Renew via WhatsApp</a>
+    <div style="display:flex;align-items:center;gap:12px">
+      <a id="approaching-wa-btn" href="#" target="_blank"
+        style="background:#25d366;color:#fff;padding:5px 12px;border-radius:6px;text-decoration:none;font-size:0.78rem;font-weight:700;display:inline-flex;align-items:center;gap:6px">💬 Renew via WhatsApp</a>
+      <button type="button" onclick="document.getElementById('approaching-limit-banner').style.display='none'"
+        style="background:transparent;border:none;color:#fef3c7;font-size:1.15rem;cursor:pointer;padding:2px 8px;line-height:1;border-radius:4px;display:flex;align-items:center;justify-content:center;opacity:0.8;transition:all .15s ease"
+        onmouseover="this.style.opacity='1';this.style.background='rgba(255,255,255,0.15)'"
+        onmouseout="this.style.opacity='0.8';this.style.background='transparent'"
+        title="Dismiss warning">✕</button>
+    </div>
   </div>
 
   <!-- Frozen Account Alert Banner -->
