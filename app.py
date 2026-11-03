@@ -1755,6 +1755,35 @@ def load_jobs(force=False):
     except Exception as e:
         print(f"  load_jobs recovery error: {e}")
 
+    # 3. SQLite DB sync: ensure all jobs tracked in SQLite jobs table are in jobs dict
+    try:
+        with database.get_db() as conn:
+            cursor = conn.cursor()
+            cursor.execute("SELECT * FROM jobs")
+            for r in cursor.fetchall():
+                jid = r['id']
+                if jid not in jobs:
+                    jobs[jid] = {
+                        'id': jid,
+                        'name': r['name'] or f"Job {jid}",
+                        'user_id': r['user_id'],
+                        'username': r['username'] or 'admin',
+                        'status': r['status'] or 'complete',
+                        'total': r['total'] or 0,
+                        'done': r['done'] or 0,
+                        'folder': r['folder'] or '',
+                        'share_token': r['share_token'] or '',
+                        'created': r['created_at'] if 'created_at' in r.keys() else '',
+                        'leads': []
+                    }
+                else:
+                    if r['share_token'] and not jobs[jid].get('share_token'):
+                        jobs[jid]['share_token'] = r['share_token']
+                    if r['username'] and not jobs[jid].get('username'):
+                        jobs[jid]['username'] = r['username']
+    except Exception as e:
+        pass
+
 # Immediately invoke load_jobs at module load time so WSGI starts with all jobs loaded
 load_jobs()
 
@@ -3561,7 +3590,9 @@ def serve_shared_subpath(share_token, subpath):
     lead_idx = 0
     if job and job.get('leads'):
         for idx, l in enumerate(job['leads']):
-            if l.get('folder_name') == folder_part or (folder_part and folder_part in l.get('folder_name', '')):
+            lf = l.get('folder_name', '')
+            lname = safe_name(l.get('name', ''), l.get('location', '')) if l.get('name') else ''
+            if lf == folder_part or (lf and folder_part in lf) or (lf and lf in folder_part) or (lname and lname in folder_part):
                 lead_found = l
                 lead_idx = idx
                 break
@@ -3648,7 +3679,9 @@ def serve_shared_single_lead(share_token, subpath):
     lead_idx = 0
     if job and job.get('leads'):
         for idx, l in enumerate(job['leads']):
-            if l.get('folder_name') == folder_part or (folder_part and folder_part in l.get('folder_name', '')):
+            lf = l.get('folder_name', '')
+            lname = safe_name(l.get('name', ''), l.get('location', '')) if l.get('name') else ''
+            if lf == folder_part or (lf and folder_part in lf) or (lf and lf in folder_part) or (lname and lname in folder_part):
                 lead_found = l
                 lead_idx = idx
                 break
@@ -4307,48 +4340,65 @@ def results_subpath(job_id, subpath):
             resp.headers['Cache-Control'] = 'public, max-age=86400, immutable'
         return resp
     if job_id not in jobs:
-        load_jobs()
+        load_jobs(force=True)
     job = jobs.get(job_id)
+    if not job and os.path.exists(OUT_DIR):
+        for entry in os.listdir(OUT_DIR):
+            if job_id.upper() in entry.upper():
+                load_jobs(force=True)
+                job = jobs.get(job_id)
+                break
 
     # Dynamic render of lead report HTML
     if safe.endswith('.html'):
         folder_part = safe.split('/')[0] if '/' in safe else ''
         if folder_part and job:
+            matched_lead = None
+            matched_idx = 0
             for idx, lead in enumerate(job.get('leads', [])):
-                if lead.get('folder_name') == folder_part or folder_part in lead.get('folder_name', ''):
-                    jfolder = job.get('folder', '')
-                    lfolder = os.path.join(jfolder, folder_part) if jfolder else ''
-                    results = []
-                    djson = os.path.join(lfolder, 'data.json') if lfolder else ''
-                    if djson and os.path.exists(djson):
-                        try:
-                            with open(djson, 'r', encoding='utf-8') as df:
-                                dj = json.load(df)
-                                results = dj.get('results', [])
-                        except Exception:
-                            pass
-                    if not job.get('share_token'):
-                        try:
-                            job['share_token'] = database.get_or_create_share_token(
-                                job['id'], job.get('user_id', 1), job.get('username', 'admin'),
-                                job.get('name', job['id']), job.get('status', 'complete'),
-                                job.get('total', 0), job.get('done', 0), job.get('folder', '')
-                            )
-                        except Exception:
-                            pass
-                    html = build_lead_report(
-                        lead['name'], lead.get('location', ''), results, lfolder or '', folder_part,
-                        job_id=job['id'], lead_idx=idx,
-                        social_link=lead.get('social_link', ''),
-                        email=lead.get('email', ''),
-                        phone=lead.get('phone', ''),
-                        is_shared=False,
-                        share_token=job.get('share_token', '')
-                    )
-                    resp = make_response(html)
-                    resp.headers['Content-Type'] = 'text/html; charset=utf-8'
-                    resp.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
-                    return resp
+                lf = lead.get('folder_name', '')
+                lname = safe_name(lead.get('name', ''), lead.get('location', '')) if lead.get('name') else ''
+                if lf == folder_part or (lf and folder_part in lf) or (lf and lf in folder_part) or (lname and lname in folder_part):
+                    matched_lead = lead
+                    matched_idx = idx
+                    break
+
+            if matched_lead or (job and job.get('leads')):
+                lead = matched_lead or job['leads'][0]
+                idx = matched_idx
+                jfolder = job.get('folder', '')
+                lfolder = os.path.join(jfolder, folder_part) if jfolder else ''
+                results = []
+                djson = os.path.join(lfolder, 'data.json') if lfolder else ''
+                if djson and os.path.exists(djson):
+                    try:
+                        with open(djson, 'r', encoding='utf-8') as df:
+                            dj = json.load(df)
+                            results = dj.get('results', [])
+                    except Exception:
+                        pass
+                if not job.get('share_token'):
+                    try:
+                        job['share_token'] = database.get_or_create_share_token(
+                            job['id'], job.get('user_id', 1), job.get('username', 'admin'),
+                            job.get('name', job['id']), job.get('status', 'complete'),
+                            job.get('total', 0), job.get('done', 0), job.get('folder', '')
+                        )
+                    except Exception:
+                        pass
+                html = build_lead_report(
+                    lead['name'], lead.get('location', ''), results, lfolder or '', folder_part,
+                    job_id=job['id'], lead_idx=idx,
+                    social_link=lead.get('social_link', ''),
+                    email=lead.get('email', ''),
+                    phone=lead.get('phone', ''),
+                    is_shared=False,
+                    share_token=job.get('share_token', '')
+                )
+                resp = make_response(html)
+                resp.headers['Content-Type'] = 'text/html; charset=utf-8'
+                resp.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+                return resp
     if job and job.get('folder'):
         c1 = os.path.join(job['folder'], safe)
         if os.path.exists(c1):

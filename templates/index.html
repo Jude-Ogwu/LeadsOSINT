@@ -545,6 +545,58 @@
       animation: blink 0.6s infinite;
     }
 
+    /* Filter bars & buttons */
+    .sb-filter-bar {
+      display: flex;
+      gap: 5px;
+      padding: 0 12px 10px;
+      overflow-x: auto;
+      scrollbar-width: none;
+      -webkit-overflow-scrolling: touch;
+    }
+    .sb-filter-bar::-webkit-scrollbar {
+      display: none;
+    }
+    .sb-pill-btn {
+      background: var(--s2);
+      border: 1px solid var(--bd);
+      color: var(--mt);
+      padding: 3px 9px;
+      border-radius: 12px;
+      font-size: 0.7rem;
+      font-weight: 600;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all .15s ease;
+      user-select: none;
+    }
+    .sb-pill-btn:hover {
+      color: #fff;
+      border-color: var(--ac);
+    }
+    .sb-pill-btn.active {
+      background: rgba(167, 139, 250, 0.22);
+      border-color: var(--ac);
+      color: #fff;
+      font-weight: 700;
+      box-shadow: 0 0 8px rgba(167, 139, 250, 0.2);
+    }
+    .admin-filter-select {
+      background: var(--s2);
+      border: 1px solid var(--bd);
+      color: #fff;
+      padding: 7px 12px;
+      border-radius: 8px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      outline: none;
+      cursor: pointer;
+      transition: border-color .15s ease;
+    }
+    .admin-filter-select:focus, .admin-filter-select:hover {
+      border-color: var(--ac);
+    }
+
     @keyframes blink {
 
       0%,
@@ -1929,6 +1981,13 @@
           oninput="filterJobs(this.value)">
         <button class="sb-search-clear" id="search-clear-btn" onclick="clearJobSearch()" style="display:none">✕</button>
       </div>
+      <div class="sb-filter-bar" id="sb-status-filters">
+        <button type="button" class="sb-pill-btn active" data-sb-filter="all" onclick="setSbJobFilter('all')">All</button>
+        <button type="button" class="sb-pill-btn" data-sb-filter="complete" onclick="setSbJobFilter('complete')">Completed</button>
+        <button type="button" class="sb-pill-btn" data-sb-filter="running" onclick="setSbJobFilter('running')">Running</button>
+        <button type="button" class="sb-pill-btn" data-sb-filter="failed" onclick="setSbJobFilter('failed')">Failed</button>
+        <button type="button" class="sb-pill-btn" data-sb-filter="paused" onclick="setSbJobFilter('paused')">Paused</button>
+      </div>
       <div class="sb-jobs" id="sb-jobs">
         <div class="sb-loading" id="sb-initial-loader">
           <div class="sb-skel-item"><div class="sb-skel-dot"></div><div class="sb-skel-lines"><div class="sb-skel-line" style="width:75%"></div><div class="sb-skel-line" style="width:40%"></div></div></div>
@@ -2111,10 +2170,21 @@
             <input type="text" id="admin-user-search" class="admin-search-input"
               placeholder="🔍 Search users by username, access key, status..." oninput="filterAdminUsersTable()"
               style="flex:1;min-width:220px;background:var(--s2);border:1px solid var(--bd);color:#fff;padding:8px 14px;border-radius:8px;font-size:.85rem;outline:none">
-            <div style="display:flex;gap:8px;align-items:center">
+            <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+              <select id="admin-user-status-filter" onchange="filterAdminUsersTable()" class="admin-filter-select" title="Filter by user status">
+                <option value="all">All Statuses</option>
+                <option value="active">Active</option>
+                <option value="frozen">Frozen / Depleted</option>
+                <option value="paused">Paused</option>
+                <option value="admin">Admin</option>
+              </select>
+              <select id="admin-user-role-filter" onchange="filterAdminUsersTable()" class="admin-filter-select" title="Filter by user role">
+                <option value="all">All Roles</option>
+                <option value="customer">Customers</option>
+                <option value="admin">Admins</option>
+              </select>
               <span id="admin-user-count"
-                style="font-size:0.75rem;color:var(--mt);font-weight:700;background:var(--s2);padding:4px 10px;border-radius:12px;border:1px solid var(--bd)">--
-                users</span>
+                style="font-size:0.75rem;color:var(--mt);font-weight:700;background:var(--s2);padding:4px 10px;border-radius:12px;border:1px solid var(--bd)">-- users</span>
               <button class="act-btn" onclick="loadAdminUsers()">🔄 Refresh</button>
             </div>
           </div>
@@ -2147,10 +2217,21 @@
             <input type="text" id="admin-job-search" class="admin-search-input"
               placeholder="🔍 Search customer jobs by name, customer, ID, status..." oninput="filterAdminJobsTable()"
               style="flex:1;min-width:220px;background:var(--s2);border:1px solid var(--bd);color:#fff;padding:8px 14px;border-radius:8px;font-size:.85rem;outline:none">
-            <div style="display:flex;gap:8px;align-items:center">
+            <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+              <select id="admin-job-account-filter" onchange="filterAdminJobsTable()" class="admin-filter-select" title="Filter by account type">
+                <option value="all">All Accounts</option>
+                <option value="admin">Admin Jobs (@admin)</option>
+                <option value="customer">Customer Jobs</option>
+              </select>
+              <select id="admin-job-status-filter" onchange="filterAdminJobsTable()" class="admin-filter-select" title="Filter by job status">
+                <option value="all">All Statuses</option>
+                <option value="complete">Completed</option>
+                <option value="running">Running</option>
+                <option value="failed">Failed</option>
+                <option value="paused">Paused</option>
+              </select>
               <span id="admin-job-count"
-                style="font-size:0.75rem;color:var(--mt);font-weight:700;background:var(--s2);padding:4px 10px;border-radius:12px;border:1px solid var(--bd)">--
-                jobs</span>
+                style="font-size:0.75rem;color:var(--mt);font-weight:700;background:var(--s2);padding:4px 10px;border-radius:12px;border:1px solid var(--bd)">-- jobs</span>
               <button class="act-btn" onclick="loadAdminCustomerJobs()">🔄 Refresh</button>
             </div>
           </div>
@@ -3048,7 +3129,7 @@
           ? `<span class="ji-user">👤 ${job.username}</span>` : '';
         return `
 <div class="job-item ${job.id === currentJobId ? 'active' : ''}"
-     data-id="${job.id}" data-name="${(job.name || job.id).toLowerCase()}" onclick="selectJob('${job.id}')">
+     data-id="${job.id}" data-name="${(job.name || job.id).toLowerCase()}" data-status="${(job.status || 'complete').toLowerCase()}" onclick="selectJob('${job.id}')">
   <div class="ji-status ${stClass}"></div>
   <div class="ji-name">${escapeHtml(job.name || job.id)}</div>
   <div class="ji-meta">
@@ -3057,6 +3138,7 @@
   </div>
 </div>`;
       }).join('');
+      filterJobs(document.getElementById('job-search')?.value || '');
     }
 
     // ── Job detail ─────────────────────────────────────────
@@ -3732,6 +3814,8 @@
 
     function filterAdminUsersTable() {
       const q = (document.getElementById('admin-user-search')?.value || '').toLowerCase().trim();
+      const statusFilter = document.getElementById('admin-user-status-filter')?.value || 'all';
+      const roleFilter = document.getElementById('admin-user-role-filter')?.value || 'all';
       const rows = document.querySelectorAll('#admin-users-tbody tr');
       let visible = 0;
       let total = 0;
@@ -3739,7 +3823,14 @@
         if (r.children.length === 1 && r.children[0].colSpan > 1) return;
         total++;
         const txt = r.textContent.toLowerCase();
-        if (!q || txt.includes(q)) {
+        const rowStatus = (r.dataset.status || '').toLowerCase();
+        const rowRole = (r.dataset.role || '').toLowerCase();
+
+        const matchQ = !q || txt.includes(q);
+        const matchStatus = (statusFilter === 'all') || (rowStatus === statusFilter);
+        const matchRole = (roleFilter === 'all') || (rowRole === roleFilter);
+
+        if (matchQ && matchStatus && matchRole) {
           r.style.display = '';
           visible++;
         } else {
@@ -3748,7 +3839,7 @@
       });
       const badge = document.getElementById('admin-user-count');
       if (badge) {
-        if (!q) {
+        if (!q && statusFilter === 'all' && roleFilter === 'all') {
           badge.textContent = `${total} user${total === 1 ? '' : 's'}`;
         } else {
           badge.textContent = `${visible} of ${total} match`;
@@ -3758,6 +3849,8 @@
 
     function filterAdminJobsTable() {
       const q = (document.getElementById('admin-job-search')?.value || '').toLowerCase().trim();
+      const accountFilter = document.getElementById('admin-job-account-filter')?.value || 'all';
+      const statusFilter = document.getElementById('admin-job-status-filter')?.value || 'all';
       const rows = document.querySelectorAll('#admin-jobs-tbody tr');
       let visible = 0;
       let total = 0;
@@ -3765,7 +3858,14 @@
         if (r.children.length === 1 && r.children[0].colSpan > 1) return;
         total++;
         const txt = r.textContent.toLowerCase();
-        if (!q || txt.includes(q)) {
+        const rowStatus = (r.dataset.status || '').toLowerCase();
+        const rowAccount = (r.dataset.account || '').toLowerCase();
+
+        const matchQ = !q || txt.includes(q);
+        const matchAccount = (accountFilter === 'all') || (rowAccount === accountFilter);
+        const matchStatus = (statusFilter === 'all') || (rowStatus === statusFilter);
+
+        if (matchQ && matchAccount && matchStatus) {
           r.style.display = '';
           visible++;
         } else {
@@ -3774,7 +3874,7 @@
       });
       const badge = document.getElementById('admin-job-count');
       if (badge) {
-        if (!q) {
+        if (!q && accountFilter === 'all' && statusFilter === 'all') {
           badge.textContent = `${total} job${total === 1 ? '' : 's'}`;
         } else {
           badge.textContent = `${visible} of ${total} match`;
@@ -3890,8 +3990,14 @@
 
           const addBtn = `<button class="act-btn primary" style="padding:3px 8px;font-size:.7rem" onclick="promptAddLeads(${u.id}, '${escapeHtml(u.username)}')">➕ Leads</button>`;
 
+          let userStatusKey = 'active';
+          if (u.role === 'admin') userStatusKey = 'admin';
+          else if (isFrozen) userStatusKey = 'frozen';
+          else if (isPaused) userStatusKey = 'paused';
+          else userStatusKey = 'active';
+
           return `
-<tr>
+<tr data-status="${userStatusKey}" data-role="${u.role}" data-username="${escapeHtml(u.username)}">
   <td><strong>${escapeHtml(u.username)}</strong> ${u.role === 'admin' ? '🛡️' : ''}</td>
   <td>${passCell}</td>
   <td><strong style="color:var(--bl)">${allocated}</strong></td>
@@ -3941,18 +4047,23 @@
         if (!res.ok) return;
         const allJobs = await res.json();
         const tbody = document.getElementById('admin-jobs-tbody');
-        const custJobs = allJobs.filter(j => j.username !== 'admin');
+        // Include ALL jobs (both customer jobs and admin jobs) so admin center displays complete platform history
+        const custJobs = allJobs;
         if (!custJobs.length) {
-          tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--mt)">No customer jobs submitted yet.</td></tr>';
+          tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--mt)">No jobs found.</td></tr>';
           filterAdminJobsTable();
           return;
         }
         tbody.innerHTML = custJobs.map(j => {
           const createdStr = j.created ? j.created.replace('T', ' ').substring(0, 16) : '—';
+          const isAdm = (j.username === 'admin');
+          const userBadge = isAdm
+            ? `<span style="display:inline-flex;align-items:center;gap:3px;font-size:0.75rem;font-weight:700;color:var(--gn);background:rgba(34,197,94,0.15);padding:2px 6px;border-radius:8px">🛡️ @admin</span>`
+            : `<span style="color:var(--ac);font-weight:700">@${escapeHtml(j.username || 'customer')}</span>`;
           return `
-<tr>
+<tr data-status="${(j.status || '').toLowerCase()}" data-account="${isAdm ? 'admin' : 'customer'}" data-user="${escapeHtml(j.username || '')}">
   <td><strong>${escapeHtml(j.name || j.id)}</strong><br><span style="font-size:.7rem;color:var(--mt)">ID: ${j.id}</span></td>
-  <td><span style="color:var(--ac);font-weight:700">@${escapeHtml(j.username)}</span></td>
+  <td>${userBadge}</td>
   <td>${j.done} / ${j.total}</td>
   <td><span class="lrs-${j.status}" style="padding:2px 8px;border-radius:10px;font-size:.7rem">${j.status}</span></td>
   <td style="font-size:.75rem">${createdStr}</td>
@@ -4076,18 +4187,35 @@
     // ── Tutorial Modal ─────────────────────────────────────
     function openTutorialModal() { openModal('tutorial-modal'); }
 
-    // ── Search & Filter ────────────────────────────────────
+    // ── Search & Filter (Available to ALL users) ──────────────────────
+    let currentSbJobFilter = 'all';
+
+    function setSbJobFilter(status) {
+      currentSbJobFilter = status;
+      document.querySelectorAll('#sb-status-filters .sb-pill-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.sbFilter === status);
+      });
+      const q = document.getElementById('job-search')?.value || '';
+      filterJobs(q);
+    }
+
     function filterJobs(query) {
-      const q = query.trim().toLowerCase();
+      const q = (query || '').trim().toLowerCase();
       const clearBtn = document.getElementById('search-clear-btn');
       if (clearBtn) clearBtn.style.display = q ? 'inline-block' : 'none';
 
       document.querySelectorAll('#sb-jobs .job-item').forEach(item => {
         const name = (item.dataset.name || '').toLowerCase();
         const id = (item.dataset.id || '').toLowerCase();
-        item.style.display = (!q || name.includes(q) || id.includes(q)) ? 'block' : 'none';
+        const status = (item.dataset.status || 'complete').toLowerCase();
+
+        const matchQ = !q || name.includes(q) || id.includes(q);
+        const matchStatus = (currentSbJobFilter === 'all') || (status === currentSbJobFilter);
+
+        item.style.display = (matchQ && matchStatus) ? 'block' : 'none';
       });
     }
+
     function clearJobSearch() {
       const inp = document.getElementById('job-search');
       if (inp) inp.value = '';
