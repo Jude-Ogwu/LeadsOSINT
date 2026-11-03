@@ -2720,6 +2720,7 @@ let currentShareToken = \'{job.get("share_token", "")}\';
 function openReportShareModal() {{
   const modal = document.getElementById('report-share-modal');
   if (!modal) return;
+  modal.style.display = 'flex';
   modal.classList.add('open');
   updateShareLinks();
   if (!currentShareToken) {{
@@ -2750,7 +2751,10 @@ function updateShareLinks() {{
 
 function closeReportShareModal() {{
   const m = document.getElementById('report-share-modal');
-  if (m) m.classList.remove('open');
+  if (m) {{
+    m.style.display = 'none';
+    m.classList.remove('open');
+  }}
 }}
 
 function copyReportShareLink() {{
