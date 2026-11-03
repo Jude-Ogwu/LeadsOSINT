@@ -1368,6 +1368,35 @@
       .hdr-right.open {
         transform: translateX(0) !important;
       }
+
+      /* Mobile Right Drawer - outside header so position:fixed works */
+      .mobile-right-drawer {
+        display: flex !important;
+        flex-direction: column !important;
+        position: fixed !important;
+        top: 54px !important;
+        right: 0 !important;
+        bottom: 0 !important;
+        width: 270px !important;
+        max-width: 85vw !important;
+        background: #101328 !important;
+        border-left: 1px solid var(--bd) !important;
+        box-shadow: -8px 0 35px rgba(0,0,0,0.85) !important;
+        padding: 18px 14px !important;
+        gap: 10px !important;
+        z-index: 1050 !important;
+        transform: translateX(100%) !important;
+        transition: transform 0.25s cubic-bezier(0.4,0,0.2,1) !important;
+        overflow-y: auto !important;
+      }
+      .mobile-right-drawer.open {
+        transform: translateX(0) !important;
+      }
+      /* Hide desktop hdr-right on mobile (it's now just in the drawer) */
+      .hdr-right {
+        display: none !important;
+      }
+
       .hdr-right .new-job-btn,
       .hdr-right .hdr-btn {
         width: 100% !important;
@@ -1638,6 +1667,165 @@
       background: var(--s);
     }
 
+    /* Job Detail Loading Skeleton */
+    .job-loading-skeleton {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      padding: 24px 20px;
+      animation: skeletonPulse 1.4s ease-in-out infinite;
+    }
+    .job-loading-skeleton.hidden { display: none; }
+    @keyframes skeletonPulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.4; }
+    }
+    .skel-bar {
+      background: var(--s2, #1e2040);
+      border-radius: 6px;
+      height: 14px;
+      width: 100%;
+    }
+    .skel-bar.w60 { width: 60%; }
+    .skel-bar.w40 { width: 40%; }
+    .skel-bar.w80 { width: 80%; }
+    .skel-bar.h20 { height: 20px; }
+    .skel-bar.h32 { height: 32px; }
+
+    /* Sidebar loading skeleton */
+    .sb-loading {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      padding: 12px 8px;
+      animation: skeletonPulse 1.4s ease-in-out infinite;
+    }
+    .sb-loading-item {
+      background: var(--s2, #1e2040);
+      border-radius: 8px;
+      height: 58px;
+    }
+
+
+
+    /* Ensure mobile right drawer is hidden by default on desktop */
+    .mobile-right-drawer {
+      display: none;
+    }
+
+
+    /* ── Polished Shimmer Loading Skeletons ── */
+    @keyframes pulseShimmer {
+      0%, 100% { opacity: 0.85; transform: scale(1); }
+      50% { opacity: 0.35; transform: scale(0.998); }
+    }
+
+    /* Sidebar Job List Skeleton */
+    .sb-loading {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      padding: 10px 8px;
+    }
+    .sb-skel-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 11px 12px;
+      background: rgba(255, 255, 255, 0.03);
+      border-radius: 9px;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      animation: pulseShimmer 1.4s ease-in-out infinite;
+    }
+    .sb-skel-dot {
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      background: var(--ac, #6366f1);
+      opacity: 0.6;
+      flex-shrink: 0;
+    }
+    .sb-skel-lines {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      flex: 1;
+    }
+    .sb-skel-line {
+      height: 10px;
+      border-radius: 4px;
+      background: rgba(255, 255, 255, 0.09);
+    }
+
+    /* Job Detail View Skeleton */
+    .job-detail-skeleton {
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      padding: 22px 26px;
+      gap: 20px;
+      animation: pulseShimmer 1.5s ease-in-out infinite;
+    }
+    .job-skel-header {
+      background: var(--s, #13152c);
+      border: 1px solid var(--bd, rgba(255,255,255,0.08));
+      border-radius: 12px;
+      padding: 18px 22px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .job-skel-title-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      flex-wrap: wrap;
+    }
+    .job-skel-title {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .job-skel-badge {
+      font-size: 0.78rem;
+      padding: 4px 10px;
+      border-radius: 6px;
+      background: rgba(99, 102, 241, 0.15);
+      color: #818cf8;
+      border: 1px solid rgba(99, 102, 241, 0.3);
+      font-weight: 600;
+    }
+    .job-skel-meta-row {
+      display: flex;
+      gap: 14px;
+      flex-wrap: wrap;
+    }
+    .job-skel-bar {
+      border-radius: 5px;
+      background: rgba(255, 255, 255, 0.08);
+    }
+    .job-skel-body {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    .job-skel-card {
+      background: var(--s, #13152c);
+      border: 1px solid var(--bd, rgba(255,255,255,0.08));
+      border-radius: 12px;
+      padding: 20px 22px;
+    }
+    .job-skel-preview-box {
+      height: 120px;
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px dashed rgba(255, 255, 255, 0.07);
+    }
+
 </style>
 </head>
 
@@ -1645,7 +1833,7 @@
 
   <!-- Header -->
   <header>
-    <button class="mobile-menu-btn" onclick="toggleSidebar()">☰</button>
+    <button class="mobile-menu-btn" onclick="toggleSidebar(event)" ontouchstart="toggleSidebar(event)">☰</button>
     <div class="logo" onclick="showNewPanel()">
       <div class="logo-box">⚡</div>
       <div class="logo-txt">
@@ -1674,7 +1862,7 @@
       </button>
       <a href="/api/auth/logout" class="hdr-btn logout-btn" title="Sign out">🚪 Logout</a>
     </div>
-    <button class="mobile-actions-toggle-btn" id="mobile-actions-toggle" onclick="toggleActionsMenu()" title="Open Navigation Menu">☰</button>
+    <button class="mobile-actions-toggle-btn" id="mobile-actions-toggle" onclick="toggleActionsMenu(event)" ontouchstart="toggleActionsMenu(event)" title="Open Navigation Menu">☰</button>
   </header>
 
   <!-- Approaching Limit Warning Banner -->
@@ -1708,14 +1896,30 @@
 
   <!-- Layout -->
     <div id="mobile-sidebar-overlay" class="mobile-sidebar-overlay" onclick="closeAllDrawers()"></div>
+  <!-- Mobile Right Navigation Drawer (outside header so position:fixed works) -->
+  <div id="mobile-right-drawer" class="mobile-right-drawer" onclick="event.stopPropagation()">
+    <button class="new-job-btn" style="width:100%;justify-content:flex-start;padding:11px 14px;font-size:0.86rem;border-radius:9px;" onclick="showNewPanel();closeActionsMenu()">+ New Job</button>
+    <button class="hdr-btn" style="width:100%;justify-content:flex-start;padding:11px 14px;font-size:0.86rem;border-radius:9px;" onclick="openMessagesModal();closeActionsMenu()">
+      💬 Messages <span class="badge-num" id="msg-badge-mobile" style="display:none">0</span>
+    </button>
+    <button class="hdr-btn" style="width:100%;justify-content:flex-start;padding:11px 14px;font-size:0.86rem;border-radius:9px;" onclick="openSupportModal();closeActionsMenu()" title="Contact Customer Support">
+      🎧 Support
+    </button>
+    <button class="hdr-btn" style="width:100%;justify-content:flex-start;padding:11px 14px;font-size:0.86rem;border-radius:9px;" onclick="openTutorialModal();closeActionsMenu()">📘 Guide</button>
+    <button class="hdr-btn admin-btn" id="admin-panel-btn-mobile" style="display:none;width:100%;justify-content:flex-start;padding:11px 14px;font-size:0.86rem;border-radius:9px;" onclick="openAdminModal();closeActionsMenu()">
+      ⚙️ Admin Center
+    </button>
+    <a href="/api/auth/logout" class="hdr-btn logout-btn" style="width:100%;justify-content:flex-start;padding:11px 14px;font-size:0.86rem;border-radius:9px;">🚪 Logout</a>
+  </div>
+
   <div class="layout">
 
     <!-- Sidebar -->
-    <div class="sidebar" id="sidebar">
+    <div class="sidebar" id="sidebar" onclick="event.stopPropagation()">
       <div class="sb-hdr">
         <div style="display:flex;align-items:center;gap:6px">
           <span>Jobs</span>
-          <span id="sb-count" style="color:var(--mt);font-size:.7rem">0</span>
+          <span id="sb-count" style="color:var(--mt);font-size:.7rem">...</span>
         </div>
         <button type="button" class="sb-toggle-btn" id="sb-toggle-btn" onclick="toggleSidebarDesktop()"
           title="Collapse Jobs Sidebar">◀</button>
@@ -1726,7 +1930,12 @@
         <button class="sb-search-clear" id="search-clear-btn" onclick="clearJobSearch()" style="display:none">✕</button>
       </div>
       <div class="sb-jobs" id="sb-jobs">
-        <div class="sb-empty">No jobs yet.<br>Click <strong>+ New Job</strong> to start.</div>
+        <div class="sb-loading" id="sb-initial-loader">
+          <div class="sb-skel-item"><div class="sb-skel-dot"></div><div class="sb-skel-lines"><div class="sb-skel-line" style="width:75%"></div><div class="sb-skel-line" style="width:40%"></div></div></div>
+          <div class="sb-skel-item"><div class="sb-skel-dot"></div><div class="sb-skel-lines"><div class="sb-skel-line" style="width:60%"></div><div class="sb-skel-line" style="width:35%"></div></div></div>
+          <div class="sb-skel-item"><div class="sb-skel-dot"></div><div class="sb-skel-lines"><div class="sb-skel-line" style="width:85%"></div><div class="sb-skel-line" style="width:50%"></div></div></div>
+          <div class="sb-skel-item"><div class="sb-skel-dot"></div><div class="sb-skel-lines"><div class="sb-skel-line" style="width:65%"></div><div class="sb-skel-line" style="width:45%"></div></div></div>
+        </div>
       </div>
     </div>
 
@@ -1821,7 +2030,7 @@
             <input type="text" class="job-title-edit" id="job-title-edit" placeholder="Job name..."
               onblur="renameJob()">
             <div class="jdh-actions">
-              <button class="act-btn share-btn" id="btn-share" onclick="shareCurrentJob()">🔗 Share Result</button>
+              <button class="act-btn share-btn" id="btn-share" onclick="shareCurrentJob()" title="Share complete dossier report">🔗 Share Report</button>
               <button class="act-btn primary" id="btn-start-all" onclick="startAll()" style="display:none">▶ Start
                 All</button>
               <button class="act-btn primary" id="btn-redo-all" onclick="redoAll()" style="display:none">🔄 Re-do
@@ -2044,6 +2253,22 @@
             <button type="button" class="act-btn primary" style="width:100%;margin-top:16px;padding:10px" onclick="saveAdminSupportSettings()">
               💾 Save Support Settings
             </button>
+
+            <div style="margin-top:24px;padding-top:18px;border-top:1px solid var(--bd)">
+              <h4 style="color:#fff;margin-bottom:6px;display:flex;align-items:center;gap:6px">
+                🎬 Official Video Walkthrough Tutorial
+              </h4>
+              <p style="color:var(--mt);font-size:0.82rem;margin-bottom:14px;line-height:1.5">
+                Set or update the video tutorial displayed in the User Guide modal. Supports YouTube links (auto-converts to embed), Vimeo, Loom, or direct MP4 URLs.
+              </p>
+              <div class="form-row">
+                <label>Tutorial Video URL</label>
+                <input type="text" id="admin-guide-video-input" placeholder="e.g. https://www.youtube.com/watch?v=... or https://example.com/walkthrough.mp4" style="width:100%">
+              </div>
+              <button type="button" class="act-btn primary" style="width:100%;margin-top:8px;padding:9px" onclick="saveAdminGuideVideo()">
+                📹 Save Tutorial Video URL
+              </button>
+            </div>
           </div>
         </div>
 
@@ -2207,37 +2432,55 @@
 
   <!-- 3. Guide & Tutorial Modal -->
   <div class="modal-overlay" id="tutorial-modal" onclick="if(event.target===this)closeModal('tutorial-modal')">
-    <div class="modal-box" style="max-width:700px">
+    <div class="modal-box" style="max-width:760px;max-height:88vh;display:flex;flex-direction:column">
       <div class="modal-hdr">
-        <h3>📘 LeadsOSINT User Guide &amp; Tutorial</h3>
+        <h3>📘 LeadsOSINT Comprehensive User Guide &amp; Video Tutorial</h3>
         <span class="modal-close" onclick="closeModal('tutorial-modal')">✕</span>
       </div>
-      <div class="modal-body" style="font-size:.88rem;line-height:1.7;color:#cbd5e1">
-        <h4 style="color:#fff;margin-bottom:6px">1. How to Format Your Search Input</h4>
-        <p style="margin-bottom:12px">Select your search mode (Name, Phone, Email, or Address), then enter leads one per
-          line or upload a CSV file:</p>
+      <div class="modal-body" style="font-size:.88rem;line-height:1.7;color:#cbd5e1;overflow-y:auto;padding-right:8px">
+        
+        <!-- Video Walkthrough Section -->
+        <div id="tutorial-video-card" style="background:var(--s2);border:1px solid var(--bd);border-radius:12px;padding:16px;margin-bottom:20px">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+            <h4 style="color:#fff;font-size:0.98rem;display:flex;align-items:center;gap:8px;margin:0">
+              🎬 Official Video Walkthrough Tutorial
+            </h4>
+            <span style="font-size:0.75rem;color:var(--ac);font-weight:700;background:rgba(167,139,250,0.15);padding:3px 8px;border-radius:10px">Video Guide</span>
+          </div>
+          <div id="tutorial-video-wrapper" style="width:100%;border-radius:8px;overflow:hidden;background:#06080f;text-align:center">
+            <!-- Dynamic video player or placeholder rendered by loadGuideVideo() -->
+            <div id="tutorial-video-placeholder" style="padding:28px 16px;color:var(--mt)">
+              <div style="font-size:2.4rem;margin-bottom:8px">🎥</div>
+              <div style="font-weight:700;color:#fff;margin-bottom:4px">Official Walkthrough Video</div>
+              <div style="font-size:0.82rem;max-width:440px;margin:0 auto">Watch this space: an interactive video screen recording walkthrough is hosted here for step-by-step visual training.</div>
+            </div>
+          </div>
+        </div>
+
+        <h4 style="color:var(--ac);margin-bottom:6px;font-size:1rem">1. The 4 Search Modes</h4>
+        <p style="margin-bottom:10px">LeadsOSINT supports 4 dedicated intelligence search engines. Select the tab that matches your query data:</p>
         <ul style="margin-left:20px;margin-bottom:16px">
-          <li><code>John Doe, New York NY</code> — standard City, State.</li>
-          <li><code>Judith Markoe, Logan Circle</code> — neighborhood name (auto-translates to Washington, DC).</li>
-          <li><code>John Smith, Winston Salem</code> — major city without state (auto-translates to Winston-Salem, NC).
-          </li>
-          <li><code>Sarah Connor, 1515 Q St NW, Washington DC</code> — street addresses are auto-cleaned.</li>
-          <li><code>Mike Brown, 27101</code> — direct 5-digit ZIP code.</li>
+          <li><strong>👤 Name &amp; Location:</strong> Enter full name and city/state or ZIP code (e.g. <code>Michael Brown, Atlanta GA</code>). Full 10/10 verified public records are parsed with address timelines, phones, and email linkages.</li>
+          <li><strong>📞 Phone Number:</strong> Reverse lookup by 10-digit US phone (e.g. <code>305-555-0199</code>). Identifies registered owners, carrier types, and resident history.</li>
+          <li><strong>✉️ Email Address:</strong> Reverse email intelligence (e.g. <code>david.miller@gmail.com</code>). Performs live record enrichment via That's Them reverse engines to locate verified individuals and residential locations.</li>
+          <li><strong>📍 Street Address:</strong> Property and resident lookup (e.g. <code>1515 Q St NW, Washington DC</code>). Reveals all current and past occupants.</li>
         </ul>
 
-        <h4 style="color:#fff;margin-bottom:6px">2. "FREE Background Report" Narrative &amp; 1-Click Copy</h4>
-        <p style="margin-bottom:12px">Every person profile card automatically extracts the full public background
-          narrative, including exact birth month/year, move-in timelines, relatives with ages, carrier names, and
-          previous addresses. Use the purple <strong>📋 Copy Report Text</strong> button to copy the entire story into
-          your clipboard in 1 click.</p>
+        <h4 style="color:var(--ac);margin-bottom:6px;font-size:1rem">2. Batch Processing &amp; CSV Upload (Up to 500 Leads)</h4>
+        <p style="margin-bottom:10px">You can paste up to 500 leads at a time, or upload a CSV file with automatic column detection (First Name, Last Name, City, State, ZIP, Phone, Email). The system runs with <strong>8-way parallel multithreading</strong> for rapid batch intelligence.</p>
 
-        <h4 style="color:#fff;margin-bottom:6px">3. Sharing Results</h4>
-        <p style="margin-bottom:12px">Click the <strong>🔗 Share</strong> button on any job or result page to generate a
-          secure read-only link. Shared links remain active while your account is in good standing and automatically freeze if your account is paused or leads are depleted.</p>
+        <h4 style="color:var(--ac);margin-bottom:6px;font-size:1rem">3. Verified Public Records &amp; 1-Click Copy</h4>
+        <p style="margin-bottom:10px">Every result is captured with an authentic full-resolution public records screenshot and detailed narrative story. Click <strong>📋 Copy Report Text</strong> to copy the entire public background report into your clipboard in 1 click.</p>
 
-        <h4 style="color:#fff;margin-bottom:6px">4. Plan Quotas &amp; Limits</h4>
-        <p>Jobs respect your assigned plan tier limits. To upgrade your plan or extend your subscription duration,
-          contact your Administrator directly via the <strong>💬 Messages</strong> tab.</p>
+        <h4 style="color:var(--ac);margin-bottom:6px;font-size:1rem">4. Re-do Searches &amp; Credit Usage</h4>
+        <p style="margin-bottom:10px">If you need to re-run a lead or refine search parameters, use the <strong>🔄 Re-do</strong> button. <em>Note:</em> Each re-do search executes a live intelligence lookup and counts as 1 lead credit from your allocated plan quota.</p>
+
+        <h4 style="color:var(--ac);margin-bottom:6px;font-size:1rem">5. Sharing Dossiers &amp; Resetting Links</h4>
+        <p style="margin-bottom:10px">Share your findings using the <strong>🔗 Share Report</strong> or <strong>Share Result</strong> buttons. Shared links are completely read-only (all edit, delete, and re-do buttons are securely removed for external viewers).</p>
+        <p style="margin-bottom:16px"><strong>Security Feature:</strong> If you ever wish to stop sharing access, click <strong>🔄 Reset / Revoke Link</strong> inside the share modal. This immediately revokes the old link (returning 404 to previous viewers) and generates a fresh private link.</p>
+
+        <h4 style="color:var(--ac);margin-bottom:6px;font-size:1rem">6. Priority Support &amp; Messaging</h4>
+        <p>Need extra quota or have questions? Reach out directly via the in-app <strong>💬 Messages</strong> system or click <strong>🎧 Support</strong> for priority WhatsApp contact.</p>
       </div>
     </div>
   </div>
@@ -2246,22 +2489,29 @@
   <div class="modal-overlay" id="share-link-modal" onclick="if(event.target===this)closeModal('share-link-modal')">
     <div class="modal-box" style="max-width:480px">
       <div class="modal-hdr">
-        <h3>🔗 Share Result Link</h3>
+        <h3>🔗 Share Dossier Report</h3>
         <span class="modal-close" onclick="closeModal('share-link-modal')">✕</span>
       </div>
       <div class="modal-body">
-        <p style="color:var(--mt);font-size:.85rem;margin-bottom:14px">Anyone with this link can view these results in
+        <p style="color:var(--mt);font-size:.85rem;margin-bottom:14px">Anyone with this link can view this complete intelligence report in
           read-only mode.<br><strong style="color:var(--ac)">⚡ Active while account is in good standing. Automatically freezes if account is paused or leads are depleted.</strong></p>
-        <div style="display:flex;gap:8px;margin-bottom:16px">
-          <input type="text" id="share-link-input" readonly
+        <div style="display:flex;gap:8px;margin-bottom:12px">
+          <input type="text" id="share-link-input" readonly placeholder="Generating share link..."
             style="flex:1;background:var(--s2);border:1px solid var(--bd);border-radius:8px;padding:9px 12px;color:#fff;font-size:.85rem">
           <button class="act-btn primary" onclick="copyShareModalLink()">Copy</button>
         </div>
+        <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap">
+          <button class="act-btn" onclick="resetShareModalLink()"
+            style="flex:1;background:rgba(239,68,68,0.15);border:1px solid #ef4444;color:#fca5a5;padding:8px 12px;border-radius:8px;font-size:.82rem;font-weight:700;cursor:pointer"
+            title="Revokes previous share link immediately and generates a new one">
+            🔄 Reset / Revoke Link
+          </button>
+        </div>
         <div style="display:flex;gap:8px;flex-wrap:wrap">
           <a id="sh-wa" href="#" target="_blank" class="act-btn"
-            style="flex:1;text-align:center;background:#16a34a;color:#fff;border:none">📱 WhatsApp</a>
+            style="flex:1;text-align:center;background:#16a34a;color:#fff;border:none;padding:9px 14px;border-radius:8px;font-weight:700;text-decoration:none">📱 WhatsApp</a>
           <a id="sh-tg" href="#" target="_blank" class="act-btn"
-            style="flex:1;text-align:center;background:#0284c7;color:#fff;border:none">✈️ Telegram</a>
+            style="flex:1;text-align:center;background:#0284c7;color:#fff;border:none;padding:9px 14px;border-radius:8px;font-weight:700;text-decoration:none">✈️ Telegram</a>
         </div>
       </div>
     </div>
@@ -2279,7 +2529,11 @@
 
     // ── Mobile Sidebar ─────────────────────────────────────
     
-    function toggleSidebar() {
+        function toggleSidebar(e) {
+      if (e) {
+        if (e.stopPropagation) e.stopPropagation();
+        if (e.preventDefault && e.type === 'touchstart') e.preventDefault();
+      }
       const sb = document.getElementById('sidebar');
       const overlay = document.getElementById('mobile-sidebar-overlay');
       const btn = document.querySelector('.mobile-menu-btn');
@@ -2289,8 +2543,12 @@
       if (btn) btn.textContent = isOpen ? '✕' : '☰';
     }
 
-    function toggleActionsMenu() {
-      const hr = document.getElementById('hdr-right');
+    function toggleActionsMenu(e) {
+      if (e) {
+        if (e.stopPropagation) e.stopPropagation();
+        if (e.preventDefault && e.type === 'touchstart') e.preventDefault();
+      }
+      const hr = document.getElementById('mobile-right-drawer');
       const overlay = document.getElementById('mobile-sidebar-overlay');
       const btn = document.getElementById('mobile-actions-toggle');
       closeSidebarOnMobile();
@@ -2308,7 +2566,7 @@
     }
 
     function closeActionsMenu() {
-      const hr = document.getElementById('hdr-right');
+      const hr = document.getElementById('mobile-right-drawer');
       const btn = document.getElementById('mobile-actions-toggle');
       if (hr) hr.classList.remove('open');
       if (btn) btn.textContent = '☰';
@@ -2324,7 +2582,7 @@
 
     function checkOverlayActive() {
       const sb = document.getElementById('sidebar');
-      const hr = document.getElementById('hdr-right');
+      const hr = document.getElementById('mobile-right-drawer');
       const overlay = document.getElementById('mobile-sidebar-overlay');
       const anyOpen = (sb && sb.classList.contains('open')) || (hr && hr.classList.contains('open'));
       if (overlay) overlay.classList.toggle('active', anyOpen);
@@ -2706,6 +2964,7 @@
       document.getElementById('panel-new').style.display = 'block';
       document.getElementById('panel-job').style.display = 'none';
       if (pollTimer) clearInterval(pollTimer);
+      currentJobId = null;
       document.querySelectorAll('.job-item').forEach(el => el.classList.remove('active'));
       closeSidebarOnMobile();
     }
@@ -2717,8 +2976,9 @@
     }
 
     // ── Jobs list ──────────────────────────────────────────
-    async function refreshJobsList() {
+    async function refreshJobsList(isFirstLoad) {
       try {
+        if (isFirstLoad) showSidebarLoading();
         const res = await fetch('/api/jobs');
         if (!res.ok) return;
         const jobs = await res.json();
@@ -2760,18 +3020,92 @@
     }
 
     // ── Job detail ─────────────────────────────────────────
-    async function selectJob(jobId) {
+    
+    // ── Global Polished Loading Skeletons ───────────────────
+    function showSidebarLoading() {
+      const sb = document.getElementById('sb-jobs');
+      if (!sb) return;
+      sb.innerHTML = `
+        <div class="sb-loading">
+          <div class="sb-skel-item"><div class="sb-skel-dot"></div><div class="sb-skel-lines"><div class="sb-skel-line" style="width:75%"></div><div class="sb-skel-line" style="width:40%"></div></div></div>
+          <div class="sb-skel-item"><div class="sb-skel-dot"></div><div class="sb-skel-lines"><div class="sb-skel-line" style="width:60%"></div><div class="sb-skel-line" style="width:35%"></div></div></div>
+          <div class="sb-skel-item"><div class="sb-skel-dot"></div><div class="sb-skel-lines"><div class="sb-skel-line" style="width:85%"></div><div class="sb-skel-line" style="width:50%"></div></div></div>
+          <div class="sb-skel-item"><div class="sb-skel-dot"></div><div class="sb-skel-lines"><div class="sb-skel-line" style="width:65%"></div><div class="sb-skel-line" style="width:45%"></div></div></div>
+        </div>
+      `;
+    }
+
+    function showJobLoadingSkeleton(jobName) {
+      const panel = document.getElementById('panel-job');
+      if (!panel) return;
+      let sk = document.getElementById('job-detail-skeleton');
+      if (!sk) {
+        sk = document.createElement('div');
+        sk.id = 'job-detail-skeleton';
+        sk.className = 'job-detail-skeleton';
+        panel.prepend(sk);
+      }
+      sk.innerHTML = `
+        <div class="job-skel-header">
+          <div class="job-skel-title-row">
+            <div class="job-skel-title">${jobName ? escapeHtml(jobName) : 'Loading Job Dossier...'}</div>
+            <div class="job-skel-badge">⏳ Loading Details...</div>
+          </div>
+          <div class="job-skel-meta-row">
+            <div class="job-skel-bar" style="width:120px;height:14px"></div>
+            <div class="job-skel-bar" style="width:90px;height:14px"></div>
+            <div class="job-skel-bar" style="width:160px;height:14px"></div>
+          </div>
+        </div>
+        <div class="job-skel-body">
+          <div class="job-skel-card">
+            <div class="job-skel-bar" style="width:40%;height:18px;margin-bottom:12px"></div>
+            <div class="job-skel-bar" style="width:70%;height:12px;margin-bottom:8px"></div>
+            <div class="job-skel-bar" style="width:55%;height:12px;margin-bottom:14px"></div>
+            <div class="job-skel-preview-box"></div>
+          </div>
+          <div class="job-skel-card">
+            <div class="job-skel-bar" style="width:35%;height:18px;margin-bottom:12px"></div>
+            <div class="job-skel-bar" style="width:65%;height:12px;margin-bottom:8px"></div>
+            <div class="job-skel-bar" style="width:50%;height:12px;margin-bottom:14px"></div>
+            <div class="job-skel-preview-box"></div>
+          </div>
+        </div>
+      `;
+      sk.style.display = 'flex';
+      const jdh = panel.querySelector('.job-detail-hdr');
+      const la = panel.querySelector('.leads-area');
+      if (jdh) jdh.style.display = 'none';
+      if (la) la.style.display = 'none';
+    }
+
+    function hideJobLoadingSkeleton() {
+      const sk = document.getElementById('job-detail-skeleton');
+      if (sk) sk.style.display = 'none';
+      const panel = document.getElementById('panel-job');
+      if (!panel) return;
+      const jdh = panel.querySelector('.job-detail-hdr');
+      const la = panel.querySelector('.leads-area');
+      if (jdh) jdh.style.display = '';
+      if (la) la.style.display = '';
+    }
+
+    function selectJob(jobId) {
       currentJobId = jobId;
       closeSidebarOnMobile();
       showJobPanel();
       document.querySelectorAll('.job-item').forEach(el => {
         el.classList.toggle('active', el.dataset.id === jobId);
       });
-      await loadJobDetail(jobId);
       if (pollTimer) clearInterval(pollTimer);
-      if (currentJob && (currentJob.status === 'running' || currentJob.status === 'queued')) {
-        pollTimer = setInterval(() => pollJobStatus(jobId), 2500);
-      }
+      // Show skeleton immediately, load detail in background
+      const _activeItem = document.querySelector(`.job-item[data-id='${jobId}']`); const _jName = _activeItem ? _activeItem.dataset.name : ''; showJobLoadingSkeleton(_jName);
+      loadJobDetail(jobId).then(() => {
+        hideJobLoadingSkeleton();
+        if (currentJob && (currentJob.status === 'running' || currentJob.status === 'queued')) {
+          pollTimer = setInterval(() => pollJobStatus(jobId), 2500);
+        }
+      });
     }
 
     async function loadJobDetail(jobId) {
@@ -2816,6 +3150,7 @@
     }
 
     function renderJobDetail(job) {
+      hideJobLoadingSkeleton();
       document.getElementById('job-title-edit').value = job.name || job.id;
 
       const pct = job.total ? Math.round(job.done / job.total * 100) : 0;
@@ -2985,6 +3320,97 @@
         showToast('Network error while sharing', 'err');
       }
     }
+    
+    // ── Share Link Reset Function ────────────────────────────────
+    async function resetShareModalLink() {
+      if (!currentJobId) return;
+      if (!confirm('Are you sure you want to reset this share link?\n\n⚠️ Anyone with the old share link will immediately lose access (404). A brand new secure link will be generated.')) return;
+      const inp = document.getElementById('share-link-input');
+      inp.value = 'Revoking old link & generating new...';
+      try {
+        const res = await fetch(`/api/jobs/${currentJobId}/share/reset`, { method: 'POST' });
+        const data = await res.json();
+        if (res.ok && data.share_url) {
+          inp.value = data.share_url;
+          const encoded = encodeURIComponent(data.share_url);
+          const text = encodeURIComponent('LeadsOSINT Shared Results: ' + (currentJob ? currentJob.name : currentJobId));
+          document.getElementById('sh-wa').href = `https://api.whatsapp.com/send?text=${text}%20${encoded}`;
+          document.getElementById('sh-tg').href = `https://t.me/share/url?url=${encoded}&text=${text}`;
+          showToast('Old link revoked! New share link active.', 'ok');
+        } else {
+          showToast(data.error || 'Failed to reset share link', 'err');
+        }
+      } catch (e) {
+        showToast('Network error while resetting share link', 'err');
+      }
+    }
+
+    // ── Tutorial Video Management ────────────────────────────────
+    async function loadGuideVideo() {
+      try {
+        const res = await fetch('/api/settings/guide-video');
+        if (res.ok) {
+          const data = await res.json();
+          const wrapper = document.getElementById('tutorial-video-wrapper');
+          const adminInp = document.getElementById('admin-guide-video-input');
+          if (adminInp && data.guide_video_url) {
+            adminInp.value = data.guide_video_url;
+          }
+          if (!wrapper) return;
+          const url = (data.guide_video_url || '').trim();
+          if (!url) {
+            wrapper.innerHTML = `
+              <div style="padding:28px 16px;color:var(--mt)">
+                <div style="font-size:2.4rem;margin-bottom:8px">🎥</div>
+                <div style="font-weight:700;color:#fff;margin-bottom:4px">Official Walkthrough Video</div>
+                <div style="font-size:0.82rem;max-width:440px;margin:0 auto">The administrator is preparing an in-depth video screen recording walkthrough. In the meantime, follow the step-by-step instructions below.</div>
+              </div>`;
+            return;
+          }
+
+          // Check if YouTube
+          let embedUrl = '';
+          const ytMatch = url.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))([\w-]{11})/);
+          if (ytMatch) {
+            embedUrl = 'https://www.youtube.com/embed/' + ytMatch[1];
+            wrapper.innerHTML = `<div style="position:relative;padding-bottom:56.25%;height:0;overflow:hidden"><iframe src="${embedUrl}" style="position:absolute;top:0;left:0;width:100%;height:100%;border:none" allowfullscreen></iframe></div>`;
+          } else if (url.endsWith('.mp4') || url.endsWith('.webm')) {
+            wrapper.innerHTML = `<video controls style="width:100%;max-height:360px;background:#000" src="${url}"></video>`;
+          } else {
+            wrapper.innerHTML = `<div style="position:relative;padding-bottom:56.25%;height:0;overflow:hidden"><iframe src="${url}" style="position:absolute;top:0;left:0;width:100%;height:100%;border:none" allowfullscreen></iframe></div>`;
+          }
+        }
+      } catch (e) {
+        console.error('Error loading guide video', e);
+      }
+    }
+
+    async function saveAdminGuideVideo() {
+      const inp = document.getElementById('admin-guide-video-input');
+      const url = (inp ? inp.value : '').trim();
+      try {
+        const res = await fetch('/api/admin/settings/guide-video', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ guide_video_url: url })
+        });
+        const data = await res.json();
+        if (res.ok) {
+          showToast('Walkthrough video URL saved successfully!', 'ok');
+          loadGuideVideo();
+        } else {
+          showToast(data.error || 'Failed to save video setting', 'err');
+        }
+      } catch (e) {
+        showToast('Network error saving video setting', 'err');
+      }
+    }
+
+    function openTutorialModal() {
+      openModal('tutorial-modal');
+      loadGuideVideo();
+    }
+
     function copyShareModalLink() {
       const inp = document.getElementById('share-link-input');
       navigator.clipboard.writeText(inp.value).then(() => showToast('Share link copied to clipboard!', 'ok'));
@@ -3760,7 +4186,7 @@
       });
 
       await fetchMe();
-      await refreshJobsList();
+      await refreshJobsList(true);
       setInterval(refreshJobsList, 5000);
     })();
   </script>

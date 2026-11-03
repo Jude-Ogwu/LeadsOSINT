@@ -51,8 +51,13 @@ PLAN_CONFIGS = {
 }
 
 def get_db():
-    conn = sqlite3.connect(DB_PATH, timeout=15)
+    conn = sqlite3.connect(DB_PATH, timeout=30)
     conn.row_factory = sqlite3.Row
+    try:
+        conn.execute("PRAGMA journal_mode=WAL")
+        conn.execute("PRAGMA busy_timeout=30000")
+    except Exception:
+        pass
     return conn
 
 def hash_pw(password, salt=None):
@@ -418,6 +423,35 @@ def get_job_by_share_token(token):
                 if remaining <= 0:
                     return job, "frozen"
         return job, "valid"
+
+
+def reset_share_token(job_id, user_id=None, username=None, name=None, folder=None):
+    """
+    Revokes the current share token and generates a brand new one.
+    All previous share links become invalid (404) immediately.
+    Returns the new token.
+    """
+    new_token = uuid.uuid4().hex[:12]
+    with get_db() as conn:
+        cursor = conn.cursor()
+        cursor.execute("SELECT id FROM jobs WHERE id = ?", (job_id,))
+        if cursor.fetchone():
+            cursor.execute("UPDATE jobs SET share_token = ? WHERE id = ?", (new_token, job_id))
+        else:
+            now_iso = datetime.now().isoformat()
+            cursor.execute("""
+                INSERT INTO jobs (id, user_id, username, name, status, total, done, folder, created_at, share_token, share_token_expires_at)
+                VALUES (?, ?, ?, ?, 'complete', 0, 0, ?, ?, ?, '')
+            """, (job_id, user_id or 1, username or 'admin', name or job_id, folder or '', now_iso, new_token))
+        conn.commit()
+    return new_token
+
+def revoke_share_token(job_id):
+    """Completely revokes public sharing for a job."""
+    with get_db() as conn:
+        cursor = conn.cursor()
+        cursor.execute("UPDATE jobs SET share_token = '' WHERE id = ?", (job_id,))
+        conn.commit()
 
 
 def refund_user_usage(user_id, count=1):

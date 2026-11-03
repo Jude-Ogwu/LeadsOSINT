@@ -13,9 +13,13 @@ from flask import Flask, request, jsonify, send_file, render_template, render_te
 from PIL import Image, ImageDraw, ImageFont
 import database
 from location_normalizer import normalize_location
+from dotenv import load_dotenv
+load_dotenv(os.path.join(os.path.dirname(__file__), ".env"))
 urllib3.disable_warnings()
 
 app = Flask(__name__)
+app.config['TEMPLATES_AUTO_RELOAD'] = True
+app.jinja_env.auto_reload = True
 
 def get_current_user():
     token = request.cookies.get('leads_session') or request.headers.get('X-Session-Token')
@@ -79,14 +83,13 @@ def add_cors_headers(response):
         response.headers["Expires"] = "0"
     return response
 
-# ── Scraper Engine Configuration ─────────────────────────────────────────────
-# Set to 'scraperapi' for current free tier (5,000 free requests, no card required)
-# Set to 'brightdata' when ready to switch back to Bright Data Web Unlocker
-SCRAPER_PROVIDER = os.environ.get("SCRAPER_PROVIDER", "scraperapi")
-SCRAPER_API_KEY  = os.environ.get("SCRAPER_API_KEY", "")
+# -- Scraper Engine Configuration ---------------------------------------------
+# Engine: Bright Data Web Unlocker (only proven provider for FPS/FBC)
+# Set BD_API_KEY env var on PythonAnywhere or paste key directly below
+SCRAPER_PROVIDER = "brightdata"
 
-# ── Bright Data Credentials (Preserved for seamless switchback) ─────────────
-BD_API_KEY = os.environ.get("BD_API_KEY", "")
+# -- Bright Data Credentials --------------------
+BD_API_KEY = os.environ.get("BD_API_KEY", "").strip()
 BD_ZONE    = "web_unlocker1"
 OUT_DIR    = os.environ.get("OUT_DIR", r"C:\Users\JUDE\OSINT_Reports" if sys.platform == 'win32' else os.path.join(os.path.dirname(__file__), 'data'))
 os.makedirs(OUT_DIR, exist_ok=True)
@@ -96,7 +99,7 @@ PORT       = int(os.environ.get("PORT", 5050))
 jobs      = {}
 jobs_lock = threading.Lock()
 
-# ── Live System Logging Buffer ────────────────────────────────────────────────
+# -- Live System Logging Buffer ------------------------------------------------
 import collections
 LOG_BUFFER = collections.deque(maxlen=500)
 LOG_LOCK   = threading.Lock()
@@ -150,9 +153,9 @@ def safe_name(name, location=''):
 def clean(s):
     return re.sub(r'\s+', ' ', str(s)).strip() if s else ''
 
-# ── HTTP Session with Connection Pooling (Massive Speed Enhancement) ─────────
+# -- HTTP Session with Connection Pooling (Massive Speed Enhancement) ---------
 HTTP_SESSION = requests.Session()
-adapter = requests.adapters.HTTPAdapter(pool_connections=30, pool_maxsize=30, max_retries=0)
+adapter = requests.adapters.HTTPAdapter(pool_connections=50, pool_maxsize=50, max_retries=0)
 HTTP_SESSION.mount('http://', adapter)
 HTTP_SESSION.mount('https://', adapter)
 
@@ -163,7 +166,7 @@ def is_rejected_scrape_body(body):
     bl = body.lower()
     
     # If the response contains authentic FastPeopleSearch content, it is valid!
-    if ('class="card' in bl or 'class=\'card' in bl or 'detail-box' in bl or 'person-details' in bl or 'class="people-list' in bl or 'page-list has-ads' in bl):
+    if ('class="card' in bl or 'class=\'card' in bl or 'class="record' in bl or 'class=\'record' in bl or 'thatsthem' in bl or 'detail-box' in bl or 'person-details' in bl or 'class="people-list' in bl or 'page-list has-ads' in bl):
         return False
         
     bad_tokens = [
@@ -176,100 +179,62 @@ def is_rejected_scrape_body(body):
     ]
     return any(t in bl for t in bad_tokens)
 
-# ── Unified Scraping Fetch Dispatcher ─────────────────────────────────────────
+# -- Unified Scraping Fetch Dispatcher -----------------------------------------
 def bd_fetch(url, retries=4):
-    """Fetch search results page with automatic real-time failover between providers."""
+    """Fetch page via Bright Data Web Unlocker (primary + only engine)."""
     if 'fastbackgroundcheck' in url.lower():
         retries = 1
     for attempt in range(retries):
         try:
-            r = None
-            used_provider = SCRAPER_PROVIDER
-            if SCRAPER_PROVIDER == 'scraperapi':
-                try:
-                    r_try = HTTP_SESSION.get(
-                        "https://api.scraperapi.com",
-                        params={"api_key": SCRAPER_API_KEY, "url": url, "country_code": "us", "session_number": str(__import__("random").randint(100000, 9999999))},
-                        timeout=35
-                    )
-                    if r_try.status_code in (401, 402, 403, 429) or (r_try.status_code != 200 and ('credit' in r_try.text.lower() or 'plan limit' in r_try.text.lower())):
-                        log_event(f"⚠️ [ScraperAPI] Out of credits or HTTP {r_try.status_code} — auto-failing over to Bright Data Web Unlocker", "WARN")
-                    else:
-                        r = r_try
-                except Exception as se:
-                    log_event(f"⚠️ [ScraperAPI] Request failed ({se}) — auto-failing over to Bright Data", "WARN")
-
-            if not r and 'fastbackgroundcheck' not in url.lower():
-                used_provider = 'brightdata'
-                r = HTTP_SESSION.post(
-                    "https://api.brightdata.com/request",
-                    json={"zone": BD_ZONE, "url": url, "format": "raw", "country": "us"},
-                    headers={"Authorization": f"Bearer {BD_API_KEY}", "Content-Type": "application/json"},
-                    verify=False, timeout=50
-                )
-                brd_err = r.headers.get('x-brd-err-msg') or r.headers.get('x-brd-error')
-                if brd_err:
-                    log_event(f"❌ Bright Data API Error: {brd_err}", "ERROR")
-
+            r = HTTP_SESSION.post(
+                "https://api.brightdata.com/request",
+                json={"zone": BD_ZONE, "url": url, "format": "raw", "country": "us"},
+                headers={"Authorization": f"Bearer {BD_API_KEY}", "Content-Type": "application/json"},
+                verify=False, timeout=55
+            )
+            brd_err = r.headers.get('x-brd-err-msg') or r.headers.get('x-brd-error')
+            if brd_err:
+                log_event(f"❌ Bright Data Error: {brd_err}", "ERROR")
             body = r.text
             is_valid_fsp = ('<div class="card"' in body or 'class="card"' in body or 'fastpeoplesearch' in body.lower())
             is_valid_fbc = ('fastbackgroundcheck' in url.lower() and ('fastbackgroundcheck' in body.lower() or 'people' in body.lower() or len(body) > 2000))
             if (r.status_code == 200
                     and not is_rejected_scrape_body(body)
-                    and (is_valid_fsp or is_valid_fbc)):
-                log_event(f"[{SCRAPER_PROVIDER.upper()}] Search page OK: {len(body):,} bytes")
+                    and (is_valid_fsp or is_valid_fbc or ('thatsthem' in url.lower() and len(body) > 1500))):
+                log_event(f"[BrightData] Search page OK: {len(body):,} bytes")
                 return body
             else:
-                log_event(f"[{SCRAPER_PROVIDER.upper()}] Search attempt {attempt+1}: HTTP {r.status_code}, len={len(body)} (Rate limit/challenge check triggered, rotating proxy IP...)", "WARN")
+                log_event(f"[BrightData] Search attempt {attempt+1}: HTTP {r.status_code}, len={len(body)} - rotating...", "WARN")
         except Exception as e:
-            log_event(f"[{SCRAPER_PROVIDER.upper()}] Search attempt {attempt+1} error: {e}", "WARN")
+            log_event(f"[BrightData] Search attempt {attempt+1} error: {e}", "WARN")
         time.sleep(1.5)
     return None
 
 
 def bd_fetch_profile(url, retries=4):
-    """Fetch profile detail page with automatic real-time failover between providers."""
+    """Fetch profile detail page via Bright Data Web Unlocker."""
     for attempt in range(retries):
         try:
-            r = None
-            used_provider = SCRAPER_PROVIDER
-            if SCRAPER_PROVIDER == 'scraperapi':
-                try:
-                    r_try = HTTP_SESSION.get(
-                        "https://api.scraperapi.com",
-                        params={"api_key": SCRAPER_API_KEY, "url": url, "country_code": "us", "session_number": str(__import__("random").randint(100000, 9999999))},
-                        timeout=35
-                    )
-                    if r_try.status_code in (401, 402, 403, 429) or (r_try.status_code != 200 and ('credit' in r_try.text.lower() or 'plan limit' in r_try.text.lower())):
-                        log_event(f"⚠️ [ScraperAPI] Out of credits or HTTP {r_try.status_code} — auto-failing over to Bright Data Web Unlocker", "WARN")
-                    else:
-                        r = r_try
-                except Exception as se:
-                    log_event(f"⚠️ [ScraperAPI] Profile request failed ({se}) — auto-failing over to Bright Data", "WARN")
-
-            if not r:
-                used_provider = 'brightdata'
-                r = HTTP_SESSION.post(
-                    "https://api.brightdata.com/request",
-                    json={"zone": BD_ZONE, "url": url, "format": "raw", "country": "us"},
-                    headers={"Authorization": f"Bearer {BD_API_KEY}", "Content-Type": "application/json"},
-                    verify=False, timeout=50
-                )
-                brd_err = r.headers.get('x-brd-err-msg') or r.headers.get('x-brd-error')
-                if brd_err:
-                    log_event(f"❌ Bright Data API Error: {brd_err}", "ERROR")
-
+            r = HTTP_SESSION.post(
+                "https://api.brightdata.com/request",
+                json={"zone": BD_ZONE, "url": url, "format": "raw", "country": "us"},
+                headers={"Authorization": f"Bearer {BD_API_KEY}", "Content-Type": "application/json"},
+                verify=False, timeout=55
+            )
+            brd_err = r.headers.get('x-brd-err-msg') or r.headers.get('x-brd-error')
+            if brd_err:
+                log_event(f"❌ Bright Data Error: {brd_err}", "ERROR")
             body = r.text
             if (r.status_code == 200
                     and not is_rejected_scrape_body(body)
                     and len(body) > 5000
                     and ('current address' in body.lower() or 'addresses' in body.lower() or 'phone' in body.lower() or 'detail-box' in body.lower() or 'person-details' in body.lower() or 'background report' in body.lower())):
-                log_event(f"[{SCRAPER_PROVIDER.upper()}] Profile fetch OK: {len(body):,} bytes")
+                log_event(f"[BrightData] Profile fetch OK: {len(body):,} bytes")
                 return body
             else:
-                log_event(f"[{SCRAPER_PROVIDER.upper()}] Profile attempt {attempt+1}: HTTP {r.status_code}, len={len(body)} (Detected proxy block/rate limit, rotating to clean IP...)", "WARN")
+                log_event(f"[BrightData] Profile attempt {attempt+1}: HTTP {r.status_code}, len={len(body)} - rotating...", "WARN")
         except Exception as e:
-            log_event(f"[{SCRAPER_PROVIDER.upper()}] Profile attempt {attempt+1} error: {e}", "WARN")
+            log_event(f"[BrightData] Profile attempt {attempt+1} error: {e}", "WARN")
         time.sleep(1.5)
     return None
 
@@ -345,7 +310,7 @@ def search_ddg(name, location):
     return None
 
 
-# ── FSP Parser — robust age/city extraction ──────────────────────────────────
+# -- FSP Parser — robust age/city extraction ----------------------------------
 def parse_fsp(html):
     soup    = BeautifulSoup(html, 'html.parser')
     results = []
@@ -361,7 +326,7 @@ def parse_fsp(html):
         if not name:
             continue
 
-        # ── Age & City: multiple fallback strategies ──────────────────
+        # -- Age & City: multiple fallback strategies ------------------
         age, city = 'N/A', 'N/A'
 
         # Strategy 1: look for any span/element containing "Age"
@@ -402,7 +367,7 @@ def parse_fsp(html):
                     if len(loc_parts) == 2 and len(loc_parts[1]) == 2:
                         city = f"{loc_parts[0].replace('-', ' ').title()}, {loc_parts[1].upper()}"
 
-        # ── Addresses ─────────────────────────────────────────────────
+        # -- Addresses -------------------------------------------------
         addrs = []
         for a in card.find_all('a', href=re.compile(r'^/address/')):
             href  = a['href'].replace('/address/', '')
@@ -419,7 +384,7 @@ def parse_fsp(html):
                     lc = raw_lc.replace('-', ' ').upper()
             addrs.append(f"{st} · {lc}" if lc else st)
 
-        # ── Relatives ──────────────────────────────────────────────
+        # -- Relatives ----------------------------------------------
         relatives = []
         card_str  = str(card)
         rel_m = re.search(r'Relatives?[:\s]+(.*?)(?:AKA|View Free|$)', card_str, re.I | re.S)
@@ -428,7 +393,7 @@ def parse_fsp(html):
             rel_text = _BS(rel_m.group(1), 'html.parser').get_text(' ', strip=True)
             relatives = [r.strip() for r in re.split(r'[•|]', rel_text) if r.strip()][:6]
 
-        # ── AKA / Aliases ──────────────────────────────────────────
+        # -- AKA / Aliases ------------------------------------------
         aliases = []
         aka_m = re.search(r'AKA[:\s]+(.*?)(?:</div>|View Free|$)', card_str, re.I | re.S)
         if aka_m:
@@ -452,7 +417,7 @@ def parse_fsp(html):
 
     return results
 
-# ── Name Relevance Matching ───────────────────────────────────────────────────
+# -- Name Relevance Matching ---------------------------------------------------
 NICKNAMES = {
     'james': {'jas', 'jim', 'jimmy', 'jamie'},
     'william': {'wm', 'bill', 'billy', 'will', 'willy', 'liam'},
@@ -658,6 +623,66 @@ def search_fastbackgroundcheck(query, location='', mode='name'):
         log_event(f"FastBackgroundCheck parse warning: {e}", "WARN")
         return []
 
+
+def search_thatsthem(email):
+    """
+    Dedicated reverse email search engine via That's Them (fully unlocked via Bright Data).
+    Returns verified public profiles tied to the queried email.
+    """
+    clean_email = str(email).strip().lower()
+    url = f"https://thatsthem.com/email/{clean_email}"
+    log_event(f"📧 [That's Them Engine] Querying Email: {url}")
+    html = bd_fetch(url)
+    if not html:
+        return []
+    soup = BeautifulSoup(html, 'html.parser')
+    records = soup.select('.record')
+    results = []
+    for card in records:
+        name_el = card.select_one('h2')
+        if not name_el:
+            continue
+        c_name = name_el.get_text(' ', strip=True)
+        card_text = card.get_text('\n', strip=True)
+
+        loc_m = re.search(r'Lives in\s+([^\n\r]+)', card_text)
+        location = loc_m.group(1).strip() if loc_m else 'N/A'
+
+        age_m = re.search(r'\((\d{1,3})\s+years old\)', card_text)
+        age = age_m.group(1).strip() if age_m else 'N/A'
+
+        addrs = []
+        addr_match = re.search(r'Current Address:\s*([^\n\r]+(?:\n[^\n\r]+)?)', card_text)
+        if addr_match:
+            clean_addr = ' '.join(addr_match.group(1).split())
+            clean_addr = re.sub(r'Uncover.*$', '', clean_addr, flags=re.I).strip()
+            if clean_addr:
+                addrs.append(clean_addr)
+        if not addrs and location != 'N/A':
+            addrs = [location]
+
+        phones = []
+        found_p = re.findall(r'\(?\d{3}\)?[-.\s]\d{3}[-.\s]\d{4}', card_text)
+        for p in found_p:
+            if p not in phones:
+                phones.append(p)
+
+        results.append({
+            'name': c_name,
+            'age': age,
+            'city': location,
+            'address': addrs[0] if addrs else 'N/A',
+            'addresses': addrs,
+            'phones': phones,
+            'emails': [clean_email],
+            'relatives': [],
+            'aliases': [],
+            'profile_url': url,
+            '_search_html': html,
+            'source': 'thatsthem'
+        })
+    return results
+
 def search_person(name, location='', phone=''):
     """
     Universal Search Dispatcher:
@@ -709,31 +734,23 @@ def search_person(name, location='', phone=''):
 
     elif mode == 'email':
         clean_email = str(query).strip().lower()
-        log_event(f"✉️ [Email Search Mode] Reverse Lookup via FastBackgroundCheck: {clean_email}")
+        log_event(f"✉️ [Email Search Mode] Reverse Lookup for: {clean_email}")
         
-        # Primary Engine specifically for Email: FastBackgroundCheck (since FPS lacks an email search endpoint)
+        # Primary Engine for Email: That's Them (verified reverse email lookup)
+        tt_results = search_thatsthem(clean_email)
+        if tt_results:
+            log_event(f"✅ That's Them found {len(tt_results)} record(s) for email: {clean_email}")
+            return tt_results
+
+        # Secondary Engine: FastBackgroundCheck
         fbc_email_results = search_fastbackgroundcheck(clean_email, mode='email')
         if fbc_email_results:
             log_event(f"✅ FastBackgroundCheck found {len(fbc_email_results)} record(s) for email: {clean_email}")
             return fbc_email_results
 
-        # 3. Intelligent Name Handle Derivation (e.g. deborah.dooley@domain.com -> Deborah Dooley)
-        email_handle = clean_email.split('@')[0].replace('.', ' ').replace('_', ' ').replace('-', ' ').strip()
-        if len(email_handle.split()) >= 2:
-            log_event(f"🔍 [Email Analysis] Deriving person name '{email_handle}' from email {clean_email}")
-            handle_results = search_person(email_handle, loc)
-            if handle_results:
-                for r in handle_results:
-                    if clean_email not in r.get('emails', []):
-                        r.setdefault('emails', []).append(clean_email)
-                return handle_results
-
-        # 4. DuckDuckGo Reverse Email OSINT Search
-        ddg = search_ddg(clean_email, '') or (search_ddg(email_handle, '') if len(email_handle.split()) >= 2 else None)
-        if ddg:
-            if clean_email not in ddg.get('emails', []):
-                ddg.setdefault('emails', []).append(clean_email)
-            return [ddg]
+        # Clean 0-result return: never synthesize or associate random individuals with this email
+        log_event(f"⚠️ No matching public records found for email: {clean_email}", "WARN")
+        return []
 
     # Name Search Mode
     parts = re.sub(r"[^a-zA-Z\s'-]", '', query).strip().split()
@@ -751,8 +768,6 @@ def search_person(name, location='', phone=''):
             _THREAD_SEARCH_HTML[threading.get_ident()] = html
         results = parse_fsp(html) if html else []
         if results:
-            results = [r for r in results if is_relevant_name_match(query, r.get('name', ''), r.get('aliases', []))]
-        if results:
             for r in results: r['_search_html'] = html
             return results
 
@@ -764,8 +779,6 @@ def search_person(name, location='', phone=''):
             if fb_html:
                 fb_results = parse_fsp(fb_html)
                 if fb_results:
-                    fb_results = [r for r in fb_results if is_relevant_name_match(query, r.get('name', ''), r.get('aliases', []))]
-                    if fb_results:
                         for r in fb_results: r['_search_html'] = fb_html
                         return fb_results
 
@@ -786,7 +799,7 @@ def search_person(name, location='', phone=''):
     return []
 
 
-# ── Screenshot ────────────────────────────────────────────────────────────────
+# -- Screenshot ----------------------------------------------------------------
 def take_screenshot_via_bd(profile_url, output_path, result_data,
                            lead_name='', lead_location=''):
     """
@@ -805,7 +818,7 @@ def take_screenshot_via_bd(profile_url, output_path, result_data,
     import re as _re
     from playwright.sync_api import sync_playwright
 
-    # ── TIER 1: BD search page ────────────────────────────────────────────────
+    # -- TIER 1: BD search page ------------------------------------------------
     name     = lead_name     or result_data.get('name', '')
     location = lead_location or result_data.get('city', '')
     state    = extract_state(location).lower()
@@ -842,15 +855,16 @@ def take_screenshot_via_bd(profile_url, output_path, result_data,
                         break
 
             if target_card:
-                # Route through FSP-clone card using the already-extracted result_data
-                ok = _card_screenshot_fallback(result_data, output_path)
-                if ok:
-                    print(f"    ✅ FSP card screenshot saved (tier 1)")
-                    return True
+                # Use real profile HTML screenshot path
+                print(f"    Tier 1: card found in search HTML, will fetch profile for real screenshot")
+                return False  # caller (_screenshot_profile_html) will handle it
         except Exception as e:
-            print(f"    Tier 1 card render error: {e}")
+            print(f"    Tier 1 error: {e}")
+    return False
 
-    # ── TIER 2: FSP-clone card (always works) ─────────────────────────────────
+
+# Placeholder - TIER 2 (fake PIL card) removed: only real BD screenshots used
+# ------------
 def _get_pil_font(size, bold=False):
     """Cross-platform font loader (supports Linux/PythonAnywhere and Windows)."""
     candidate_fonts = [
@@ -1144,8 +1158,8 @@ def _screenshot_profile_html(html, output_path, result):
     Decodes Cloudflare obfuscated emails and injects official FSP CSS styling.
     """
     if is_rejected_scrape_body(html):
-        print(f"    ⚠️ HTML contains rate limit or challenge. Using clean card fallback: {output_path}")
-        return _card_screenshot_fallback(result, output_path)
+        print(f"    ⚠️ HTML has rate limit/challenge - no screenshot (no fake card): {output_path}")
+        return False
 
     try:
         from playwright.sync_api import sync_playwright
@@ -1298,7 +1312,7 @@ def _screenshot_profile_html(html, output_path, result):
                 try: os.remove(tmp_html)
                 except Exception: pass
                 return True
-        return _card_screenshot_fallback(result, output_path)
+        return False
 
 
 def _card_screenshot_fallback(result, output_path):
@@ -1444,8 +1458,8 @@ body{{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
                 try: os.remove(tmp)
                 except Exception: pass
                 return True
-        is_search = ('search' in output_path or 'search_page' in output_path)
-        return _render_pil_screenshot(result, output_path, is_search_overview=is_search)
+        # No PIL fake card fallback
+        return False
 
 
 
@@ -1634,15 +1648,18 @@ def parse_csv_leads(filepath_or_content, is_content=False):
     return leads
 
 
-# ── Job persistence ───────────────────────────────────────────────────────────
+# -- Job persistence -----------------------------------------------------------
 def _job_to_dict(job):
     return {k: v for k, v in job.items()
             if k not in ('pause_flag', 'cancel_flag', '_thread')}
 
+_JOBS_CACHE_MTIME = 0
+_LAST_DISK_RECOVERY = 0
+
 def save_jobs():
+    global _JOBS_CACHE_MTIME
     os.makedirs(OUT_DIR, exist_ok=True)
     with jobs_lock:
-        # Load and merge with existing on-disk jobs registry so previous jobs are never overwritten
         if os.path.exists(JOBS_FILE):
             try:
                 with open(JOBS_FILE, 'r', encoding='utf-8') as f:
@@ -1656,83 +1673,38 @@ def save_jobs():
     try:
         with open(JOBS_FILE, 'w', encoding='utf-8') as f:
             json.dump(data, f, indent=2)
+        _JOBS_CACHE_MTIME = os.path.getmtime(JOBS_FILE)
     except Exception as e:
         print(f"  save_jobs error: {e}")
 
-def load_jobs():
-    # 1. Load from JOBS_FILE
+def load_jobs(force=False):
+    global _JOBS_CACHE_MTIME, _LAST_DISK_RECOVERY
+    now = time.time()
+
+    # Fast-path cache check: if file unmodified on disk and jobs in memory, return in 0ms!
     if os.path.exists(JOBS_FILE):
         try:
+            mtime = os.path.getmtime(JOBS_FILE)
+            if not force and mtime == _JOBS_CACHE_MTIME and len(jobs) > 0:
+                return
+            _JOBS_CACHE_MTIME = mtime
             with open(JOBS_FILE, encoding='utf-8') as f:
                 data = json.load(f)
             updated_any = False
             for jid, jdata in data.items():
-                if jid not in jobs or jobs[jid].get('status') in ('running', 'paused', 'queued'):
+                if jid not in jobs:
                     jobs[jid] = jdata
                     jobs[jid].setdefault('pause_flag', False)
                     jobs[jid].setdefault('cancel_flag', False)
-                    
-                    # Disk state verification: resolve folder if path moved or mismatch
-                    jfolder = jdata.get('folder', '')
-                    if (not jfolder or not os.path.exists(jfolder)) and os.path.exists(OUT_DIR):
-                        for entry in os.listdir(OUT_DIR):
-                            if jid.upper() in entry.upper():
-                                cand = os.path.join(OUT_DIR, entry)
-                                if os.path.isdir(cand):
-                                    jfolder = cand
-                                    jobs[jid]['folder'] = jfolder
-                                    jdata['folder'] = jfolder
-                                    updated_any = True
-                                    break
-
-                    all_leads_done = True
-                    done_count = 0
-                    for lead in jobs[jid].get('leads', []):
-                        lfolder_name = lead.get('folder_name', '')
-                        rep_file = os.path.join(jfolder, lfolder_name, 'report.html') if jfolder and lfolder_name else ''
-                        djson_file = os.path.join(jfolder, lfolder_name, 'data.json') if jfolder and lfolder_name else ''
-                        
-                        if (not rep_file or not os.path.exists(rep_file)) and os.path.exists(OUT_DIR):
-                            for entry in os.listdir(OUT_DIR):
-                                if jid.upper() in entry.upper():
-                                    c_rep = os.path.join(OUT_DIR, entry, lfolder_name, 'report.html')
-                                    if os.path.exists(c_rep):
-                                        rep_file = c_rep
-                                        djson_file = os.path.join(OUT_DIR, entry, lfolder_name, 'data.json')
-                                        if not jfolder or not os.path.exists(jfolder):
-                                            jfolder = os.path.join(OUT_DIR, entry)
-                                            jobs[jid]['folder'] = jfolder
-                                            jdata['folder'] = jfolder
-                                            updated_any = True
-                                        break
-
-                        if djson_file and os.path.exists(djson_file):
-                            try:
-                                with open(djson_file, 'r', encoding='utf-8') as dfp:
-                                    res_list = json.load(dfp).get('results', [])
-                                    lead['count'] = len(res_list)
-                            except Exception:
-                                pass
-
-                        if rep_file and os.path.exists(rep_file):
-                            lead['status'] = 'done' if lead.get('count', 0) > 0 else 'none'
-                            lead['error'] = ''
-
-                        if lead.get('status') in ('done', 'none', 'failed', 'cancelled'):
-                            done_count += 1
-                        else:
-                            all_leads_done = False
-                    
-                    jobs[jid]['done'] = done_count
-                    if all_leads_done and len(jobs[jid].get('leads', [])) > 0:
-                        jobs[jid]['status'] = 'complete'
-                        updated_any = True
-                    elif jobs[jid].get('status') == 'running':
-                        jobs[jid]['status'] = 'paused'
             if updated_any:
                 save_jobs()
         except Exception as e:
             print(f"  load_jobs file error: {e}")
+
+    # Only run disk scan for untracked folders once every 120 seconds or when forced
+    if not force and (now - _LAST_DISK_RECOVERY < 120) and len(jobs) > 0:
+        return
+    _LAST_DISK_RECOVERY = now
 
     # 2. Disk auto-recovery: scan OUT_DIR for existing job directories
     try:
@@ -1798,7 +1770,7 @@ def _get_social_label(url):
     return 'Social Profile'
 
 
-# ── HTML report generation ─────────────────────────────────────
+# -- HTML report generation -------------------------------------
 def build_lead_report(lead_name, location, results, lead_folder, lead_safe,
                       job_id='', lead_idx=0, social_link='', email='', phone=''):
     active_cards   = ''
@@ -2272,8 +2244,11 @@ body{{font-family:"Segoe UI",system-ui,sans-serif;background:var(--bg);color:var
     </div>
     <p>Anyone with this direct link can view these results in read-only mode.<br><strong style="color:var(--ac)">⚡ Active while account is in good standing. Automatically freezes if account is paused or leads are depleted.</strong></p>
     <div class="share-input-wrap">
-      <input type="text" id="share-url-input" readonly value="">
+      <input type="text" id="share-url-input" readonly value="" placeholder="Generating link...">
       <button class="share-copy-btn" onclick="copyShareLink()">Copy</button>
+    </div>
+    <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap">
+      <button class="res-btn" onclick="resetLeadShareLink()" style="flex:1;background:rgba(239,68,68,0.15);border:1px solid #ef4444;color:#fca5a5;padding:8px 12px;border-radius:8px;font-size:.82rem;font-weight:700;cursor:pointer" title="Revokes old share link and generates a brand new one">🔄 Reset / Revoke Link</button>
     </div>
     <div class="share-socials">
       <a id="share-wa" href="#" target="_blank" class="soc-btn soc-wa">📱 WhatsApp</a>
@@ -2296,14 +2271,57 @@ window.addEventListener('scroll', () => {{
   }}
 }});
 
-function openShareModal() {{
-  const url = window.location.href;
-  document.getElementById('share-url-input').value = url;
+let _reportShareToken = '';
+
+async function openShareModal() {{
+  document.getElementById('share-modal').classList.add('open');
+  const inp = document.getElementById('share-url-input');
+  if (!_reportShareToken) {{
+    inp.value = 'Generating secure share link...';
+    try {{
+      const r = await fetch(API + '/api/jobs/' + JOB_ID + '/share', {{method: 'POST'}});
+      const d = await r.json();
+      if (d.share_token) {{
+        _reportShareToken = d.share_token;
+      }}
+    }} catch(e) {{}}
+  }}
+  updateLeadShareLink();
+}}
+
+function updateLeadShareLink() {{
+  const inp = document.getElementById('share-url-input');
+  let url = window.location.href;
+  if (_reportShareToken) {{
+    const folder = '{folder_name}';
+    url = window.location.origin + '/share/' + _reportShareToken + '/' + folder + '/report.html';
+  }}
+  inp.value = url;
   const encodedUrl = encodeURIComponent(url);
   const text = encodeURIComponent('LeadsOSINT Report: {lead_name}');
   document.getElementById('share-wa').href = 'https://api.whatsapp.com/send?text=' + text + '%20' + encodedUrl;
   document.getElementById('share-tg').href = 'https://t.me/share/url?url=' + encodedUrl + '&text=' + text;
-  document.getElementById('share-modal').classList.add('open');
+}}
+
+async function resetLeadShareLink() {{
+  if (!confirm('Are you sure you want to reset this share link?\\n\\n⚠️ Anyone with the old share link will immediately lose access (404). A brand new link will be generated.')) return;
+  const inp = document.getElementById('share-url-input');
+  inp.value = 'Revoking & generating new link...';
+  try {{
+    const r = await fetch(API + '/api/jobs/' + JOB_ID + '/share/reset', {{method: 'POST'}});
+    const d = await r.json();
+    if (d.share_token) {{
+      _reportShareToken = d.share_token;
+      updateLeadShareLink();
+      showToast('Old share link revoked! New secure link active.', 'ok');
+    }} else {{
+      showToast(d.error || 'Failed to reset link', 'err');
+      updateLeadShareLink();
+    }}
+  }} catch(e) {{
+    showToast('Network error resetting link', 'err');
+    updateLeadShareLink();
+  }}
 }}
 function closeShareModal() {{
   document.getElementById('share-modal').classList.remove('open');
@@ -2583,14 +2601,121 @@ def build_job_index(job, is_shared=False, share_token=None):
         top_nav = '<span class="back" style="pointer-events:none;background:rgba(167,139,250,0.12);border-color:rgba(167,139,250,0.3);color:var(--ac);font-weight:600">⚡ Read-Only Dossier</span>'
         redo_script = ''
         redo_css = ''
+        share_modal_html = ''
     else:
-        top_nav = '<a href="/" class="back">← Dashboard</a>'
+        top_nav = f'''<div class="hero-actions-bar" style="display:flex;align-items:center;gap:10px;margin-left:auto;flex-wrap:wrap">
+          <button class="share-report-btn" onclick="openReportShareModal()" title="Share Dossier Report">🔗 Share Report</button>
+          <a href="/" class="back">← Dashboard</a>
+        </div>'''
         redo_css = '''.redo-lead-btn{background:var(--s2);border:1px solid var(--bd);color:var(--ac);padding:6px 12px;
                 border-radius:8px;font-size:.78rem;font-weight:700;cursor:pointer;transition:.2s;flex-shrink:0}
 .redo-lead-btn:hover{background:var(--ac2);color:#fff;border-color:var(--ac)}'''
+        share_modal_html = f'''
+<div class="share-modal-overlay" id="report-share-modal" onclick="if(event.target===this)closeReportShareModal()">
+  <div class="share-modal-box">
+    <div class="share-modal-hdr">
+      <div style="display:flex;align-items:center;gap:8px">
+        <span style="font-size:1.3rem">🔗</span>
+        <h3 style="font-size:1.15rem;font-weight:700">Share Public Dossier</h3>
+      </div>
+      <span class="share-modal-close" onclick="closeReportShareModal()">✕</span>
+    </div>
+    <div class="share-modal-body">
+      <p style="color:var(--mt);font-size:.85rem;line-height:1.5;margin-bottom:14px">
+        Anyone with this link can view this dossier in <strong>read-only mode</strong>.<br>
+        <span style="color:var(--ac);font-weight:600">⚡ Active while account is in good standing.</span>
+      </p>
+      
+      <div class="share-input-row" style="display:flex;gap:8px;margin-bottom:12px">
+        <input type="text" id="report-share-input" readonly value="" placeholder="Generating link..." style="flex:1;background:var(--s2);border:1px solid var(--bd);border-radius:8px;padding:9px 12px;color:var(--tx);font-size:.85rem">
+        <button class="modal-btn-act" onclick="copyReportShareLink()" style="background:var(--ac2);border:1px solid var(--ac);color:#fff;padding:9px 16px;border-radius:8px;font-weight:700;cursor:pointer">Copy</button>
+      </div>
+
+      <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap">
+        <button class="modal-btn-act" onclick="resetReportShareLink()" style="flex:1;min-width:140px;background:rgba(239,68,68,0.15);border:1px solid #ef4444;color:#fca5a5;padding:8px 12px;border-radius:8px;font-size:.82rem;font-weight:700;cursor:pointer" title="Revokes old share link and generates a brand new one">🔄 Reset / Revoke Link</button>
+      </div>
+
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <a id="rep-sh-wa" href="#" target="_blank" class="modal-btn-act" style="flex:1;text-align:center;text-decoration:none;background:#16a34a;color:#fff;padding:9px 14px;border-radius:8px;font-size:.85rem;font-weight:700">📱 WhatsApp</a>
+        <a id="rep-sh-tg" href="#" target="_blank" class="modal-btn-act" style="flex:1;text-align:center;text-decoration:none;background:#0284c7;color:#fff;padding:9px 14px;border-radius:8px;font-size:.85rem;font-weight:700">✈️ Telegram</a>
+      </div>
+    </div>
+  </div>
+</div>'''
         redo_script = f'''
+const JOB_ID = \'{job["id"]}\';
+let currentShareToken = \'{job.get("share_token", "")}\';
+
+async function openReportShareModal() {{
+  const modal = document.getElementById('report-share-modal');
+  modal.classList.add('open');
+  const inp = document.getElementById('report-share-input');
+  if (!currentShareToken) {{
+    inp.value = 'Generating share link...';
+    try {{
+      const r = await fetch('/api/jobs/' + JOB_ID + '/share', {{method: 'POST'}});
+      const d = await r.json();
+      if (d.share_token) {{
+        currentShareToken = d.share_token;
+      }}
+    }} catch(e) {{}}
+  }}
+  updateShareLinks();
+}}
+
+function updateShareLinks() {{
+  const inp = document.getElementById('report-share-input');
+  const url = window.location.origin + '/share/' + currentShareToken;
+  inp.value = url;
+  const enc = encodeURIComponent(url);
+  const txt = encodeURIComponent('LeadsOSINT Dossier: {job_name}');
+  const wa = document.getElementById('rep-sh-wa');
+  const tg = document.getElementById('rep-sh-tg');
+  if (wa) wa.href = 'https://api.whatsapp.com/send?text=' + txt + '%20' + enc;
+  if (tg) tg.href = 'https://t.me/share/url?url=' + enc + '&text=' + txt;
+}}
+
+function closeReportShareModal() {{
+  const m = document.getElementById('report-share-modal');
+  if (m) m.classList.remove('open');
+}}
+
+function copyReportShareLink() {{
+  const inp = document.getElementById('report-share-input');
+  navigator.clipboard.writeText(inp.value).then(() => {{
+    alert('Share link copied to clipboard!');
+  }}).catch(() => {{
+    inp.select();
+    document.execCommand('copy');
+    alert('Share link copied!');
+  }});
+}}
+
+async function resetReportShareLink() {{
+  if (!confirm('Are you sure you want to reset this share link?
+
+⚠️ Anyone with the old share link will immediately lose access (404). A brand new link will be generated.')) return;
+  const inp = document.getElementById('report-share-input');
+  inp.value = 'Revoking old link & generating new...';
+  try {{
+    const r = await fetch('/api/jobs/' + JOB_ID + '/share/reset', {{method: 'POST'}});
+    const d = await r.json();
+    if (d.share_token) {{
+      currentShareToken = d.share_token;
+      updateShareLinks();
+      alert('Old share link revoked! New secure link generated.');
+    }} else {{
+      alert(d.error || 'Failed to reset share link');
+      updateShareLinks();
+    }}
+  }} catch(e) {{
+    alert('Network error resetting share link');
+    updateShareLinks();
+  }}
+}}
+
 async function redoLead(jobId, idx) {{
-  if (!confirm('Re-run search for this single lead now?')) return;
+  if (!confirm('Re-run search for this single lead now? (Uses 1 lead credit)')) return;
   const api = (window.location.protocol.startsWith('http') ? window.location.origin : 'http://localhost:{PORT}');
   try {{
     const r = await fetch(api + '/api/jobs/' + jobId + '/leads/' + idx + '/retry', {{method: 'POST'}});
@@ -2604,7 +2729,8 @@ async function redoLead(jobId, idx) {{
   }} catch(e) {{
     alert('Network error triggering retry');
   }}
-}}'''
+}}
+'''
 
     return f'''<!DOCTYPE html>
 <html lang="en"><head>
@@ -2623,8 +2749,12 @@ h1{{font-size:2rem;font-weight:800;background:linear-gradient(135deg,var(--ac),#
     -webkit-background-clip:text;-webkit-text-fill-color:transparent}}
 p{{color:var(--mt);font-size:.85rem;margin-top:5px}}
 .back{{background:var(--s2);border:1px solid var(--bd);color:var(--ac);padding:9px 18px;
-       border-radius:9px;font-size:.85rem;text-decoration:none;margin-left:auto}}
+       border-radius:9px;font-size:.85rem;text-decoration:none;display:inline-flex;align-items:center}}
 .back:hover{{border-color:var(--ac);background:var(--ac2);color:#fff}}
+.share-report-btn{{background:linear-gradient(135deg,#0284c7,#38bdf8);border:1px solid rgba(56,189,248,0.4);
+       color:#fff;padding:9px 18px;border-radius:9px;font-size:.85rem;font-weight:700;cursor:pointer;
+       display:inline-flex;align-items:center;gap:6px;transition:all .2s ease;white-space:nowrap}}
+.share-report-btn:hover{{background:linear-gradient(135deg,#0369a1,#0284c7);box-shadow:0 4px 14px rgba(2,132,199,0.4);transform:translateY(-1px)}}
 .stats{{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:14px;max-width:700px}}
 .st{{background:rgba(255,255,255,.04);border:1px solid var(--bd);border-radius:12px;
      padding:18px 22px;text-align:center;transition:.2s}}
@@ -2636,7 +2766,8 @@ p{{color:var(--mt);font-size:.85rem;margin-top:5px}}
   .hero{{padding:24px 16px}}
   .htop{{flex-direction:column;align-items:flex-start;gap:12px}}
   h1{{font-size:1.35rem;word-break:break-word}}
-  .back{{margin-left:0;width:100%;text-align:center}}
+  .hero-actions-bar{{width:100%;margin-left:0 !important;display:flex;gap:8px}}
+  .share-report-btn, .back{{flex:1;text-align:center;justify-content:center;margin-left:0 !important;padding:10px 12px;font-size:.82rem}}
   .stats{{grid-template-columns:repeat(2,1fr);gap:8px;width:100%}}
   .st{{padding:12px 14px}}
   .sv{{font-size:1.4rem}}
@@ -2662,6 +2793,13 @@ p{{color:var(--mt);font-size:.85rem;margin-top:5px}}
 .lc-lbl{{font-size:.68rem;color:var(--mt);text-transform:uppercase;letter-spacing:.5px}}
 {redo_css}
 .footer{{text-align:center;padding:36px;color:var(--mt);font-size:.82rem;border-top:1px solid var(--bd)}}
+.share-modal-overlay{{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.75);backdrop-filter:blur(4px);z-index:9999;align-items:center;justify-content:center;padding:16px}}
+.share-modal-overlay.open{{display:flex}}
+.share-modal-box{{background:var(--s);border:1px solid var(--bd);border-radius:16px;max-width:480px;width:100%;padding:24px;box-shadow:0 20px 40px rgba(0,0,0,0.5);animation:fadeInModal .2s ease}}
+.share-modal-hdr{{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}}
+.share-modal-close{{cursor:pointer;color:var(--mt);font-size:1.2rem;padding:4px 8px;border-radius:6px}}
+.share-modal-close:hover{{color:#fff;background:var(--s2)}}
+@keyframes fadeInModal{{from{{opacity:0;transform:scale(.95)}}to{{opacity:1;transform:scale(1)}}}}
 </style></head><body>
 <div class="hero">
   <div class="htop">
@@ -2679,6 +2817,7 @@ p{{color:var(--mt);font-size:.85rem;margin-top:5px}}
 <div class="grid">{cards}</div>
 <div class="footer">LeadsOSINT · Public Records Intelligence Engine</div>
 <button id="btt-btn" style="position:fixed;bottom:24px;right:24px;z-index:999;background:rgba(30,41,59,.92);border:1px solid var(--ac);color:#fff;padding:9px 16px;border-radius:30px;font-size:.8rem;font-weight:700;display:none;align-items:center;gap:6px;cursor:pointer;box-shadow:0 8px 24px rgba(0,0,0,.6);backdrop-filter:blur(8px);transition:.2s" onclick="window.scrollTo({{top:0,behavior:'smooth'}})" title="Back to top">↑ Back to Top</button>
+{share_modal_html}
 <script>
 window.addEventListener('scroll', () => {{
   const b = document.getElementById('btt-btn');
@@ -2739,7 +2878,7 @@ def regenerate_index(job_id):
         print(f"  regenerate_index error: {e}")
     save_jobs()
 
-# ── Core lead processor ───────────────────────────────────────────────────────
+# -- Core lead processor -------------------------------------------------------
 def process_lead(job_id, lead_idx):
     job  = jobs.get(job_id)
     if not job: return
@@ -2765,7 +2904,7 @@ def process_lead(job_id, lead_idx):
         os.makedirs(lead_folder, exist_ok=True)
         lead['folder_name'] = lead_safe
 
-        # ── Phase 2: enrich with profile detail page (phones, emails, etc.) ──
+        # -- Phase 2: enrich with profile detail page (phones, emails, etc.) --
         from fsp_profile_parser import parse_fsp_profile as _parse_profile
 
         def _enrich_single_result(res):
@@ -2818,7 +2957,7 @@ def process_lead(job_id, lead_idx):
                        'results': save_results}, f, indent=2)
 
         # Screenshots
-        # ── 1. Single Full Search Page Screenshot (1x per lead overview) ──────────
+        # -- 1. Single Full Search Page Screenshot (1x per lead overview) ----------
         search_ss_file = f"{lead_safe}_search_page.png"
         search_ss_path = os.path.join(lead_folder, search_ss_file)
         search_html = next((r.get('_search_html') for r in results if r.get('_search_html')), None)
@@ -2854,7 +2993,7 @@ def process_lead(job_id, lead_idx):
         target_res = results[0] if results else {'name': lead['name'], 'city': lead.get('location', '')}
         _screenshot_profile_html(search_html, search_ss_path, target_res)
 
-        # ── 2. Profile Detail Page Screenshots (per individual result card) ──────
+        # -- 2. Profile Detail Page Screenshots (per individual result card) ------
         for j, res in enumerate(results, 1):
             if lead.get('cancel_flag') or job.get('cancel_flag'):
                 break
@@ -2874,8 +3013,7 @@ def process_lead(job_id, lead_idx):
                 log_event(f"  📸 Capturing authentic profile screenshot {j}/{len(results)}: {res['name']}")
                 _screenshot_profile_html(phtml, ss_path, res)
             else:
-                log_event(f"  📸 Capturing record card screenshot {j}/{len(results)}: {res['name']}")
-                _card_screenshot_fallback(res, ss_path)
+                log_event(f"  ⚠️ No real HTML for {res['name']} - skipping screenshot (no fake cards)", "WARN")
             time.sleep(0.4)
 
         # HTML report (pass job_id + lead_idx so delete/archive buttons work)
@@ -2929,7 +3067,7 @@ def run_job_bg(job_id, lead_indices=None):
         return
 
     total_count = len(job['leads'])
-    concurrency = min(4, max(1, len(to_process)))
+    concurrency = min(8, max(1, len(to_process)))
 
     log_event(f"🚀 Starting Job {job_id}: processing {len(to_process)} leads with {concurrency} worker threads")
 
@@ -3000,8 +3138,8 @@ def run_job_bg(job_id, lead_indices=None):
     regenerate_index(job_id)
     log_event(f"✅ Job {job_id} finished with status '{job['status']}' ({job['done']}/{total_count} leads processed)")
 
-# ── Flask API ─────────────────────────────────────────────────────────────────
-# ── Flask API & Auth ──────────────────────────────────────────────────────────
+# -- Flask API -----------------------------------------------------------------
+# -- Flask API & Auth ----------------------------------------------------------
 @app.route('/favicon.ico')
 def favicon():
     ico_file = os.path.join(os.path.dirname(__file__), 'favicon.ico')
@@ -3079,7 +3217,7 @@ def api_me():
         'whatsapp_url': database.WHATSAPP_SUPPORT_URL
     })
 
-# ── Admin User Management ─────────────────────────────────────────────────────
+# -- Admin User Management -----------------------------------------------------
 @app.route('/api/admin/users', methods=['GET'])
 @admin_required
 def api_admin_list_users():
@@ -3139,7 +3277,7 @@ def api_admin_delete_user(uid):
     database.delete_user(uid)
     return jsonify({'success': True})
 
-# ── In-App Messaging ──────────────────────────────────────────────────────────
+# -- In-App Messaging ----------------------------------------------------------
 @app.route('/api/messages', methods=['GET'])
 @login_required
 def api_get_messages():
@@ -3163,7 +3301,7 @@ def api_post_message():
     mid = database.send_message(user['id'], user['username'], receiver_id, content, receiver_username)
     return jsonify({'success': True, 'message_id': mid})
 
-# ── Sharing ───────────────────────────────────────────────────────────────────
+# -- Sharing -------------------------------------------------------------------
 @app.route('/api/jobs/<job_id>/share', methods=['POST'])
 @login_required
 def api_share_job(job_id):
@@ -3179,6 +3317,59 @@ def api_share_job(job_id):
     save_jobs()
     share_url = f"{request.host_url}share/{token}"
     return jsonify({'success': True, 'share_token': token, 'share_url': share_url})
+
+@app.route('/api/jobs/<job_id>/share/reset', methods=['POST'])
+@login_required
+def api_reset_share_job(job_id):
+    job = jobs.get(job_id)
+    if not job:
+        return jsonify({'error': 'Job not found'}), 404
+    user = getattr(request, 'current_user', None)
+    if user and user.get('role') != 'admin' and job.get('user_id') != user.get('id'):
+        return jsonify({'error': 'Unauthorized to modify share settings for this job'}), 403
+    
+    new_token = database.reset_share_token(
+        job_id, job.get('user_id', 1), job.get('username', 'admin'),
+        job.get('name', job_id), job.get('folder', '')
+    )
+    job['share_token'] = new_token
+    save_jobs()
+    try:
+        regenerate_index(job_id)
+    except Exception:
+        pass
+    share_url = f"{request.host_url}share/{new_token}"
+    return jsonify({'success': True, 'share_token': new_token, 'share_url': share_url})
+
+@app.route('/api/jobs/<job_id>/share/revoke', methods=['POST'])
+@login_required
+def api_revoke_share_job(job_id):
+    job = jobs.get(job_id)
+    if not job:
+        return jsonify({'error': 'Job not found'}), 404
+    user = getattr(request, 'current_user', None)
+    if user and user.get('role') != 'admin' and job.get('user_id') != user.get('id'):
+        return jsonify({'error': 'Unauthorized'}), 403
+    
+    database.revoke_share_token(job_id)
+    job['share_token'] = ''
+    save_jobs()
+    return jsonify({'success': True, 'message': 'Sharing revoked successfully.'})
+
+@app.route('/api/settings/guide-video', methods=['GET'])
+def api_get_guide_video():
+    url = database.get_setting('guide_video_url', '')
+    return jsonify({'guide_video_url': url})
+
+@app.route('/api/admin/settings/guide-video', methods=['POST'])
+@admin_required
+def api_set_guide_video():
+    data = request.get_json() or {}
+    url = data.get('guide_video_url', '').strip()
+    database.set_setting('guide_video_url', url)
+    log_event(f"⚙️ Admin updated Walkthrough Video URL")
+    return jsonify({'success': True, 'guide_video_url': url})
+
 
 FROZEN_SHARE_TEMPLATE = """
 <!DOCTYPE html>
@@ -3300,39 +3491,55 @@ def serve_shared_subpath(share_token, subpath):
         with open(target_path, 'r', encoding='utf-8') as f:
             html = f.read()
 
-        # 1. Rewriting back button to return to shared dossier index
+        # 1. Strip Back to Job / Back button completely from share page
         html = re.sub(
-            r'<a\s+href="[^"]*"\s+class="back"[^>]*>← Back to Job</a>',
-            f'<a href="/share/{share_token}" class="back">← Back to Dossier</a>',
-            html
+            r'<a\s+[^>]*class="back"[^>]*>.*?</a>',
+            '',
+            html,
+            flags=re.DOTALL
         )
-        # 2. Strip Re-do search button completely from topbar
+        # 2. Strip Re-do search button completely from share page topbar
         html = re.sub(
             r'<button[^>]*redoReportLead[^>]*>.*?</button>',
             '',
             html,
             flags=re.DOTALL
         )
-        # 3. Strip all res-actions divs (contains "Not This Person", "Delete Result", "Restore", "Delete Permanently")
+        # 3. Strip Share button & Share modal completely from share page topbar
+        html = re.sub(
+            r'<button[^>]*openShareModal[^>]*>.*?</button>',
+            '',
+            html,
+            flags=re.DOTALL
+        )
+        html = re.sub(
+            r'<div\s+class="share-modal"[^>]*>.*?</div>\s*(?=</body>|\Z)',
+            '',
+            html,
+            flags=re.DOTALL
+        )
+        # 4. Strip all res-actions divs (contains "Not This Person", "Delete Result", "Restore", "Delete Permanently")
         html = re.sub(
             r'<div class="res-actions[^"]*">.*?</div>\s*(?=</details>|\Z)',
             '',
             html,
             flags=re.DOTALL
         )
-        # 4. Strip any standalone action buttons that might exist
+        # 5. Strip any standalone action buttons that might exist
         html = re.sub(
             r'<button[^>]*(?:archiveResult|unarchiveResult|confirmDelete|deleteResult)[^>]*>.*?</button>',
             '',
             html,
             flags=re.DOTALL
         )
-        # 5. Inject fail-safe CSS so NO action buttons can ever display or be clicked in shared views
+        # 6. Inject fail-safe CSS so NO action buttons (Re-do, Not this person, Delete, Share, Back) can display or be active
         ro_css = """
 <style>
-.res-actions, .redo-report-btn, .redo-lead-btn,
-button[onclick*="redo"], button[onclick*="Delete"], button[onclick*="delete"],
-button[onclick*="archive"], button[onclick*="unarchive"] {
+.back, a.back, .res-actions, .redo-report-btn, .redo-lead-btn,
+button[onclick*="openShareModal"], button[onclick*="redo"],
+button[onclick*="Delete"], button[onclick*="delete"],
+button[onclick*="archive"], button[onclick*="unarchive"],
+#share-modal, #confirm-overlay, .share-modal, .confirm-overlay {
   display: none !important;
   visibility: hidden !important;
   pointer-events: none !important;
@@ -3349,7 +3556,7 @@ button[onclick*="archive"], button[onclick*="unarchive"] {
     return send_file(target_path)
 
 
-# ── Network Status Health Check ────────────────────────────────────────────────
+# -- Network Status Health Check ------------------------------------------------
 @app.route('/api/network-status', methods=['GET'])
 def api_network_status():
     import socket
@@ -3378,7 +3585,7 @@ def api_network_status():
         return jsonify({'status': 'unstable', 'latency_ms': round(avg_latency)})
     return jsonify({'status': 'online', 'latency_ms': round(avg_latency)})
 
-# ── User / Admin Credentials Update ───────────────────────────────────────────
+# -- User / Admin Credentials Update -------------------------------------------
 @app.route('/api/auth/change-credentials', methods=['POST'])
 @login_required
 def api_change_credentials():
@@ -3397,7 +3604,7 @@ def api_change_credentials():
     log_event(f"🔐 User '{user['username']}' updated account credentials successfully")
     return jsonify({'success': True, 'message': 'Credentials updated successfully'})
 
-# ── Messaging: Mark as Read & Unread Count ─────────────────────────────────────
+# -- Messaging: Mark as Read & Unread Count -------------------------------------
 @app.route('/api/messages/<int:mid>/read', methods=['POST'])
 @login_required
 def api_mark_message_read(mid):
@@ -3419,7 +3626,7 @@ def api_unread_message_count():
     count = database.get_unread_message_count(user['id'], user['role'])
     return jsonify({'unread_count': count})
 
-# ── Customer Support Settings ──────────────────────────────────────────────────
+# -- Customer Support Settings --------------------------------------------------
 @app.route('/api/settings/support', methods=['GET'])
 def api_get_support_settings():
     settings = database.get_support_settings()
@@ -3485,7 +3692,7 @@ def _create_job_from_leads(leads, name='', autostart=True, user=None, auto_trim_
 
     user_role = user.get('role', '') if isinstance(user, dict) else getattr(user, 'role', '')
 
-    # ── Maximum Batch Input Limit (500 Leads / Job) ───────────────────────────
+    # -- Maximum Batch Input Limit (500 Leads / Job) ---------------------------
     if len(leads) > MAX_BATCH_LEADS_PER_JOB and user_role != 'admin':
         if auto_trim_batch:
             leads = leads[:MAX_BATCH_LEADS_PER_JOB]
@@ -3608,8 +3815,10 @@ def create_job_form():
 
 @app.route('/api/jobs/<job_id>', methods=['GET'])
 def get_job_api(job_id):
-    load_jobs()
     job = jobs.get(job_id)
+    if not job:
+        load_jobs(force=True)
+        job = jobs.get(job_id)
     if not job: return jsonify({'error': 'Not found'}), 404
     d = _job_to_dict(job)
     # Include folder basename for frontend path resolution
@@ -3708,6 +3917,11 @@ def retry_failed_api(job_id):
     failed = [i for i, l in enumerate(job['leads']) if l['status'] == 'failed']
     if not failed:
         return jsonify({'error': 'No failed leads to retry'}), 400
+    user_id = job.get('user_id', 1)
+    allowed, err_msg, _, _ = database.check_user_quota_and_status(user_id, len(failed))
+    if not allowed:
+        return jsonify({'error': err_msg or f'Insufficient lead credits ({len(failed)} needed).'}), 403
+    database.record_user_usage(user_id, len(failed))
     for idx in failed:
         job['leads'][idx]['status']      = 'queued'
         job['leads'][idx]['error']       = ''
@@ -3725,6 +3939,12 @@ def redo_all_api(job_id):
     """Re-run ALL leads from scratch."""
     job = jobs.get(job_id)
     if not job: return jsonify({'error': 'Not found'}), 404
+    user_id = job.get('user_id', 1)
+    count = len(job['leads'])
+    allowed, err_msg, _, _ = database.check_user_quota_and_status(user_id, count)
+    if not allowed:
+        return jsonify({'error': err_msg or f'Insufficient lead credits ({count} needed).'}), 403
+    database.record_user_usage(user_id, count)
     for lead in job['leads']:
         lead['status']      = 'queued'
         lead['error']       = ''
@@ -3755,6 +3975,11 @@ def start_lead_api(job_id, idx):
 def retry_lead_api(job_id, idx):
     job = jobs.get(job_id)
     if not job or idx >= len(job['leads']): return jsonify({'error': 'Not found'}), 404
+    user_id = job.get('user_id', 1)
+    allowed, err_msg, _, _ = database.check_user_quota_and_status(user_id, 1)
+    if not allowed:
+        return jsonify({'error': err_msg or 'Insufficient lead credits to re-run lead.'}), 403
+    database.record_user_usage(user_id, 1)
     lead = job['leads'][idx]
     lead['status']      = 'queued'
     lead['cancel_flag'] = False
@@ -4000,7 +4225,7 @@ def serve_report(filepath):
             return send_file(candidate)
     return 'Not found', 404
 
-# ── CLI mode ──────────────────────────────────────────────────────────────────
+# -- CLI mode ------------------------------------------------------------------
 def cli_run():
     parser = argparse.ArgumentParser()
     parser.add_argument('--bulk', help='CSV file')
