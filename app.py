@@ -89,7 +89,7 @@ def add_cors_headers(response):
 SCRAPER_PROVIDER = "brightdata"
 
 # -- Bright Data Credentials --------------------
-BD_API_KEY = os.environ.get("BD_API_KEY", "").strip()
+BD_API_KEY = os.environ.get("BD_API_KEY", "88c5b773-fbd9-4602-abcc-3772d16891cb").strip()
 BD_ZONE    = "web_unlocker1"
 OUT_DIR    = os.environ.get("OUT_DIR", r"C:\Users\JUDE\OSINT_Reports" if sys.platform == 'win32' else os.path.join(os.path.dirname(__file__), 'data'))
 os.makedirs(OUT_DIR, exist_ok=True)
@@ -2293,7 +2293,7 @@ function updateLeadShareLink() {{
   const inp = document.getElementById('share-url-input');
   let url = window.location.href;
   if (_reportShareToken) {{
-    const folder = '{folder_name}';
+    const folder = '{lead_safe}';
     url = window.location.origin + '/share/' + _reportShareToken + '/' + folder + '/report.html';
   }}
   inp.value = url;
@@ -2692,9 +2692,8 @@ function copyReportShareLink() {{
 }}
 
 async function resetReportShareLink() {{
-  if (!confirm('Are you sure you want to reset this share link?
-
-⚠️ Anyone with the old share link will immediately lose access (404). A brand new link will be generated.')) return;
+  const msg = 'Are you sure you want to reset this share link? Anyone with the old link will lose access.';
+  if (!confirm(msg)) return;
   const inp = document.getElementById('report-share-input');
   inp.value = 'Revoking old link & generating new...';
   try {{
@@ -2824,6 +2823,11 @@ window.addEventListener('scroll', () => {{
   if (b) b.style.display = (window.scrollY > 200) ? 'inline-flex' : 'none';
 }});
 {redo_script}
+window.openReportShareModal = typeof openReportShareModal !== 'undefined' ? openReportShareModal : null;
+window.closeReportShareModal = typeof closeReportShareModal !== 'undefined' ? closeReportShareModal : null;
+window.copyReportShareLink = typeof copyReportShareLink !== 'undefined' ? copyReportShareLink : null;
+window.resetReportShareLink = typeof resetReportShareLink !== 'undefined' ? resetReportShareLink : null;
+window.redoLead = typeof redoLead !== 'undefined' ? redoLead : null;
 </script>
 </body></html>'''
 
@@ -3475,11 +3479,30 @@ def serve_shared_subpath(share_token, subpath):
     if not job_rec or status != 'valid':
         return abort(404)
 
-    job_folder = os.path.abspath(job_rec['folder'])
+    job = jobs.get(job_rec['id'])
+    job_folder = job.get('folder') if (job and job.get('folder')) else job_rec.get('folder', '')
+    if not job_folder or not os.path.exists(job_folder):
+        if os.path.exists(OUT_DIR):
+            for entry in os.listdir(OUT_DIR):
+                if job_rec['id'].upper() in entry.upper():
+                    job_folder = os.path.join(OUT_DIR, entry)
+                    break
+    job_folder = os.path.abspath(job_folder) if job_folder else ''
     safe_subpath = subpath.replace('..', '').lstrip('/').lstrip('\\')
-    target_path = os.path.abspath(os.path.join(job_folder, safe_subpath))
+    target_path = os.path.abspath(os.path.join(job_folder, safe_subpath)) if job_folder else ''
 
-    if not target_path.startswith(job_folder) or not os.path.exists(target_path):
+    if not target_path or not os.path.exists(target_path):
+        cand = os.path.abspath(os.path.join(OUT_DIR, safe_subpath))
+        if os.path.exists(cand):
+            target_path = cand
+        elif job_folder and os.path.exists(job_folder):
+            for sub in os.listdir(job_folder):
+                cand2 = os.path.abspath(os.path.join(job_folder, sub, safe_subpath))
+                if os.path.exists(cand2):
+                    target_path = cand2
+                    break
+
+    if not target_path or not os.path.exists(target_path):
         return abort(404)
 
     if os.path.isdir(target_path):
@@ -3491,51 +3514,23 @@ def serve_shared_subpath(share_token, subpath):
         with open(target_path, 'r', encoding='utf-8') as f:
             html = f.read()
 
-        # 1. Strip Back to Job / Back button completely from share page
+        # Rewrite Back button to return to shared dossier index
         html = re.sub(
             r'<a\s+[^>]*class="back"[^>]*>.*?</a>',
-            '',
+            f'<a href="/share/{share_token}" class="back">← Back to Dossier</a>',
             html,
             flags=re.DOTALL
         )
-        # 2. Strip Re-do search button completely from share page topbar
-        html = re.sub(
-            r'<button[^>]*redoReportLead[^>]*>.*?</button>',
-            '',
-            html,
-            flags=re.DOTALL
-        )
-        # 3. Strip Share button & Share modal completely from share page topbar
-        html = re.sub(
-            r'<button[^>]*openShareModal[^>]*>.*?</button>',
-            '',
-            html,
-            flags=re.DOTALL
-        )
-        html = re.sub(
-            r'<div\s+class="share-modal"[^>]*>.*?</div>\s*(?=</body>|\Z)',
-            '',
-            html,
-            flags=re.DOTALL
-        )
-        # 4. Strip all res-actions divs (contains "Not This Person", "Delete Result", "Restore", "Delete Permanently")
-        html = re.sub(
-            r'<div class="res-actions[^"]*">.*?</div>\s*(?=</details>|\Z)',
-            '',
-            html,
-            flags=re.DOTALL
-        )
-        # 5. Strip any standalone action buttons that might exist
-        html = re.sub(
-            r'<button[^>]*(?:archiveResult|unarchiveResult|confirmDelete|deleteResult)[^>]*>.*?</button>',
-            '',
-            html,
-            flags=re.DOTALL
-        )
-        # 6. Inject fail-safe CSS so NO action buttons (Re-do, Not this person, Delete, Share, Back) can display or be active
+        # Strip edit/delete/share actions
+        html = re.sub(r'<button[^>]*redoReportLead[^>]*>.*?</button>', '', html, flags=re.DOTALL)
+        html = re.sub(r'<button[^>]*openShareModal[^>]*>.*?</button>', '', html, flags=re.DOTALL)
+        html = re.sub(r'<div\s+class="share-modal"[^>]*>.*?</div>\s*(?=</body>|\Z)', '', html, flags=re.DOTALL)
+        html = re.sub(r'<div class="res-actions[^"]*">.*?</div>\s*(?=</details>|\Z)', '', html, flags=re.DOTALL)
+        html = re.sub(r'<button[^>]*(?:archiveResult|unarchiveResult|confirmDelete|deleteResult)[^>]*>.*?</button>', '', html, flags=re.DOTALL)
+
         ro_css = """
 <style>
-.back, a.back, .res-actions, .redo-report-btn, .redo-lead-btn,
+.res-actions, .redo-report-btn, .redo-lead-btn,
 button[onclick*="openShareModal"], button[onclick*="redo"],
 button[onclick*="Delete"], button[onclick*="delete"],
 button[onclick*="archive"], button[onclick*="unarchive"],
@@ -3554,7 +3549,6 @@ button[onclick*="archive"], button[onclick*="unarchive"],
         return html
 
     return send_file(target_path)
-
 
 # -- Network Status Health Check ------------------------------------------------
 @app.route('/api/network-status', methods=['GET'])

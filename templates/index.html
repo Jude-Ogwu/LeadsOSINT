@@ -1285,7 +1285,7 @@
     
     
     /* ── Full Device Responsiveness (Mobile & Tablet) ── */
-    @media (max-width: 768px) {
+    @media (max-width: 1100px) {
       header {
         position: sticky !important;
         top: 0 !important;
@@ -2348,7 +2348,7 @@
             <div id="inspect-status-badge"><span class="lrs-queued">QUEUED</span></div>
           </div>
           <div>
-            <a id="inspect-report-btn" href="#" target="_blank" class="act-btn success"
+            <a id="inspect-report-btn" href="#" class="act-btn success"
               style="text-decoration:none;display:inline-flex;align-items:center;gap:6px">📊 View Full Report</a>
           </div>
         </div>
@@ -2448,12 +2448,54 @@
             <span style="font-size:0.75rem;color:var(--ac);font-weight:700;background:rgba(167,139,250,0.15);padding:3px 8px;border-radius:10px">Video Guide</span>
           </div>
           <div id="tutorial-video-wrapper" style="width:100%;border-radius:8px;overflow:hidden;background:#06080f;text-align:center">
-            <!-- Dynamic video player or placeholder rendered by loadGuideVideo() -->
             <div id="tutorial-video-placeholder" style="padding:28px 16px;color:var(--mt)">
               <div style="font-size:2.4rem;margin-bottom:8px">🎥</div>
               <div style="font-weight:700;color:#fff;margin-bottom:4px">Official Walkthrough Video</div>
               <div style="font-size:0.82rem;max-width:440px;margin:0 auto">Watch this space: an interactive video screen recording walkthrough is hosted here for step-by-step visual training.</div>
             </div>
+          </div>
+          
+          <!-- Notice in Video Section -->
+          <div style="background:rgba(245,158,11,0.12);border:1px solid rgba(245,158,11,0.35);border-radius:10px;padding:12px 14px;margin-top:14px;display:flex;gap:12px;align-items:flex-start">
+            <span style="font-size:1.3rem;line-height:1">💡</span>
+            <div>
+              <div style="font-weight:700;color:#fbbf24;font-size:0.88rem;margin-bottom:3px">
+                PRO-TIP NOTICE: How to Accurately Trace & Confirm Who is Who
+              </div>
+              <div style="color:#e2e8f0;font-size:0.82rem;line-height:1.5">
+                When searching by name, public databases often index multiple people with the same name. Always cross-reference additional intelligence (approximate age/birth year, previous city/state addresses, and listed relatives) to confirm the exact person you are tracing!
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Comprehensive Identity Tracing Guide Notice -->
+        <div style="background:linear-gradient(135deg,rgba(99,102,241,0.15),rgba(168,85,247,0.15));border:1px solid rgba(168,85,247,0.4);border-radius:12px;padding:18px;margin-bottom:20px">
+          <h4 style="color:#c084fc;margin-bottom:8px;font-size:1rem;display:flex;align-items:center;gap:8px">
+            🎯 CRITICAL NOTICE: The Technique to Successfully Trace & Verify Who is Who
+          </h4>
+          <p style="color:#e2e8f0;font-size:0.85rem;line-height:1.6;margin-bottom:12px">
+            Public records searches often yield multiple results for common names. Simply finding a name is not enough — <strong>you need extra verification markers to lock in the true identity</strong>. Always use the background intelligence cards to cross-verify:
+          </p>
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px">
+            <div style="background:var(--s2);padding:10px 14px;border-radius:8px;border:1px solid var(--bd)">
+              <div style="color:#38bdf8;font-weight:700;font-size:0.82rem;margin-bottom:2px">🎂 1. Approximate Age / DOB</div>
+              <div style="font-size:0.78rem;color:var(--mt);line-height:1.4">Match birth month/year and calculated age against your lead profile.</div>
+            </div>
+            <div style="background:var(--s2);padding:10px 14px;border-radius:8px;border:1px solid var(--bd)">
+              <div style="color:#34d399;font-weight:700;font-size:0.82rem;margin-bottom:2px">📍 2. Address History & Timeline</div>
+              <div style="font-size:0.78rem;color:var(--mt);line-height:1.4">Trace move-in timelines and past cities/states where the subject lived.</div>
+            </div>
+            <div style="background:var(--s2);padding:10px 14px;border-radius:8px;border:1px solid var(--bd)">
+              <div style="color:#f472b6;font-weight:700;font-size:0.82rem;margin-bottom:2px">👥 3. Known Relatives & Family</div>
+              <div style="font-size:0.78rem;color:var(--mt);line-height:1.4">Cross-check listed family members with ages to confirm family units.</div>
+            </div>
+            <div style="background:var(--s2);padding:10px 14px;border-radius:8px;border:1px solid var(--bd)">
+              <div style="color:#fbbf24;font-weight:700;font-size:0.82rem;margin-bottom:2px">💼 4. Associates & Phone Carriers</div>
+              <div style="font-size:0.78rem;color:var(--mt);line-height:1.4">Examine co-residents, business associates, and wireless line carriers.</div>
+            </div>
+          </div>
+        </div>
           </div>
         </div>
 
@@ -3208,14 +3250,14 @@
             <span style="background:rgba(52,211,153,0.15);color:#34d399;border:1px solid rgba(52,211,153,0.3);padding:4px 10px;border-radius:6px;font-size:0.75rem;font-weight:700;display:inline-flex;align-items:center;gap:4px">
               ✅ Found (${lead.count || 0})
             </span>
-            ${reportLink ? `<a href="${reportLink}" target="_blank" style="background:#059669;color:#fff;padding:5px 12px;border-radius:6px;font-size:0.75rem;font-weight:700;text-decoration:none;display:inline-flex;align-items:center;gap:4px;margin-left:8px;box-shadow:0 2px 8px rgba(5,150,105,0.3)">📄 View Report</a>` : ''}
+            ${reportLink ? `<a href="${reportLink}" style="background:#059669;color:#fff;padding:5px 12px;border-radius:6px;font-size:0.75rem;font-weight:700;text-decoration:none;display:inline-flex;align-items:center;gap:4px;margin-left:8px;box-shadow:0 2px 8px rgba(5,150,105,0.3)">📄 View Report</a>` : ''}
           `;
         } else if (lead.status === 'none') {
           statusHtml = `
             <span style="background:rgba(239,68,68,0.12);color:#fca5a5;border:1px solid rgba(239,68,68,0.3);padding:4px 10px;border-radius:6px;font-size:0.75rem;font-weight:700;display:inline-flex;align-items:center;gap:4px">
               ⚪ No Records Found
             </span>
-            ${reportLink ? `<a href="${reportLink}" target="_blank" style="background:#2563eb;color:#fff;padding:5px 12px;border-radius:6px;font-size:0.75rem;font-weight:700;text-decoration:none;display:inline-flex;align-items:center;gap:4px;margin-left:8px;box-shadow:0 2px 8px rgba(37,99,235,0.3)">📄 View Report</a>` : ''}
+            ${reportLink ? `<a href="${reportLink}" style="background:#2563eb;color:#fff;padding:5px 12px;border-radius:6px;font-size:0.75rem;font-weight:700;text-decoration:none;display:inline-flex;align-items:center;gap:4px;margin-left:8px;box-shadow:0 2px 8px rgba(37,99,235,0.3)">📄 View Report</a>` : ''}
           `;
         } else if (lead.status === 'running') {
           statusHtml = `<span style="background:rgba(96,165,250,0.15);color:#60a5fa;border:1px solid rgba(96,165,250,0.3);padding:4px 10px;border-radius:6px;font-size:0.75rem;font-weight:700">⚙️ Searching...</span>`;
@@ -3949,7 +3991,7 @@
         } else {
           listEl.innerHTML = job.leads.map((l, idx) => {
             const reportLink = l.folder_name ? `/results/${job.id}/${l.folder_name}/report.html` : '';
-            const linkHtml = reportLink ? `<a href="${reportLink}" target="_blank" style="color:var(--ac);text-decoration:underline">Report ↗</a>` : '';
+            const linkHtml = reportLink ? `<a href="${reportLink}" style="color:var(--ac);text-decoration:underline">Report ↗</a>` : '';
             return `
 <div style="background:var(--s);padding:10px 14px;border-radius:8px;border:1px solid var(--bd);display:flex;align-items:center;justify-content:space-between;gap:10px">
   <div style="display:flex;align-items:center;gap:10px">
