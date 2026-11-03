@@ -154,9 +154,15 @@ def clean(s):
     return re.sub(r'\s+', ' ', str(s)).strip() if s else ''
 
 # -- HTTP Session with Connection Pooling (Massive Speed Enhancement) ---------
+# BD_SESSION: direct connections to api.brightdata.com, no env proxy (avoids PA proxy 403)
+BD_SESSION = requests.Session()
+BD_SESSION.trust_env = False
+bd_adapter = requests.adapters.HTTPAdapter(pool_connections=20, pool_maxsize=20, max_retries=0)
+BD_SESSION.mount('http://', bd_adapter)
+BD_SESSION.mount('https://', bd_adapter)
+
+# HTTP_SESSION: general web scraping session — uses env proxy if set (PA proxy allows FPS/FBC/ThatsThem)
 HTTP_SESSION = requests.Session()
-# Disable automatic proxy detection from env vars (fixes PythonAnywhere 403 proxy block on outbound requests)
-HTTP_SESSION.trust_env = False
 adapter = requests.adapters.HTTPAdapter(pool_connections=50, pool_maxsize=50, max_retries=0)
 HTTP_SESSION.mount('http://', adapter)
 HTTP_SESSION.mount('https://', adapter)
@@ -188,7 +194,7 @@ def bd_fetch(url, retries=4):
         retries = 1
     for attempt in range(retries):
         try:
-            r = HTTP_SESSION.post(
+            r = BD_SESSION.post(
                 "https://api.brightdata.com/request",
                 json={"zone": BD_ZONE, "url": url, "format": "raw", "country": "us"},
                 headers={"Authorization": f"Bearer {BD_API_KEY}", "Content-Type": "application/json"},
@@ -217,7 +223,7 @@ def bd_fetch_profile(url, retries=4):
     """Fetch profile detail page via Bright Data Web Unlocker."""
     for attempt in range(retries):
         try:
-            r = HTTP_SESSION.post(
+            r = BD_SESSION.post(
                 "https://api.brightdata.com/request",
                 json={"zone": BD_ZONE, "url": url, "format": "raw", "country": "us"},
                 headers={"Authorization": f"Bearer {BD_API_KEY}", "Content-Type": "application/json"},
@@ -3100,18 +3106,23 @@ def process_lead(job_id, lead_idx):
             time.sleep(0.4)
 
         # HTML report (pass job_id + lead_idx so delete/archive buttons work)
-        report = build_lead_report(lead['name'], lead['location'],
-                                   results, lead_folder, lead_safe,
-                                   job_id=job_id, lead_idx=lead_idx,
-                                   social_link=lead.get('social_link',''), email=lead.get('email',''), phone=lead.get('phone',''))
-        with open(os.path.join(lead_folder, 'report.html'), 'w', encoding='utf-8') as f:
-            f.write(report)
+        try:
+            report = build_lead_report(lead['name'], lead['location'],
+                                       results, lead_folder, lead_safe,
+                                       job_id=job_id, lead_idx=lead_idx,
+                                       social_link=lead.get('social_link',''), email=lead.get('email',''), phone=lead.get('phone',''))
+            with open(os.path.join(lead_folder, 'report.html'), 'w', encoding='utf-8') as f:
+                f.write(report)
+        except Exception as rpt_e:
+            log_event(f"Report generation warning: {rpt_e}", "WARN")
 
+        # Commit status NOW — before screenshots — so a screenshot crash doesn't erase results
         if results:
             lead['status'] = 'done'
         else:
             lead['status'] = 'none'
             lead['error']  = 'No public records found'
+        save_jobs()
 
     except Exception as e:
         lead['status'] = 'failed'

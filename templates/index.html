@@ -3267,6 +3267,8 @@
               clearInterval(pollTimer);
               pollTimer = null;
             }
+            // Force one final full reload so lead statuses reflect server truth
+            loadJobDetail(jobId);
           }
         }
       } catch (e) {
