@@ -4153,17 +4153,29 @@ def start_lead_api(job_id, idx):
 
 @app.route('/api/jobs/<job_id>/leads/<int:idx>/retry', methods=['POST'])
 def retry_lead_api(job_id, idx):
+    if job_id not in jobs:
+        load_jobs(force=True)
     job = jobs.get(job_id)
-    if not job or idx >= len(job['leads']): return jsonify({'error': 'Not found'}), 404
+    if not job or idx >= len(job.get('leads', [])):
+        return jsonify({'error': 'Not found'}), 404
+
     user_id = job.get('user_id', 1)
-    allowed, err_msg, _, _ = database.check_user_quota_and_status(user_id, 1)
-    if not allowed:
-        return jsonify({'error': err_msg or 'Insufficient lead credits to re-run lead.'}), 403
-    database.record_user_usage(user_id, 1)
+    # Admin has unlimited leads, only deduct credits for customer accounts
+    if job.get('username') != 'admin' and user_id != 1:
+        allowed, err_msg, _, _ = database.check_user_quota_and_status(user_id, 1)
+        if not allowed:
+            return jsonify({'error': err_msg or 'Insufficient lead credits to re-run lead.'}), 403
+        database.record_user_usage(user_id, 1)
+
     lead = job['leads'][idx]
     lead['status']      = 'queued'
     lead['cancel_flag'] = False
     lead['error']       = ''
+    job['status']       = 'running'
+    job['cancel_flag']  = False
+    job['pause_flag']   = False
+    save_jobs()
+
     t = threading.Thread(target=process_lead, args=(job_id, idx), daemon=True)
     t.start()
     return jsonify({'ok': True})
