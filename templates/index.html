@@ -3422,10 +3422,20 @@
     }
     async function deleteJob() {
       if (!confirm('⚠️ Are you sure you want to permanently delete this job and all associated search records? This action cannot be undone.')) return;
-      await fetch(`/api/jobs/${currentJobId}`, { method: 'DELETE' });
-      showToast('Job deleted permanently', 'ok');
-      showNewPanel();
-      refreshJobsList();
+      try {
+        const res = await fetch(`/api/jobs/${currentJobId}`, { method: 'DELETE' });
+        const d = await res.json().catch(() => ({}));
+        if (res.ok) {
+          showToast('Job deleted permanently', 'ok');
+          currentJobId = null;
+          showNewPanel();
+          refreshJobsList();
+        } else {
+          showToast(d.error || 'Delete failed', 'err');
+        }
+      } catch (e) {
+        showToast('Delete failed: ' + e.message, 'err');
+      }
     }
     function openReport() {
       if (!currentJobId) return;

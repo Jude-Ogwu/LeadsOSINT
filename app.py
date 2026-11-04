@@ -4064,11 +4064,40 @@ def update_job_api(job_id):
 
 @app.route('/api/jobs/<job_id>', methods=['DELETE'])
 def delete_job_api(job_id):
+    import shutil
     load_jobs()
     job = jobs.pop(job_id, None)
     if not job: return jsonify({'error': 'Not found'}), 404
     job['cancel_flag'] = True
-    save_jobs()
+
+    # 1. Write jobs_registry.json WITHOUT the deleted job (bypass save_jobs merge-back)
+    try:
+        with jobs_lock:
+            if os.path.exists(JOBS_FILE):
+                with open(JOBS_FILE, 'r', encoding='utf-8') as f:
+                    disk_data = json.load(f)
+                disk_data.pop(job_id, None)
+                with open(JOBS_FILE, 'w', encoding='utf-8') as f:
+                    json.dump(disk_data, f, indent=2)
+    except Exception as e:
+        print(f'  delete_job registry error: {e}')
+
+    # 2. Remove from SQLite DB so load_jobs() can't re-add it
+    try:
+        with database.get_db() as conn:
+            conn.execute('DELETE FROM jobs WHERE id = ?', (job_id,))
+    except Exception as e:
+        print(f'  delete_job DB error: {e}')
+
+    # 3. Delete job folder from disk so auto-recovery can't resurrect it
+    job_folder = job.get('folder', '')
+    if job_folder and os.path.isdir(job_folder):
+        try:
+            shutil.rmtree(job_folder)
+        except Exception as e:
+            print(f'  delete_job folder error: {e}')
+
+    log_event(f'🗑 Job {job_id} permanently deleted')
     return jsonify({'ok': True})
 
 @app.route('/api/jobs/<job_id>/pause', methods=['POST'])
