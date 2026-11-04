@@ -2,11 +2,10 @@ FROM python:3.10-slim
 
 ENV PYTHONUNBUFFERED=1 \
     DEBIAN_FRONTEND=noninteractive \
-    PORT=7860 \
     OUT_DIR=/app/data \
     DB_DIR=/app/data
 
-# Install system utilities and Linux libraries for Playwright Chromium
+# Install system libraries for Playwright Chromium
 RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential \
     curl \
@@ -49,8 +48,8 @@ RUN playwright install-deps chromium || true
 # Copy application source code
 COPY . .
 
-# Expose port 7860 (Hugging Face default)
-EXPOSE 7860
+# Railway injects PORT at runtime — expose it
+EXPOSE 8080
 
-# Run LeadsOSINT
+# Run LeadsOSINT (reads PORT from env, defaults to 5050)
 CMD ["python", "app.py"]
