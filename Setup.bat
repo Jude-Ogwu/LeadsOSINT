@@ -44,13 +44,31 @@ if %errorlevel% neq 0 (
 for /f "tokens=*" %%v in ('python --version 2^>^&1') do echo  Found: %%v
 
 rem -------------------------------------------------------
-rem Step 2: Get LeadsOSINT files
+rem Step 2: Get / Update LeadsOSINT files
 rem -------------------------------------------------------
 echo.
 echo [2/5] Getting LeadsOSINT files...
 if exist "%INSTALL_DIR%\app.py" (
-    echo  Already installed!
-    cd /d "%INSTALL_DIR%"
+    echo  Already installed - checking for updates...
+    git --version >nul 2>&1
+    if %errorlevel% equ 0 (
+        cd /d "%INSTALL_DIR%"
+        git pull >nul 2>&1
+        echo  Updated via git.
+    ) else (
+        echo  Downloading latest update...
+        if exist "%TEMP%\leadsosint.zip" del "%TEMP%\leadsosint.zip" >nul 2>&1
+        curl.exe -L --retry 3 --retry-delay 3 -o "%TEMP%\leadsosint.zip" "https://github.com/Jude-Ogwu/LeadsOSINT/archive/refs/heads/main.zip"
+        if exist "%TEMP%\leadsosint.zip" (
+            echo  Applying update (preserving your data)...
+            powershell -Command "Expand-Archive -Path '%TEMP%\leadsosint.zip' -DestinationPath '%TEMP%\leadsosint_ext' -Force; Get-ChildItem '%TEMP%\leadsosint_ext\LeadsOSINT-main' | Where-Object { $_.Name -notin @('data','.env','jobs_registry.json') } | ForEach-Object { Copy-Item $_.FullName -Destination '%INSTALL_DIR%' -Recurse -Force }; Remove-Item '%TEMP%\leadsosint_ext' -Recurse -Force"
+            del "%TEMP%\leadsosint.zip" >nul 2>&1
+            echo  Updated!
+        ) else (
+            echo  Could not download update. Running existing version.
+        )
+        cd /d "%INSTALL_DIR%"
+    )
 ) else (
     git --version >nul 2>&1
     if %errorlevel% equ 0 (
@@ -125,7 +143,6 @@ echo [5/5] Configuring app...
 if not exist ".env" (
     echo BD_API_KEY=88c5b773-fbd9-4602-abcc-3772d16891cb> .env
     echo PORT=5050>> .env
-    echo OUT_DIR=%INSTALL_DIR%\data>> .env
     mkdir data >nul 2>&1
     echo  Configuration created.
 ) else (
