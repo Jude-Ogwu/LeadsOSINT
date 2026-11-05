@@ -89,7 +89,7 @@ def add_cors_headers(response):
 SCRAPER_PROVIDER = "brightdata"
 
 # -- Bright Data Credentials --------------------
-BD_API_KEY = os.environ.get("BD_API_KEY", "88c5b773-fbd9-4602-abcc-3772d16891cb").strip()
+BD_API_KEY = os.environ.get("BD_API_KEY", "74c1d9bb-e468-4005-af28-46368cf62554").strip()
 BD_ZONE    = "web_unlocker1"
 OUT_DIR    = os.environ.get("OUT_DIR", os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data'))
 os.makedirs(OUT_DIR, exist_ok=True)

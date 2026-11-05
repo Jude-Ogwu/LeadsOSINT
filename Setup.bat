@@ -141,7 +141,7 @@ rem -------------------------------------------------------
 echo.
 echo [5/5] Configuring app...
 if not exist ".env" (
-    echo BD_API_KEY=88c5b773-fbd9-4602-abcc-3772d16891cb> .env
+    echo BD_API_KEY=74c1d9bb-e468-4005-af28-46368cf62554> .env
     echo PORT=5050>> .env
     mkdir data >nul 2>&1
     echo  Configuration created.
