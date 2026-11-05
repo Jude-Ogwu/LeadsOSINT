@@ -4586,3 +4586,43 @@ if __name__ == '__main__':
     else:
         log_event(f"LeadsOSINT server running on http://127.0.0.1:{PORT}")
         app.run(host='0.0.0.0', port=PORT, debug=False, use_reloader=False)
+
+@app.route('/api/diagnostics')
+def api_diagnostics():
+    """Admin-only: tests BrightData connectivity and shows system info + recent logs."""
+    user = get_current_user()
+    if not user or user.get('role') != 'admin':
+        return jsonify({'error': 'Admin only'}), 403
+    import platform, socket
+    result = {
+        'system': platform.system(),
+        'python': platform.python_version(),
+        'hostname': socket.gethostname(),
+        'bd_api_key': (BD_API_KEY[:8] + '...') if BD_API_KEY else 'NOT SET',
+        'bd_zone': BD_ZONE,
+        'out_dir': OUT_DIR,
+        'db_path': DB_PATH,
+        'out_dir_exists': os.path.exists(OUT_DIR),
+        'brightdata_test': None,
+        'brightdata_error': None,
+        'recent_logs': list(LOG_BUFFER)[-50:]
+    }
+    try:
+        test_r = BD_SESSION.post(
+            'https://api.brightdata.com/request',
+            json={'zone': BD_ZONE, 'url': 'https://www.fastpeoplesearch.com/', 'format': 'raw', 'country': 'us'},
+            headers={'Authorization': f'Bearer {BD_API_KEY}', 'Content-Type': 'application/json'},
+            verify=False, timeout=20
+        )
+        brd_err = test_r.headers.get('x-brd-err-msg') or test_r.headers.get('x-brd-error', '')
+        result['brightdata_test'] = {
+            'http_status': test_r.status_code,
+            'response_len': len(test_r.text),
+            'brd_error': brd_err or None,
+            'preview': test_r.text[:300]
+        }
+        result['brightdata_error'] = brd_err or (None if test_r.status_code == 200 else f'HTTP {test_r.status_code}')
+    except Exception as e:
+        result['brightdata_error'] = str(e)
+    return jsonify(result)
+
