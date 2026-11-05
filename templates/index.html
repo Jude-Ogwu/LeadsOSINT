@@ -3,7 +3,11 @@
 
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=5,viewport-fit=cover">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="theme-color" content="#090b14">
   <title>LeadsOSINT — Private Bulk People Search</title>
   <link rel="icon" type="image/svg+xml"
     href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2064%2064%22%3E%3Cdefs%3E%3ClinearGradient%20id%3D%22g%22%20x1%3D%220%25%22%20y1%3D%220%25%22%20x2%3D%22100%25%22%20y2%3D%22100%25%22%3E%3Cstop%20offset%3D%220%25%22%20stop-color%3D%22%237c3aed%22/%3E%3Cstop%20offset%3D%22100%25%22%20stop-color%3D%22%23a78bfa%22/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect%20width%3D%2264%22%20height%3D%2264%22%20rx%3D%2216%22%20fill%3D%22url%28%23g%29%22/%3E%3Cpath%20d%3D%22M35%2011%20L19%2035%20L31%2035%20L26%2053%20L45%2027%20L33%2027%20Z%22%20fill%3D%22%23ffffff%22/%3E%3C/svg%3E">
@@ -32,6 +36,7 @@
       padding: 0;
     }
 
+    html, body { overscroll-behavior: none; }
     body {
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
       background: var(--bg);
@@ -1337,6 +1342,25 @@
     
     
     /* ── Full Device Responsiveness (Mobile & Tablet) ── */
+    /* Touch & tap highlight removal */
+    * { -webkit-tap-highlight-color: transparent !important; touch-action: manipulation; }
+    input, textarea, select, button, a { -webkit-tap-highlight-color: transparent !important; }
+    /* Prevent iOS zoom on input focus - must be >=16px */
+    input[type='text'], input[type='email'], input[type='password'],
+    input[type='search'], textarea, select { font-size: max(16px,1em) !important; }
+    /* Smooth scroll */
+    html { scroll-behavior: smooth; }
+    /* Minimum tap target size */
+    button, .act-btn, .hdr-btn, .new-job-btn, .tab, .mode-tab, .sb-pill-btn { min-height: 36px; }
+
+    /* Tablet portrait (641px - 900px) */
+    @media (min-width: 641px) and (max-width: 900px) {
+      #panel-new { padding: 20px 16px !important; padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 60px) !important; }
+      .jdh-actions { display: grid !important; grid-template-columns: repeat(3,1fr) !important; gap: 8px !important; }
+      .leads-ta { height: 180px !important; }
+      .mode-tabs { display: grid !important; grid-template-columns: 1fr 1fr !important; gap: 8px !important; }
+    }
+
     @media (max-width: 1200px) {
       header {
         position: sticky !important;
@@ -3445,7 +3469,7 @@
     }
     function openReport() {
       if (!currentJobId) return;
-      window.open('/results/' + currentJobId, '_blank');
+      window.location.href = '/results/' + currentJobId;
     }
     function updateOpenReportHref() {
       const btn = document.getElementById('btn-open-report');
