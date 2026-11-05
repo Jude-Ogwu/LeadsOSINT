@@ -51,10 +51,8 @@ rem -------------------------------------------------------
 echo.
 echo [2/5] Getting LeadsOSINT files...
 if exist "%INSTALL_DIR%\app.py" (
-    echo  Already installed - updating to latest version...
+    echo  Already installed!
     cd /d "%INSTALL_DIR%"
-    git pull >nul 2>&1
-    echo  Updated!
 ) else (
     git --version >nul 2>&1
     if %errorlevel% equ 0 (
@@ -155,7 +153,7 @@ echo  To restart: double-click Setup.bat again.
 echo.
 
 rem Start Flask
-start "LeadsOSINT" /MIN cmd /c "cd /d "%INSTALL_DIR%" && venv\Scripts\python app.py"
+start "LeadsOSINT" /MIN venv\Scripts\python app.py
 
 rem Wait for Flask to start then open browser
 timeout /t 5 /nobreak >nul
