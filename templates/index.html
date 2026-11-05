@@ -1463,6 +1463,10 @@
       }
       #panel-new {
         padding: 16px 12px !important;
+        padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 80px) !important;
+      }
+      .main {
+        padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 24px) !important;
       }
       .job-detail-hdr {
         padding: 14px 12px !important;
@@ -1886,13 +1890,13 @@
   <!-- Header -->
   <header>
     <button class="mobile-menu-btn" onclick="toggleSidebar(event)" ontouchstart="toggleSidebar(event)">☰</button>
-    <div class="logo" onclick="showNewPanel()">
+    <a class="logo" href="/" onclick="event.preventDefault();showNewPanel()" style="text-decoration:none;cursor:pointer">
       <div class="logo-box">⚡</div>
       <div class="logo-txt">
         <h1>LeadsOSINT</h1>
         <p>Private Intelligence Edition</p>
       </div>
-    </div>
+    </a>
 
     <div class="hdr-user-info">
       <div class="plan-pill" id="plan-pill">⭐ Loading...</div>
@@ -2106,8 +2110,7 @@
                 Failed</button>
               <button class="act-btn danger" id="btn-cancel-all" onclick="cancelAll()" style="display:none">✕
                 Cancel</button>
-              <button class="act-btn success" id="btn-open-report" onclick="openReport()" style="display:none">📊 Open
-                Report</button>
+              <a class="act-btn success" id="btn-open-report" href="#" onclick="event.preventDefault();openReport()" style="display:none;text-decoration:none">📊 Open Report</a>
               <button class="act-btn danger" id="btn-delete" onclick="deleteJob()">🗑 Delete</button>
             </div>
           </div>
@@ -2858,6 +2861,8 @@
           if (logsWrap) logsWrap.style.display = 'flex';
           const adminBtn = document.getElementById('admin-panel-btn');
           if (adminBtn) adminBtn.style.display = 'inline-flex';
+          const adminBtnMobile = document.getElementById('admin-panel-btn-mobile');
+          if (adminBtnMobile) adminBtnMobile.style.display = 'flex';
           setInterval(fetchLogs, 1500);
           fetchLogs();
         } else {
@@ -3303,6 +3308,7 @@
       const btnRetryFailed = document.getElementById('btn-retry-failed');
       const btnCancelAll = document.getElementById('btn-cancel-all');
       const btnOpenReport = document.getElementById('btn-open-report');
+      updateOpenReportHref();
 
       const isRunning = job.status === 'running';
       const isPaused = job.status === 'paused' || job.status === 'paused_network_error';
@@ -3439,7 +3445,11 @@
     }
     function openReport() {
       if (!currentJobId) return;
-      window.location.href = '/results/' + currentJobId;
+      window.open('/results/' + currentJobId, '_blank');
+    }
+    function updateOpenReportHref() {
+      const btn = document.getElementById('btn-open-report');
+      if (btn && currentJobId) btn.href = '/results/' + currentJobId;
     }
     async function shareCurrentJob() {
       if (!currentJobId) return;
