@@ -1,6 +1,6 @@
 @echo off
 setlocal EnableDelayedExpansion
-title LeadsOSINT - Setup & Launch
+title LeadsOSINT Setup
 color 0A
 
 echo.
@@ -23,8 +23,9 @@ if %errorlevel% neq 0 (
     echo  Python not found. Downloading Python 3.11...
     echo  Please wait - this only happens once.
     echo.
-    curl -L --retry 3 -o "%TEMP%\python_installer.exe" "https://www.python.org/ftp/python/3.11.9/python-3.11.9-amd64.exe"
-    if %errorlevel% neq 0 (
+    if exist "%TEMP%\python_installer.exe" del "%TEMP%\python_installer.exe" >nul 2>&1
+    curl.exe -L --retry 3 --retry-delay 3 -o "%TEMP%\python_installer.exe" "https://www.python.org/ftp/python/3.11.9/python-3.11.9-amd64.exe"
+    if not exist "%TEMP%\python_installer.exe" (
         echo.
         echo  ERROR: Could not download Python.
         echo  Please install Python manually from: https://python.org
@@ -35,13 +36,10 @@ if %errorlevel% neq 0 (
     echo  Installing Python silently...
     "%TEMP%\python_installer.exe" /quiet InstallAllUsers=0 PrependPath=1 Include_test=0
     del "%TEMP%\python_installer.exe" >nul 2>&1
-    python --version >nul 2>&1
-    if %errorlevel% neq 0 (
-        echo.
-        echo  Python installed! Please CLOSE this window and run Setup.bat again.
-        pause
-        exit /b 1
-    )
+    echo.
+    echo  Python installed! Please CLOSE this window and double-click Setup.bat again.
+    pause
+    exit /b 0
 )
 for /f "tokens=*" %%v in ('python --version 2^>^&1') do echo  Found: %%v
 
@@ -60,8 +58,9 @@ if exist "%INSTALL_DIR%\app.py" (
         git clone https://github.com/Jude-Ogwu/LeadsOSINT.git "%INSTALL_DIR%"
     ) else (
         echo  Downloading LeadsOSINT as ZIP...
-        curl -L --retry 3 -o "%TEMP%\leadsosint.zip" "https://github.com/Jude-Ogwu/LeadsOSINT/archive/refs/heads/main.zip"
-        if %errorlevel% neq 0 (
+        if exist "%TEMP%\leadsosint.zip" del "%TEMP%\leadsosint.zip" >nul 2>&1
+        curl.exe -L --retry 3 --retry-delay 3 -o "%TEMP%\leadsosint.zip" "https://github.com/Jude-Ogwu/LeadsOSINT/archive/refs/heads/main.zip"
+        if not exist "%TEMP%\leadsosint.zip" (
             echo.
             echo  ERROR: Could not download LeadsOSINT.
             echo  Please check your internet connection and try again.
@@ -106,8 +105,6 @@ rem Step 4: Playwright Chromium
 rem -------------------------------------------------------
 echo.
 echo [4/5] Setting up browser engine...
-venv\Scripts\python -c "import subprocess,sys; r=subprocess.run(['playwright','install','chromium','--dry-run'],capture_output=True,text=True); sys.exit(0 if 'chromium' in r.stdout.lower() or 'already' in r.stdout.lower() else 1)" >nul 2>&1
-set "PW_CHECK=%errorlevel%"
 set "PW_MARKER=%USERPROFILE%\AppData\Local\ms-playwright"
 if exist "%PW_MARKER%\" (
     dir /b /ad "%PW_MARKER%\chromium*" >nul 2>&1
