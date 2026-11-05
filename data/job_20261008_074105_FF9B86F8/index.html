@@ -1,0 +1,935 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Big B The Cow & Friends_v1 — LeadsOSINT</title>
+<style>
+:root{--bg:#0d0f1a;--s:#1a1d3a;--s2:#22264a;--bd:#3a3f7a;--ac:#a78bfa;
+      --ac2:#6d28d9;--tx:#e0e6ff;--mt:#8b95c4;--gn:#34d399}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:"Segoe UI",system-ui,sans-serif;background:var(--bg);color:var(--tx);min-height:100vh}
+.hero{background:linear-gradient(135deg,#1a1d3a,#0d0f1a);border-bottom:1px solid var(--bd);
+       padding:40px 50px}
+.htop{display:flex;align-items:center;gap:16px;margin-bottom:24px}
+.logo{font-size:2rem}
+h1{font-size:2rem;font-weight:800;background:linear-gradient(135deg,var(--ac),#60a5fa);
+    -webkit-background-clip:text;-webkit-text-fill-color:transparent}
+p{color:var(--mt);font-size:.85rem;margin-top:5px}
+.back{background:var(--s2);border:1px solid var(--bd);color:var(--ac);padding:9px 18px;
+       border-radius:9px;font-size:.85rem;text-decoration:none;margin-left:auto}
+.back:hover{border-color:var(--ac);background:var(--ac2);color:#fff}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:14px;max-width:700px}
+.st{background:rgba(255,255,255,.04);border:1px solid var(--bd);border-radius:12px;
+     padding:18px 22px;text-align:center;transition:.2s}
+.st:hover{border-color:var(--ac)}
+.sv{font-size:1.8rem;font-weight:800;color:var(--ac)}
+.sl{font-size:.72rem;color:var(--mt);text-transform:uppercase;letter-spacing:.5px;margin-top:5px}
+.grid{padding:36px 50px;display:grid;grid-template-columns:repeat(auto-fill,minmax(400px,1fr));gap:14px}
+.lcard{background:var(--s);border:1px solid var(--bd);border-radius:14px;padding:16px 20px;
+        display:flex;align-items:center;gap:14px;color:inherit;transition:.25s;position:relative}
+.lcard:hover{transform:translateY(-3px);box-shadow:0 12px 40px rgba(109,40,217,.2);background:var(--s2)}
+.lcard.found{border-left:4px solid var(--ac)}
+.lcard.none{border-left:4px solid var(--bd);opacity:.75}
+.lcard.running{border-left:4px solid var(--gn);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(52,211,153,.2)}
+                  50%{box-shadow:0 0 0 6px rgba(52,211,153,.0)}}
+.lc-icon{font-size:1.7rem;flex-shrink:0}
+.lc-info{flex:1;min-width:0}
+.lc-name{font-size:1rem;font-weight:700;color:#fff;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.lc-loc{font-size:.78rem;color:var(--mt);margin-top:4px}
+.lc-count{text-align:center;flex-shrink:0;margin-right:8px}
+.lc-num{font-size:1.6rem;font-weight:800;color:var(--ac)}
+.lc-lbl{font-size:.68rem;color:var(--mt);text-transform:uppercase;letter-spacing:.5px}
+.redo-lead-btn{background:var(--s2);border:1px solid var(--bd);color:var(--ac);padding:6px 12px;
+                border-radius:8px;font-size:.78rem;font-weight:700;cursor:pointer;transition:.2s;flex-shrink:0}
+.redo-lead-btn:hover{background:var(--ac2);color:#fff;border-color:var(--ac)}
+.footer{text-align:center;padding:36px;color:var(--mt);font-size:.82rem;border-top:1px solid var(--bd)}
+</style></head><body>
+<div class="hero">
+  <div class="htop">
+    <div class="logo">🔍</div>
+    <div><h1>Big B The Cow & Friends_v1</h1><p>Job ID: FF9B86F8 · Generated: October 10, 2026 · 07:40 AM</p></div>
+    <a href="/" class="back">← Dashboard</a>
+  </div>
+  <div class="stats">
+    <div class="st"><div class="sv">57</div><div class="sl">Total Leads</div></div>
+    <div class="st"><div class="sv">57</div><div class="sl">Found</div></div>
+    <div class="st"><div class="sv">0</div><div class="sl">Failed</div></div>
+    <div class="st"><div class="sv">269</div><div class="sl">Total Results</div></div>
+  </div>
+</div>
+<div class="grid">
+<div class="lcard found">
+  <a href="/results/FF9B86F8/Rebecca_Hillhouse_Hardenville__MO_1/report.html" style="display:flex;align-items:center;gap:16px;flex:1;text-decoration:none;color:inherit;min-width:0" >
+    <div class="lc-icon">✅</div>
+    <div class="lc-info">
+      <div class="lc-name">Rebecca Hillhouse</div>
+      <div class="lc-loc">Hardenville, MO</div>
+      <div style="font-size:.75rem;color:var(--ac);margin-top:4px">🔗 Facebook</div>
+    </div>
+    <div class="lc-count">
+      <div class="lc-num">1</div>
+      <div class="lc-lbl">results</div>
+    </div>
+  </a>
+  <button class="redo-lead-btn" onclick="redoLead('FF9B86F8', 0)" title="Re-run search for this lead">🔄 Re-do</button>
+</div>
+<div class="lcard found">
+  <a href="/results/FF9B86F8/Ami_Simmons/report.html" style="display:flex;align-items:center;gap:16px;flex:1;text-decoration:none;color:inherit;min-width:0" >
+    <div class="lc-icon">✅</div>
+    <div class="lc-info">
+      <div class="lc-name">Ami Simmons</div>
+      <div class="lc-loc">No location</div>
+      <div style="font-size:.75rem;color:var(--ac);margin-top:4px">🔗 Facebook</div>
+    </div>
+    <div class="lc-count">
+      <div class="lc-num">10</div>
+      <div class="lc-lbl">results</div>
+    </div>
+  </a>
+  <button class="redo-lead-btn" onclick="redoLead('FF9B86F8', 1)" title="Re-run search for this lead">🔄 Re-do</button>
+</div>
+<div class="lcard found">
+  <a href="/results/FF9B86F8/Mark_Simmons_Hamilton/report.html" style="display:flex;align-items:center;gap:16px;flex:1;text-decoration:none;color:inherit;min-width:0" >
+    <div class="lc-icon">✅</div>
+    <div class="lc-info">
+      <div class="lc-name">Mark Simmons</div>
+      <div class="lc-loc">Hamilton, OH</div>
+      <div style="font-size:.75rem;color:var(--ac);margin-top:4px">🔗 Facebook</div>
+    </div>
+    <div class="lc-count">
+      <div class="lc-num">3</div>
+      <div class="lc-lbl">results</div>
+    </div>
+  </a>
+  <button class="redo-lead-btn" onclick="redoLead('FF9B86F8', 2)" title="Re-run search for this lead">🔄 Re-do</button>
+</div>
+<div class="lcard found">
+  <a href="/results/FF9B86F8/Horton_Matt_Michelle_Superior/report.html" style="display:flex;align-items:center;gap:16px;flex:1;text-decoration:none;color:inherit;min-width:0" >
+    <div class="lc-icon">✅</div>
+    <div class="lc-info">
+      <div class="lc-name">Horton Matt Michelle</div>
+      <div class="lc-loc">Superior, CO</div>
+      <div style="font-size:.75rem;color:var(--ac);margin-top:4px">🔗 Facebook</div>
+    </div>
+    <div class="lc-count">
+      <div class="lc-num">1</div>
+      <div class="lc-lbl">results</div>
+    </div>
+  </a>
+  <button class="redo-lead-btn" onclick="redoLead('FF9B86F8', 3)" title="Re-run search for this lead">🔄 Re-do</button>
+</div>
+<div class="lcard found">
+  <a href="/results/FF9B86F8/Amanda_Holland/report.html" style="display:flex;align-items:center;gap:16px;flex:1;text-decoration:none;color:inherit;min-width:0" >
+    <div class="lc-icon">✅</div>
+    <div class="lc-info">
+      <div class="lc-name">Amanda Holland</div>
+      <div class="lc-loc">No location</div>
+      <div style="font-size:.75rem;color:var(--ac);margin-top:4px">🔗 Facebook</div>
+    </div>
+    <div class="lc-count">
+      <div class="lc-num">10</div>
+      <div class="lc-lbl">results</div>
+    </div>
+  </a>
+  <button class="redo-lead-btn" onclick="redoLead('FF9B86F8', 4)" title="Re-run search for this lead">🔄 Re-do</button>
+</div>
+<div class="lcard found">
+  <a href="/results/FF9B86F8/Elaine_Townsend_Leadston_Kitchener/report.html" style="display:flex;align-items:center;gap:16px;flex:1;text-decoration:none;color:inherit;min-width:0" >
+    <div class="lc-icon">✅</div>
+    <div class="lc-info">
+      <div class="lc-name">Elaine Townsend Leadston</div>
+      <div class="lc-loc">Kitchener, ON</div>
+      <div style="font-size:.75rem;color:var(--ac);margin-top:4px">🔗 Facebook</div>
+    </div>
+    <div class="lc-count">
+      <div class="lc-num">1</div>
+      <div class="lc-lbl">results</div>
+    </div>
+  </a>
+  <button class="redo-lead-btn" onclick="redoLead('FF9B86F8', 5)" title="Re-run search for this lead">🔄 Re-do</button>
+</div>
+<div class="lcard found">
+  <a href="/results/FF9B86F8/Deb_Martie/report.html" style="display:flex;align-items:center;gap:16px;flex:1;text-decoration:none;color:inherit;min-width:0" >
+    <div class="lc-icon">✅</div>
+    <div class="lc-info">
+      <div class="lc-name">Deb Martie</div>
+      <div class="lc-loc">No location</div>
+      <div style="font-size:.75rem;color:var(--ac);margin-top:4px">🔗 Facebook</div>
+    </div>
+    <div class="lc-count">
+      <div class="lc-num">9</div>
+      <div class="lc-lbl">results</div>
+    </div>
+  </a>
+  <button class="redo-lead-btn" onclick="redoLead('FF9B86F8', 6)" title="Re-run search for this lead">🔄 Re-do</button>
+</div>
+<div class="lcard found">
+  <a href="/results/FF9B86F8/Emily_Langley_Washington/report.html" style="display:flex;align-items:center;gap:16px;flex:1;text-decoration:none;color:inherit;min-width:0" >
+    <div class="lc-icon">✅</div>
+    <div class="lc-info">
+      <div class="lc-name">Emily Langley</div>
+      <div class="lc-loc">Washington, North Carolina</div>
+      <div style="font-size:.75rem;color:var(--ac);margin-top:4px">🔗 Facebook</div>
+    </div>
+    <div class="lc-count">
+      <div class="lc-num">1</div>
+      <div class="lc-lbl">results</div>
+    </div>
+  </a>
+  <button class="redo-lead-btn" onclick="redoLead('FF9B86F8', 7)" title="Re-run search for this lead">🔄 Re-do</button>
+</div>
+<div class="lcard found">
+  <a href="/results/FF9B86F8/Marla_Anne_Taylor/report.html" style="display:flex;align-items:center;gap:16px;flex:1;text-decoration:none;color:inherit;min-width:0" >
+    <div class="lc-icon">✅</div>
+    <div class="lc-info">
+      <div class="lc-name">Marla Anne Taylor</div>
+      <div class="lc-loc">No location</div>
+      <div style="font-size:.75rem;color:var(--ac);margin-top:4px">🔗 Facebook</div>
+    </div>
+    <div class="lc-count">
+      <div class="lc-num">10</div>
+      <div class="lc-lbl">results</div>
+    </div>
+  </a>
+  <button class="redo-lead-btn" onclick="redoLead('FF9B86F8', 8)" title="Re-run search for this lead">🔄 Re-do</button>
+</div>
+<div class="lcard found">
+  <a href="/results/FF9B86F8/Rochelle_Snyder_Cohen/report.html" style="display:flex;align-items:center;gap:16px;flex:1;text-decoration:none;color:inherit;min-width:0" >
+    <div class="lc-icon">✅</div>
+    <div class="lc-info">
+      <div class="lc-name">Rochelle Snyder Cohen</div>
+      <div class="lc-loc">No location</div>
+      <div style="font-size:.75rem;color:var(--ac);margin-top:4px">🔗 Facebook</div>
+    </div>
+    <div class="lc-count">
+      <div class="lc-num">10</div>
+      <div class="lc-lbl">results</div>
+    </div>
+  </a>
+  <button class="redo-lead-btn" onclick="redoLead('FF9B86F8', 9)" title="Re-run search for this lead">🔄 Re-do</button>
+</div>
+<div class="lcard found">
+  <a href="/results/FF9B86F8/Heather_Taylor/report.html" style="display:flex;align-items:center;gap:16px;flex:1;text-decoration:none;color:inherit;min-width:0" >
+    <div class="lc-icon">✅</div>
+    <div class="lc-info">
+      <div class="lc-name">Heather Taylor</div>
+      <div class="lc-loc">No location</div>
+      <div style="font-size:.75rem;color:var(--ac);margin-top:4px">🔗 Facebook</div>
+    </div>
+    <div class="lc-count">
+      <div class="lc-num">10</div>
+      <div class="lc-lbl">results</div>
+    </div>
+  </a>
+  <button class="redo-lead-btn" onclick="redoLead('FF9B86F8', 10)" title="Re-run search for this lead">🔄 Re-do</button>
+</div>
+<div class="lcard found">
+  <a href="/results/FF9B86F8/Sandra_Jajtner_Aubrey/report.html" style="display:flex;align-items:center;gap:16px;flex:1;text-decoration:none;color:inherit;min-width:0" >
+    <div class="lc-icon">✅</div>
+    <div class="lc-info">
+      <div class="lc-name">Sandra Jajtner</div>
+      <div class="lc-loc">Aubrey, TX</div>
+      <div style="font-size:.75rem;color:var(--ac);margin-top:4px">🔗 Facebook</div>
+    </div>
+    <div class="lc-count">
+      <div class="lc-num">1</div>
+      <div class="lc-lbl">results</div>
+    </div>
+  </a>
+  <button class="redo-lead-btn" onclick="redoLead('FF9B86F8', 11)" title="Re-run search for this lead">🔄 Re-do</button>
+</div>
+<div class="lcard found">
+  <a href="/results/FF9B86F8/Stacey_Owens_Dallas/report.html" style="display:flex;align-items:center;gap:16px;flex:1;text-decoration:none;color:inherit;min-width:0" >
+    <div class="lc-icon">✅</div>
+    <div class="lc-info">
+      <div class="lc-name">Stacey Owens</div>
+      <div class="lc-loc">Dallas, TX</div>
+      <div style="font-size:.75rem;color:var(--ac);margin-top:4px">🔗 Facebook</div>
+    </div>
+    <div class="lc-count">
+      <div class="lc-num">10</div>
+      <div class="lc-lbl">results</div>
+    </div>
+  </a>
+  <button class="redo-lead-btn" onclick="redoLead('FF9B86F8', 12)" title="Re-run search for this lead">🔄 Re-do</button>
+</div>
+<div class="lcard found">
+  <a href="/results/FF9B86F8/Tammy_Vostrez_Hubbell/report.html" style="display:flex;align-items:center;gap:16px;flex:1;text-decoration:none;color:inherit;min-width:0" >
+    <div class="lc-icon">✅</div>
+    <div class="lc-info">
+      <div class="lc-name">Tammy Vostrez</div>
+      <div class="lc-loc">Hubbell, NE</div>
+      <div style="font-size:.75rem;color:var(--ac);margin-top:4px">🔗 Facebook</div>
+    </div>
+    <div class="lc-count">
+      <div class="lc-num">1</div>
+      <div class="lc-lbl">results</div>
+    </div>
+  </a>
+  <button class="redo-lead-btn" onclick="redoLead('FF9B86F8', 13)" title="Re-run search for this lead">🔄 Re-do</button>
+</div>
+<div class="lcard found">
+  <a href="/results/FF9B86F8/Julie_Stewart_Deepe_Hebron/report.html" style="display:flex;align-items:center;gap:16px;flex:1;text-decoration:none;color:inherit;min-width:0" >
+    <div class="lc-icon">✅</div>
+    <div class="lc-info">
+      <div class="lc-name">Julie Stewart Deepe</div>
+      <div class="lc-loc">Hebron, NE</div>
+      <div style="font-size:.75rem;color:var(--ac);margin-top:4px">🔗 Facebook</div>
+    </div>
+    <div class="lc-count">
+      <div class="lc-num">6</div>
+      <div class="lc-lbl">results</div>
+    </div>
+  </a>
+  <button class="redo-lead-btn" onclick="redoLead('FF9B86F8', 14)" title="Re-run search for this lead">🔄 Re-do</button>
+</div>
+<div class="lcard found">
+  <a href="/results/FF9B86F8/Lonnie_Craig_Munden/report.html" style="display:flex;align-items:center;gap:16px;flex:1;text-decoration:none;color:inherit;min-width:0" >
+    <div class="lc-icon">✅</div>
+    <div class="lc-info">
+      <div class="lc-name">Lonnie Craig</div>
+      <div class="lc-loc">Munden, KS</div>
+      <div style="font-size:.75rem;color:var(--ac);margin-top:4px">🔗 Facebook</div>
+    </div>
+    <div class="lc-count">
+      <div class="lc-num">1</div>
+      <div class="lc-lbl">results</div>
+    </div>
+  </a>
+  <button class="redo-lead-btn" onclick="redoLead('FF9B86F8', 15)" title="Re-run search for this lead">🔄 Re-do</button>
+</div>
+<div class="lcard found">
+  <a href="/results/FF9B86F8/Gina_DeAngelis_DiSano/report.html" style="display:flex;align-items:center;gap:16px;flex:1;text-decoration:none;color:inherit;min-width:0" >
+    <div class="lc-icon">✅</div>
+    <div class="lc-info">
+      <div class="lc-name">Gina DeAngelis DiSano</div>
+      <div class="lc-loc">No location</div>
+      <div style="font-size:.75rem;color:var(--ac);margin-top:4px">🔗 Facebook</div>
+    </div>
+    <div class="lc-count">
+      <div class="lc-num">8</div>
+      <div class="lc-lbl">results</div>
+    </div>
+  </a>
+  <button class="redo-lead-btn" onclick="redoLead('FF9B86F8', 16)" title="Re-run search for this lead">🔄 Re-do</button>
+</div>
+<div class="lcard found">
+  <a href="/results/FF9B86F8/Ann_Marie_DeAngelis_Blackwell_Braintree_Highlands/report.html" style="display:flex;align-items:center;gap:16px;flex:1;text-decoration:none;color:inherit;min-width:0" >
+    <div class="lc-icon">✅</div>
+    <div class="lc-info">
+      <div class="lc-name">Ann Marie DeAngelis Blackwell</div>
+      <div class="lc-loc">Braintree Highlands, MA</div>
+      <div style="font-size:.75rem;color:var(--ac);margin-top:4px">🔗 Facebook</div>
+    </div>
+    <div class="lc-count">
+      <div class="lc-num">1</div>
+      <div class="lc-lbl">results</div>
+    </div>
+  </a>
+  <button class="redo-lead-btn" onclick="redoLead('FF9B86F8', 17)" title="Re-run search for this lead">🔄 Re-do</button>
+</div>
+<div class="lcard found">
+  <a href="/results/FF9B86F8/Andrew_Hurley_Tampa/report.html" style="display:flex;align-items:center;gap:16px;flex:1;text-decoration:none;color:inherit;min-width:0" >
+    <div class="lc-icon">✅</div>
+    <div class="lc-info">
+      <div class="lc-name">Andrew Hurley</div>
+      <div class="lc-loc">Tampa, FL</div>
+      <div style="font-size:.75rem;color:var(--ac);margin-top:4px">🔗 Facebook</div>
+    </div>
+    <div class="lc-count">
+      <div class="lc-num">1</div>
+      <div class="lc-lbl">results</div>
+    </div>
+  </a>
+  <button class="redo-lead-btn" onclick="redoLead('FF9B86F8', 18)" title="Re-run search for this lead">🔄 Re-do</button>
+</div>
+<div class="lcard found">
+  <a href="/results/FF9B86F8/Darla_Hobbs_Beverlin/report.html" style="display:flex;align-items:center;gap:16px;flex:1;text-decoration:none;color:inherit;min-width:0" >
+    <div class="lc-icon">✅</div>
+    <div class="lc-info">
+      <div class="lc-name">Darla Hobbs-Beverlin</div>
+      <div class="lc-loc">No location</div>
+      <div style="font-size:.75rem;color:var(--ac);margin-top:4px">🔗 Facebook</div>
+    </div>
+    <div class="lc-count">
+      <div class="lc-num">10</div>
+      <div class="lc-lbl">results</div>
+    </div>
+  </a>
+  <button class="redo-lead-btn" onclick="redoLead('FF9B86F8', 19)" title="Re-run search for this lead">🔄 Re-do</button>
+</div>
+<div class="lcard found">
+  <a href="/results/FF9B86F8/Pat_Throgmorton/report.html" style="display:flex;align-items:center;gap:16px;flex:1;text-decoration:none;color:inherit;min-width:0" >
+    <div class="lc-icon">✅</div>
+    <div class="lc-info">
+      <div class="lc-name">Pat Throgmorton</div>
+      <div class="lc-loc">No location</div>
+      <div style="font-size:.75rem;color:var(--ac);margin-top:4px">🔗 Facebook</div>
+    </div>
+    <div class="lc-count">
+      <div class="lc-num">5</div>
+      <div class="lc-lbl">results</div>
+    </div>
+  </a>
+  <button class="redo-lead-btn" onclick="redoLead('FF9B86F8', 20)" title="Re-run search for this lead">🔄 Re-do</button>
+</div>
+<div class="lcard found">
+  <a href="/results/FF9B86F8/Tricia_Morgan_Thrower/report.html" style="display:flex;align-items:center;gap:16px;flex:1;text-decoration:none;color:inherit;min-width:0" >
+    <div class="lc-icon">✅</div>
+    <div class="lc-info">
+      <div class="lc-name">Tricia Morgan Thrower</div>
+      <div class="lc-loc">No location</div>
+      <div style="font-size:.75rem;color:var(--ac);margin-top:4px">🔗 Facebook</div>
+    </div>
+    <div class="lc-count">
+      <div class="lc-num">10</div>
+      <div class="lc-lbl">results</div>
+    </div>
+  </a>
+  <button class="redo-lead-btn" onclick="redoLead('FF9B86F8', 21)" title="Re-run search for this lead">🔄 Re-do</button>
+</div>
+<div class="lcard found">
+  <a href="/results/FF9B86F8/Karen_Wilson_Stanton_Broken_Arrow/report.html" style="display:flex;align-items:center;gap:16px;flex:1;text-decoration:none;color:inherit;min-width:0" >
+    <div class="lc-icon">✅</div>
+    <div class="lc-info">
+      <div class="lc-name">Karen Wilson Stanton</div>
+      <div class="lc-loc">Broken Arrow</div>
+      <div style="font-size:.75rem;color:var(--ac);margin-top:4px">🔗 Facebook</div>
+    </div>
+    <div class="lc-count">
+      <div class="lc-num">4</div>
+      <div class="lc-lbl">results</div>
+    </div>
+  </a>
+  <button class="redo-lead-btn" onclick="redoLead('FF9B86F8', 22)" title="Re-run search for this lead">🔄 Re-do</button>
+</div>
+<div class="lcard found">
+  <a href="/results/FF9B86F8/Lorrine_Barrett/report.html" style="display:flex;align-items:center;gap:16px;flex:1;text-decoration:none;color:inherit;min-width:0" >
+    <div class="lc-icon">✅</div>
+    <div class="lc-info">
+      <div class="lc-name">Lorrine Barrett</div>
+      <div class="lc-loc">No location</div>
+      <div style="font-size:.75rem;color:var(--ac);margin-top:4px">🔗 Facebook</div>
+    </div>
+    <div class="lc-count">
+      <div class="lc-num">10</div>
+      <div class="lc-lbl">results</div>
+    </div>
+  </a>
+  <button class="redo-lead-btn" onclick="redoLead('FF9B86F8', 23)" title="Re-run search for this lead">🔄 Re-do</button>
+</div>
+<div class="lcard found">
+  <a href="/results/FF9B86F8/Kathy_Morgan_Hill/report.html" style="display:flex;align-items:center;gap:16px;flex:1;text-decoration:none;color:inherit;min-width:0" >
+    <div class="lc-icon">✅</div>
+    <div class="lc-info">
+      <div class="lc-name">Kathy Morgan Hill</div>
+      <div class="lc-loc">No location</div>
+      <div style="font-size:.75rem;color:var(--ac);margin-top:4px">🔗 Facebook</div>
+    </div>
+    <div class="lc-count">
+      <div class="lc-num">10</div>
+      <div class="lc-lbl">results</div>
+    </div>
+  </a>
+  <button class="redo-lead-btn" onclick="redoLead('FF9B86F8', 24)" title="Re-run search for this lead">🔄 Re-do</button>
+</div>
+<div class="lcard found">
+  <a href="/results/FF9B86F8/Barron_Greenwalt_Pittsburgh/report.html" style="display:flex;align-items:center;gap:16px;flex:1;text-decoration:none;color:inherit;min-width:0" >
+    <div class="lc-icon">✅</div>
+    <div class="lc-info">
+      <div class="lc-name">Barron Greenwalt</div>
+      <div class="lc-loc">Pittsburgh, PA</div>
+      <div style="font-size:.75rem;color:var(--ac);margin-top:4px">🔗 Facebook</div>
+    </div>
+    <div class="lc-count">
+      <div class="lc-num">1</div>
+      <div class="lc-lbl">results</div>
+    </div>
+  </a>
+  <button class="redo-lead-btn" onclick="redoLead('FF9B86F8', 25)" title="Re-run search for this lead">🔄 Re-do</button>
+</div>
+<div class="lcard found">
+  <a href="/results/FF9B86F8/Sandy_Lanza_Allison_Park/report.html" style="display:flex;align-items:center;gap:16px;flex:1;text-decoration:none;color:inherit;min-width:0" >
+    <div class="lc-icon">✅</div>
+    <div class="lc-info">
+      <div class="lc-name">Sandy Lanza</div>
+      <div class="lc-loc">Allison Park</div>
+      <div style="font-size:.75rem;color:var(--ac);margin-top:4px">🔗 Facebook</div>
+    </div>
+    <div class="lc-count">
+      <div class="lc-num">1</div>
+      <div class="lc-lbl">results</div>
+    </div>
+  </a>
+  <button class="redo-lead-btn" onclick="redoLead('FF9B86F8', 26)" title="Re-run search for this lead">🔄 Re-do</button>
+</div>
+<div class="lcard found">
+  <a href="/results/FF9B86F8/Barbara_Myers_West_Chester/report.html" style="display:flex;align-items:center;gap:16px;flex:1;text-decoration:none;color:inherit;min-width:0" >
+    <div class="lc-icon">✅</div>
+    <div class="lc-info">
+      <div class="lc-name">Barbara Myers</div>
+      <div class="lc-loc">West Chester, PA</div>
+      <div style="font-size:.75rem;color:var(--ac);margin-top:4px">🔗 Facebook</div>
+    </div>
+    <div class="lc-count">
+      <div class="lc-num">9</div>
+      <div class="lc-lbl">results</div>
+    </div>
+  </a>
+  <button class="redo-lead-btn" onclick="redoLead('FF9B86F8', 27)" title="Re-run search for this lead">🔄 Re-do</button>
+</div>
+<div class="lcard found">
+  <a href="/results/FF9B86F8/Melody_Blades_Brooklyn_Park/report.html" style="display:flex;align-items:center;gap:16px;flex:1;text-decoration:none;color:inherit;min-width:0" >
+    <div class="lc-icon">✅</div>
+    <div class="lc-info">
+      <div class="lc-name">Melody Blades</div>
+      <div class="lc-loc">Brooklyn Park, MD</div>
+      <div style="font-size:.75rem;color:var(--ac);margin-top:4px">🔗 Facebook</div>
+    </div>
+    <div class="lc-count">
+      <div class="lc-num">1</div>
+      <div class="lc-lbl">results</div>
+    </div>
+  </a>
+  <button class="redo-lead-btn" onclick="redoLead('FF9B86F8', 28)" title="Re-run search for this lead">🔄 Re-do</button>
+</div>
+<div class="lcard found">
+  <a href="/results/FF9B86F8/Ashley_Merchant_Sharon/report.html" style="display:flex;align-items:center;gap:16px;flex:1;text-decoration:none;color:inherit;min-width:0" >
+    <div class="lc-icon">✅</div>
+    <div class="lc-info">
+      <div class="lc-name">Ashley Merchant</div>
+      <div class="lc-loc">Sharon, PA</div>
+      <div style="font-size:.75rem;color:var(--ac);margin-top:4px">🔗 Facebook</div>
+    </div>
+    <div class="lc-count">
+      <div class="lc-num">4</div>
+      <div class="lc-lbl">results</div>
+    </div>
+  </a>
+  <button class="redo-lead-btn" onclick="redoLead('FF9B86F8', 29)" title="Re-run search for this lead">🔄 Re-do</button>
+</div>
+<div class="lcard found">
+  <a href="/results/FF9B86F8/Tracy_Sethman/report.html" style="display:flex;align-items:center;gap:16px;flex:1;text-decoration:none;color:inherit;min-width:0" >
+    <div class="lc-icon">✅</div>
+    <div class="lc-info">
+      <div class="lc-name">Tracy Sethman</div>
+      <div class="lc-loc">No location</div>
+      <div style="font-size:.75rem;color:var(--ac);margin-top:4px">🔗 Facebook</div>
+    </div>
+    <div class="lc-count">
+      <div class="lc-num">2</div>
+      <div class="lc-lbl">results</div>
+    </div>
+  </a>
+  <button class="redo-lead-btn" onclick="redoLead('FF9B86F8', 30)" title="Re-run search for this lead">🔄 Re-do</button>
+</div>
+<div class="lcard found">
+  <a href="/results/FF9B86F8/Gail_Johnson/report.html" style="display:flex;align-items:center;gap:16px;flex:1;text-decoration:none;color:inherit;min-width:0" >
+    <div class="lc-icon">✅</div>
+    <div class="lc-info">
+      <div class="lc-name">Gail Johnson</div>
+      <div class="lc-loc">No location</div>
+      <div style="font-size:.75rem;color:var(--ac);margin-top:4px">🔗 Facebook</div>
+    </div>
+    <div class="lc-count">
+      <div class="lc-num">10</div>
+      <div class="lc-lbl">results</div>
+    </div>
+  </a>
+  <button class="redo-lead-btn" onclick="redoLead('FF9B86F8', 31)" title="Re-run search for this lead">🔄 Re-do</button>
+</div>
+<div class="lcard found">
+  <a href="/results/FF9B86F8/Raeleen_Sample_Croswell/report.html" style="display:flex;align-items:center;gap:16px;flex:1;text-decoration:none;color:inherit;min-width:0" >
+    <div class="lc-icon">✅</div>
+    <div class="lc-info">
+      <div class="lc-name">Raeleen Sample</div>
+      <div class="lc-loc">Croswell, MI</div>
+      <div style="font-size:.75rem;color:var(--ac);margin-top:4px">🔗 Facebook</div>
+    </div>
+    <div class="lc-count">
+      <div class="lc-num">1</div>
+      <div class="lc-lbl">results</div>
+    </div>
+  </a>
+  <button class="redo-lead-btn" onclick="redoLead('FF9B86F8', 32)" title="Re-run search for this lead">🔄 Re-do</button>
+</div>
+<div class="lcard found">
+  <a href="/results/FF9B86F8/Sharon_Backes_Cleveland/report.html" style="display:flex;align-items:center;gap:16px;flex:1;text-decoration:none;color:inherit;min-width:0" >
+    <div class="lc-icon">✅</div>
+    <div class="lc-info">
+      <div class="lc-name">Sharon Backes</div>
+      <div class="lc-loc">Cleveland, Ohio</div>
+      <div style="font-size:.75rem;color:var(--ac);margin-top:4px">🔗 Facebook</div>
+    </div>
+    <div class="lc-count">
+      <div class="lc-num">1</div>
+      <div class="lc-lbl">results</div>
+    </div>
+  </a>
+  <button class="redo-lead-btn" onclick="redoLead('FF9B86F8', 33)" title="Re-run search for this lead">🔄 Re-do</button>
+</div>
+<div class="lcard found">
+  <a href="/results/FF9B86F8/Jeannie_Finan_Pittsburgh/report.html" style="display:flex;align-items:center;gap:16px;flex:1;text-decoration:none;color:inherit;min-width:0" >
+    <div class="lc-icon">✅</div>
+    <div class="lc-info">
+      <div class="lc-name">Jeannie Finan</div>
+      <div class="lc-loc">Pittsburgh, PA</div>
+      <div style="font-size:.75rem;color:var(--ac);margin-top:4px">🔗 Facebook</div>
+    </div>
+    <div class="lc-count">
+      <div class="lc-num">1</div>
+      <div class="lc-lbl">results</div>
+    </div>
+  </a>
+  <button class="redo-lead-btn" onclick="redoLead('FF9B86F8', 34)" title="Re-run search for this lead">🔄 Re-do</button>
+</div>
+<div class="lcard found">
+  <a href="/results/FF9B86F8/Patsy_Arnold_Arlington/report.html" style="display:flex;align-items:center;gap:16px;flex:1;text-decoration:none;color:inherit;min-width:0" >
+    <div class="lc-icon">✅</div>
+    <div class="lc-info">
+      <div class="lc-name">Patsy Arnold</div>
+      <div class="lc-loc">Arlington, TX</div>
+      <div style="font-size:.75rem;color:var(--ac);margin-top:4px">🔗 Facebook</div>
+    </div>
+    <div class="lc-count">
+      <div class="lc-num">10</div>
+      <div class="lc-lbl">results</div>
+    </div>
+  </a>
+  <button class="redo-lead-btn" onclick="redoLead('FF9B86F8', 35)" title="Re-run search for this lead">🔄 Re-do</button>
+</div>
+<div class="lcard found">
+  <a href="/results/FF9B86F8/Irene_Adamson/report.html" style="display:flex;align-items:center;gap:16px;flex:1;text-decoration:none;color:inherit;min-width:0" >
+    <div class="lc-icon">✅</div>
+    <div class="lc-info">
+      <div class="lc-name">Irene Adamson</div>
+      <div class="lc-loc">No location</div>
+      <div style="font-size:.75rem;color:var(--ac);margin-top:4px">🔗 Facebook</div>
+    </div>
+    <div class="lc-count">
+      <div class="lc-num">10</div>
+      <div class="lc-lbl">results</div>
+    </div>
+  </a>
+  <button class="redo-lead-btn" onclick="redoLead('FF9B86F8', 36)" title="Re-run search for this lead">🔄 Re-do</button>
+</div>
+<div class="lcard found">
+  <a href="/results/FF9B86F8/Clarence_Morgan_Buchanan_Dam/report.html" style="display:flex;align-items:center;gap:16px;flex:1;text-decoration:none;color:inherit;min-width:0" >
+    <div class="lc-icon">✅</div>
+    <div class="lc-info">
+      <div class="lc-name">Clarence Morgan</div>
+      <div class="lc-loc">Buchanan Dam, TX</div>
+      <div style="font-size:.75rem;color:var(--ac);margin-top:4px">🔗 Facebook</div>
+    </div>
+    <div class="lc-count">
+      <div class="lc-num">1</div>
+      <div class="lc-lbl">results</div>
+    </div>
+  </a>
+  <button class="redo-lead-btn" onclick="redoLead('FF9B86F8', 37)" title="Re-run search for this lead">🔄 Re-do</button>
+</div>
+<div class="lcard found">
+  <a href="/results/FF9B86F8/Sarah_Pozo_Clarksville/report.html" style="display:flex;align-items:center;gap:16px;flex:1;text-decoration:none;color:inherit;min-width:0" >
+    <div class="lc-icon">✅</div>
+    <div class="lc-info">
+      <div class="lc-name">Sarah Pozo</div>
+      <div class="lc-loc">Clarksville, Tennessee</div>
+      <div style="font-size:.75rem;color:var(--ac);margin-top:4px">🔗 Facebook</div>
+    </div>
+    <div class="lc-count">
+      <div class="lc-num">10</div>
+      <div class="lc-lbl">results</div>
+    </div>
+  </a>
+  <button class="redo-lead-btn" onclick="redoLead('FF9B86F8', 38)" title="Re-run search for this lead">🔄 Re-do</button>
+</div>
+<div class="lcard found">
+  <a href="/results/FF9B86F8/Ashlee_Ayers_Delta/report.html" style="display:flex;align-items:center;gap:16px;flex:1;text-decoration:none;color:inherit;min-width:0" >
+    <div class="lc-icon">✅</div>
+    <div class="lc-info">
+      <div class="lc-name">Ashlee Ayers</div>
+      <div class="lc-loc">Delta, Iowa</div>
+      <div style="font-size:.75rem;color:var(--ac);margin-top:4px">🔗 Facebook</div>
+    </div>
+    <div class="lc-count">
+      <div class="lc-num">8</div>
+      <div class="lc-lbl">results</div>
+    </div>
+  </a>
+  <button class="redo-lead-btn" onclick="redoLead('FF9B86F8', 39)" title="Re-run search for this lead">🔄 Re-do</button>
+</div>
+<div class="lcard found">
+  <a href="/results/FF9B86F8/Kristin_Grace_North_Richland_Hills/report.html" style="display:flex;align-items:center;gap:16px;flex:1;text-decoration:none;color:inherit;min-width:0" >
+    <div class="lc-icon">✅</div>
+    <div class="lc-info">
+      <div class="lc-name">Kristin Grace</div>
+      <div class="lc-loc">North Richland Hills, Texas</div>
+      <div style="font-size:.75rem;color:var(--ac);margin-top:4px">🔗 Facebook</div>
+    </div>
+    <div class="lc-count">
+      <div class="lc-num">2</div>
+      <div class="lc-lbl">results</div>
+    </div>
+  </a>
+  <button class="redo-lead-btn" onclick="redoLead('FF9B86F8', 40)" title="Re-run search for this lead">🔄 Re-do</button>
+</div>
+<div class="lcard found">
+  <a href="/results/FF9B86F8/Stephanie_Guy_Ohaver_Conroe/report.html" style="display:flex;align-items:center;gap:16px;flex:1;text-decoration:none;color:inherit;min-width:0" >
+    <div class="lc-icon">✅</div>
+    <div class="lc-info">
+      <div class="lc-name">Stephanie Guy Ohaver</div>
+      <div class="lc-loc">Conroe, Texas</div>
+      <div style="font-size:.75rem;color:var(--ac);margin-top:4px">🔗 Facebook</div>
+    </div>
+    <div class="lc-count">
+      <div class="lc-num">1</div>
+      <div class="lc-lbl">results</div>
+    </div>
+  </a>
+  <button class="redo-lead-btn" onclick="redoLead('FF9B86F8', 41)" title="Re-run search for this lead">🔄 Re-do</button>
+</div>
+<div class="lcard found">
+  <a href="/results/FF9B86F8/Mary_Sizemore_Young_Campton/report.html" style="display:flex;align-items:center;gap:16px;flex:1;text-decoration:none;color:inherit;min-width:0" >
+    <div class="lc-icon">✅</div>
+    <div class="lc-info">
+      <div class="lc-name">Mary Sizemore Young</div>
+      <div class="lc-loc">Campton, KY</div>
+      <div style="font-size:.75rem;color:var(--ac);margin-top:4px">🔗 Facebook</div>
+    </div>
+    <div class="lc-count">
+      <div class="lc-num">10</div>
+      <div class="lc-lbl">results</div>
+    </div>
+  </a>
+  <button class="redo-lead-btn" onclick="redoLead('FF9B86F8', 42)" title="Re-run search for this lead">🔄 Re-do</button>
+</div>
+<div class="lcard found">
+  <a href="/results/FF9B86F8/Andrea_Hayes_East_Missoula/report.html" style="display:flex;align-items:center;gap:16px;flex:1;text-decoration:none;color:inherit;min-width:0" >
+    <div class="lc-icon">✅</div>
+    <div class="lc-info">
+      <div class="lc-name">Andrea Hayes</div>
+      <div class="lc-loc">East Missoula, MT</div>
+      <div style="font-size:.75rem;color:var(--ac);margin-top:4px">🔗 Facebook</div>
+    </div>
+    <div class="lc-count">
+      <div class="lc-num">1</div>
+      <div class="lc-lbl">results</div>
+    </div>
+  </a>
+  <button class="redo-lead-btn" onclick="redoLead('FF9B86F8', 43)" title="Re-run search for this lead">🔄 Re-do</button>
+</div>
+<div class="lcard found">
+  <a href="/results/FF9B86F8/Shannon_Huebert_Lincoln/report.html" style="display:flex;align-items:center;gap:16px;flex:1;text-decoration:none;color:inherit;min-width:0" >
+    <div class="lc-icon">✅</div>
+    <div class="lc-info">
+      <div class="lc-name">Shannon Huebert</div>
+      <div class="lc-loc">Lincoln, NE</div>
+      <div style="font-size:.75rem;color:var(--ac);margin-top:4px">🔗 Facebook</div>
+    </div>
+    <div class="lc-count">
+      <div class="lc-num">2</div>
+      <div class="lc-lbl">results</div>
+    </div>
+  </a>
+  <button class="redo-lead-btn" onclick="redoLead('FF9B86F8', 44)" title="Re-run search for this lead">🔄 Re-do</button>
+</div>
+<div class="lcard found">
+  <a href="/results/FF9B86F8/Sherri_Kapke_Oaks/report.html" style="display:flex;align-items:center;gap:16px;flex:1;text-decoration:none;color:inherit;min-width:0" >
+    <div class="lc-icon">✅</div>
+    <div class="lc-info">
+      <div class="lc-name">Sherri Kapke Oaks</div>
+      <div class="lc-loc">No location</div>
+      <div style="font-size:.75rem;color:var(--ac);margin-top:4px">🔗 Facebook</div>
+    </div>
+    <div class="lc-count">
+      <div class="lc-num">10</div>
+      <div class="lc-lbl">results</div>
+    </div>
+  </a>
+  <button class="redo-lead-btn" onclick="redoLead('FF9B86F8', 45)" title="Re-run search for this lead">🔄 Re-do</button>
+</div>
+<div class="lcard found">
+  <a href="/results/FF9B86F8/James_Oaks_Lincoln/report.html" style="display:flex;align-items:center;gap:16px;flex:1;text-decoration:none;color:inherit;min-width:0" >
+    <div class="lc-icon">✅</div>
+    <div class="lc-info">
+      <div class="lc-name">James Oaks</div>
+      <div class="lc-loc">Lincoln, NE</div>
+      <div style="font-size:.75rem;color:var(--ac);margin-top:4px">🔗 Facebook</div>
+    </div>
+    <div class="lc-count">
+      <div class="lc-num">1</div>
+      <div class="lc-lbl">results</div>
+    </div>
+  </a>
+  <button class="redo-lead-btn" onclick="redoLead('FF9B86F8', 46)" title="Re-run search for this lead">🔄 Re-do</button>
+</div>
+<div class="lcard found">
+  <a href="/results/FF9B86F8/Anita_Rubalcava_Chicago/report.html" style="display:flex;align-items:center;gap:16px;flex:1;text-decoration:none;color:inherit;min-width:0" >
+    <div class="lc-icon">✅</div>
+    <div class="lc-info">
+      <div class="lc-name">Anita Rubalcava</div>
+      <div class="lc-loc">Chicago, IL</div>
+      <div style="font-size:.75rem;color:var(--ac);margin-top:4px">🔗 Facebook</div>
+    </div>
+    <div class="lc-count">
+      <div class="lc-num">3</div>
+      <div class="lc-lbl">results</div>
+    </div>
+  </a>
+  <button class="redo-lead-btn" onclick="redoLead('FF9B86F8', 47)" title="Re-run search for this lead">🔄 Re-do</button>
+</div>
+<div class="lcard found">
+  <a href="/results/FF9B86F8/Kelli_Fitzgerald_Wrangell/report.html" style="display:flex;align-items:center;gap:16px;flex:1;text-decoration:none;color:inherit;min-width:0" >
+    <div class="lc-icon">✅</div>
+    <div class="lc-info">
+      <div class="lc-name">Kelli Fitzgerald</div>
+      <div class="lc-loc">Wrangell, AK</div>
+      <div style="font-size:.75rem;color:var(--ac);margin-top:4px">🔗 Facebook</div>
+    </div>
+    <div class="lc-count">
+      <div class="lc-num">2</div>
+      <div class="lc-lbl">results</div>
+    </div>
+  </a>
+  <button class="redo-lead-btn" onclick="redoLead('FF9B86F8', 48)" title="Re-run search for this lead">🔄 Re-do</button>
+</div>
+<div class="lcard found">
+  <a href="/results/FF9B86F8/ennifer_Ann_Falandys_Cuba/report.html" style="display:flex;align-items:center;gap:16px;flex:1;text-decoration:none;color:inherit;min-width:0" >
+    <div class="lc-icon">✅</div>
+    <div class="lc-info">
+      <div class="lc-name">ennifer Ann Falandys</div>
+      <div class="lc-loc">Cuba, New York</div>
+      <div style="font-size:.75rem;color:var(--ac);margin-top:4px">🔗 Facebook</div>
+    </div>
+    <div class="lc-count">
+      <div class="lc-num">2</div>
+      <div class="lc-lbl">results</div>
+    </div>
+  </a>
+  <button class="redo-lead-btn" onclick="redoLead('FF9B86F8', 49)" title="Re-run search for this lead">🔄 Re-do</button>
+</div>
+<div class="lcard found">
+  <a href="/results/FF9B86F8/Atah_Lynn_Fort_Morgan/report.html" style="display:flex;align-items:center;gap:16px;flex:1;text-decoration:none;color:inherit;min-width:0" >
+    <div class="lc-icon">✅</div>
+    <div class="lc-info">
+      <div class="lc-name">Atah Lynn</div>
+      <div class="lc-loc">Fort Morgan, CO</div>
+      <div style="font-size:.75rem;color:var(--ac);margin-top:4px">🔗 Facebook</div>
+    </div>
+    <div class="lc-count">
+      <div class="lc-num">1</div>
+      <div class="lc-lbl">results</div>
+    </div>
+  </a>
+  <button class="redo-lead-btn" onclick="redoLead('FF9B86F8', 50)" title="Re-run search for this lead">🔄 Re-do</button>
+</div>
+<div class="lcard found">
+  <a href="/results/FF9B86F8/Steventino_Tino_Joseph_Cotè_Colorado_Springs/report.html" style="display:flex;align-items:center;gap:16px;flex:1;text-decoration:none;color:inherit;min-width:0" >
+    <div class="lc-icon">✅</div>
+    <div class="lc-info">
+      <div class="lc-name">Steventino Tino Joseph Cotè</div>
+      <div class="lc-loc">Colorado Springs</div>
+      <div style="font-size:.75rem;color:var(--ac);margin-top:4px">🔗 Facebook</div>
+    </div>
+    <div class="lc-count">
+      <div class="lc-num">1</div>
+      <div class="lc-lbl">results</div>
+    </div>
+  </a>
+  <button class="redo-lead-btn" onclick="redoLead('FF9B86F8', 51)" title="Re-run search for this lead">🔄 Re-do</button>
+</div>
+<div class="lcard found">
+  <a href="/results/FF9B86F8/Kaela_Borders_Phoenix/report.html" style="display:flex;align-items:center;gap:16px;flex:1;text-decoration:none;color:inherit;min-width:0" >
+    <div class="lc-icon">✅</div>
+    <div class="lc-info">
+      <div class="lc-name">Kaela Borders</div>
+      <div class="lc-loc">Phoenix, AZ</div>
+      <div style="font-size:.75rem;color:var(--ac);margin-top:4px">🔗 Facebook</div>
+    </div>
+    <div class="lc-count">
+      <div class="lc-num">1</div>
+      <div class="lc-lbl">results</div>
+    </div>
+  </a>
+  <button class="redo-lead-btn" onclick="redoLead('FF9B86F8', 52)" title="Re-run search for this lead">🔄 Re-do</button>
+</div>
+<div class="lcard found">
+  <a href="/results/FF9B86F8/Krissy_Jones_Minneapolis/report.html" style="display:flex;align-items:center;gap:16px;flex:1;text-decoration:none;color:inherit;min-width:0" >
+    <div class="lc-icon">✅</div>
+    <div class="lc-info">
+      <div class="lc-name">Krissy Jones</div>
+      <div class="lc-loc">Minneapolis, MN</div>
+      <div style="font-size:.75rem;color:var(--ac);margin-top:4px">🔗 Facebook</div>
+    </div>
+    <div class="lc-count">
+      <div class="lc-num">10</div>
+      <div class="lc-lbl">results</div>
+    </div>
+  </a>
+  <button class="redo-lead-btn" onclick="redoLead('FF9B86F8', 53)" title="Re-run search for this lead">🔄 Re-do</button>
+</div>
+<div class="lcard found">
+  <a href="/results/FF9B86F8/Dessie_Moore_Houma/report.html" style="display:flex;align-items:center;gap:16px;flex:1;text-decoration:none;color:inherit;min-width:0" >
+    <div class="lc-icon">✅</div>
+    <div class="lc-info">
+      <div class="lc-name">Dessie Moore</div>
+      <div class="lc-loc">Houma, LA</div>
+      <div style="font-size:.75rem;color:var(--ac);margin-top:4px">🔗 Facebook</div>
+    </div>
+    <div class="lc-count">
+      <div class="lc-num">2</div>
+      <div class="lc-lbl">results</div>
+    </div>
+  </a>
+  <button class="redo-lead-btn" onclick="redoLead('FF9B86F8', 54)" title="Re-run search for this lead">🔄 Re-do</button>
+</div>
+<div class="lcard found">
+  <a href="/results/FF9B86F8/James_Murdock_Summerville/report.html" style="display:flex;align-items:center;gap:16px;flex:1;text-decoration:none;color:inherit;min-width:0" >
+    <div class="lc-icon">✅</div>
+    <div class="lc-info">
+      <div class="lc-name">James Murdock</div>
+      <div class="lc-loc">Summerville, GA</div>
+      <div style="font-size:.75rem;color:var(--ac);margin-top:4px">🔗 Facebook</div>
+    </div>
+    <div class="lc-count">
+      <div class="lc-num">5</div>
+      <div class="lc-lbl">results</div>
+    </div>
+  </a>
+  <button class="redo-lead-btn" onclick="redoLead('FF9B86F8', 55)" title="Re-run search for this lead">🔄 Re-do</button>
+</div>
+<div class="lcard found">
+  <a href="/results/FF9B86F8/Sara_Lynn_Farber/report.html" style="display:flex;align-items:center;gap:16px;flex:1;text-decoration:none;color:inherit;min-width:0" >
+    <div class="lc-icon">✅</div>
+    <div class="lc-info">
+      <div class="lc-name">Sara Lynn</div>
+      <div class="lc-loc">Farber, MO</div>
+      <div style="font-size:.75rem;color:var(--ac);margin-top:4px">🔗 Facebook</div>
+    </div>
+    <div class="lc-count">
+      <div class="lc-num">1</div>
+      <div class="lc-lbl">results</div>
+    </div>
+  </a>
+  <button class="redo-lead-btn" onclick="redoLead('FF9B86F8', 56)" title="Re-run search for this lead">🔄 Re-do</button>
+</div></div>
+<div class="footer">LeadsOSINT · FastPeopleSearch via Bright Data</div>
+<script>
+async function redoLead(jobId, idx) {
+  if (!confirm('Re-run search for this single lead now?')) return;
+  const api = (window.location.protocol.startsWith('http') ? window.location.origin : 'http://localhost:5050');
+  try {
+    const r = await fetch(api + '/api/jobs/' + jobId + '/leads/' + idx + '/retry', {method: 'POST'});
+    if (r.ok) {
+      alert('Re-starting search for lead... Page will refresh.');
+      setTimeout(() => location.reload(), 1500);
+    } else {
+      const d = await r.json().catch(()=>({}));
+      alert(d.error || 'Error triggering retry');
+    }
+  } catch(e) {
+    alert('Network error triggering retry');
+  }
+}
+</script>
+</body></html>

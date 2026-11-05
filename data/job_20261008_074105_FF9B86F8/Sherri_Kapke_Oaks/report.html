@@ -1,0 +1,764 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Sherri Kapke Oaks — LeadsOSINT</title>
+<style>
+:root{--bg:#0d0f1a;--s:#1a1d3a;--s2:#22264a;--bd:#3a3f7a;--ac:#a78bfa;--ac2:#6d28d9;
+      --tx:#e0e6ff;--mt:#8b95c4;--gn:#34d399;--rd:#f87171;--bl:#60a5fa;--yw:#fbbf24}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:"Segoe UI",system-ui,sans-serif;background:var(--bg);color:var(--tx);min-height:100vh}
+.topbar{background:linear-gradient(135deg,#1a1d3a,#0d0f1a);border-bottom:1px solid var(--bd);
+         padding:18px 40px;display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.back{background:var(--s2);border:1px solid var(--bd);color:var(--ac);padding:9px 18px;
+       border-radius:9px;font-size:.85rem;text-decoration:none;transition:.2s}
+.back:hover{border-color:var(--ac);background:var(--ac2);color:#fff}
+.ttl h1{font-size:1.5rem;color:#fff;font-weight:700}
+.ttl p{color:var(--mt);font-size:.8rem;margin-top:3px}
+.social-top-btn{background:linear-gradient(135deg,#2563eb,#60a5fa);color:#fff;padding:8px 16px;border-radius:9px;font-size:.82rem;font-weight:700;text-decoration:none;transition:.2s;box-shadow:0 4px 14px rgba(37,99,235,.3)}
+.social-top-btn:hover{transform:translateY(-1px);color:#fff;box-shadow:0 6px 20px rgba(96,165,250,.4)}
+.stats{display:flex;gap:14px;padding:20px 40px;background:var(--s);border-bottom:1px solid var(--bd);flex-wrap:wrap}
+.sp{background:var(--bg);border:1px solid var(--bd);border-radius:10px;
+     padding:12px 20px;text-align:center}
+.sp.hi{border-color:var(--ac);background:rgba(167,139,250,.07)}
+.sv{font-size:1.4rem;font-weight:800;color:var(--ac)}
+.sl{font-size:.7rem;color:var(--mt);text-transform:uppercase;letter-spacing:.5px;margin-top:2px}
+.content{padding:28px 40px;max-width:1400px;margin:0 auto}
+.rcard{background:var(--s);border:1px solid var(--bd);border-radius:16px;
+        margin-bottom:24px;overflow:hidden;transition:.4s all}
+.rcard:hover{border-color:var(--ac);transform:translateY(-2px);
+              box-shadow:0 10px 36px rgba(109,40,217,.2)}
+.rcard.removing{opacity:0;transform:translateY(-12px) scale(.97);pointer-events:none}
+.archived-card{opacity:.55;border-style:dashed;filter:grayscale(.3)}
+.rcard-hdr{background:linear-gradient(135deg,var(--s2),var(--s));padding:16px 24px;
+            display:flex;align-items:center;gap:14px;border-bottom:1px solid var(--bd);flex-wrap:wrap;cursor:pointer;list-style:none}
+.rcard-hdr::-webkit-details-marker{display:none}
+.rnum{background:linear-gradient(135deg,var(--ac2),var(--ac));color:#fff;
+       font-size:.78rem;font-weight:700;padding:4px 12px;border-radius:16px;flex-shrink:0}
+.rname{font-size:1.15rem;font-weight:700;color:#fff;flex:1}
+.badge-group{display:flex;gap:6px;align-items:center}
+.badge-tag{background:rgba(167,139,250,.15);border:1px solid rgba(167,139,250,.3);color:var(--ac);font-size:.75rem;padding:3px 8px;border-radius:6px;font-weight:600}
+.expand-indicator{color:var(--ac);font-size:.8rem;font-weight:700;margin-left:8px}
+.arch-tag{background:rgba(251,191,36,.15);border:1px solid rgba(251,191,36,.3);
+           color:var(--yw);font-size:.72rem;padding:3px 10px;border-radius:10px;flex-shrink:0}
+.profile-btn{background:linear-gradient(135deg,#4c3d8f,var(--ac2));color:#fff;
+              padding:8px 16px;border-radius:9px;font-size:.8rem;
+              font-weight:600;text-decoration:none;transition:.2s;flex-shrink:0}
+.profile-btn:hover{background:linear-gradient(135deg,var(--ac2),var(--ac));
+                    transform:translateY(-1px);color:#fff}
+.copy-all-btn{background:linear-gradient(135deg,var(--ac2),var(--ac3));color:#fff;border:none;padding:5px 12px;border-radius:6px;font-size:.75rem;font-weight:600;cursor:pointer;margin-bottom:6px;display:inline-block}
+.copy-all-btn:hover{background:var(--ac2)}
+.copy-item-btn{background:transparent;border:none;color:var(--mt);cursor:pointer;font-size:.8rem;padding:0 4px;margin-left:auto}
+.copy-item-btn:hover{color:var(--ac)}
+.addr-row{color:#c4caf0;font-size:.88rem;padding:6px 12px;
+           background:rgba(255,255,255,.03);border-radius:7px;border:1px solid var(--bd);display:flex;align-items:center;gap:8px}
+.url-link{color:var(--bl);font-size:.82rem;word-break:break-all;text-decoration:underline}
+.url-link:hover{color:var(--ac)}
+.rcard-body{padding:24px 28px;display:flex;gap:24px;align-items:flex-start;flex-wrap:wrap}
+.rinfo{flex:1;min-width:320px;display:flex;flex-direction:column;gap:14px}
+.frow{display:grid;grid-template-columns:140px 1fr;gap:12px;align-items:start;font-size:.92rem}
+.fl{font-weight:700;color:var(--mt);font-size:.85rem;letter-spacing:.3px;padding-top:4px}
+.fv{color:#fff;font-weight:600;line-height:1.5}
+.fname{font-size:1.15rem;color:var(--ac);font-weight:700}
+.ss-wrap{flex:0 0 320px;display:flex;flex-direction:column;align-items:center}
+.ss-thumb{width:100%;border-radius:10px;border:2px solid var(--bd);cursor:pointer;
+           transition:.2s;display:block}
+.ss-thumb:hover{border-color:var(--ac);transform:scale(1.02);
+                 box-shadow:0 6px 24px rgba(167,139,250,.3)}
+.ss-lbl{color:var(--mt);font-size:.78rem;margin-top:8px;text-align:center}
+.ss-missing{color:var(--mt);font-size:.82rem;padding:20px;text-align:center;
+             background:var(--s2);border-radius:10px;border:1px dashed var(--bd)}
+.res-actions{padding:14px 24px;border-top:1px solid var(--bd);
+              display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.res-actions.arch-mode{background:rgba(251,191,36,.04)}
+.res-btn{padding:8px 16px;border-radius:8px;font-size:.8rem;font-weight:600;
+          cursor:pointer;transition:.2s;border:1px solid;background:transparent}
+.arch-btn{border-color:rgba(251,191,36,.5);color:var(--yw);}
+.arch-btn:hover{background:rgba(251,191,36,.1)}
+.del-btn{border-color:rgba(248,113,113,.5);color:var(--rd);}
+.del-btn:hover{background:rgba(248,113,113,.1)}
+.unarch-btn{border-color:rgba(96,165,250,.5);color:var(--bl);}
+.unarch-btn:hover{background:rgba(96,165,250,.1)}
+.arch-label{font-size:.8rem;color:var(--yw);flex:1}
+.arch-section{margin-top:10px;border-radius:14px;border:1px dashed var(--bd);overflow:hidden}
+.arch-section summary{padding:14px 20px;cursor:pointer;color:var(--mt);font-size:.9rem;
+                       font-weight:600;list-style:none;background:var(--s2);
+                       display:flex;align-items:center;gap:8px}
+.arch-section summary:hover{color:var(--tx)}
+.arch-section summary span{font-size:.75rem;font-weight:400;margin-left:auto;color:var(--mt)}
+.arch-inner{padding:16px}
+.empty{background:var(--s);border:2px dashed var(--bd);border-radius:14px;
+        padding:50px;text-align:center;color:var(--mt);font-size:1rem}
+.search-ss-card{background:var(--s);border:1px solid var(--bd);border-radius:16px;margin-bottom:28px;overflow:hidden;box-shadow:0 4px 20px rgba(0,0,0,0.3)}
+.search-ss-hdr{background:linear-gradient(135deg,var(--s2),var(--s));padding:16px 24px;border-bottom:1px solid var(--bd);display:flex;justify-content:space-between;align-items:center}
+.search-ss-title{font-weight:700;color:#fff;font-size:1.05rem}
+.search-ss-sub{font-size:.78rem;color:var(--mt);margin-top:2px}
+.search-ss-body{position:relative;cursor:pointer;max-height:380px;overflow:hidden;background:#0d0f1a}
+.search-ss-img{width:100%;display:block;opacity:.88;transition:.3s all}
+.search-ss-body:hover .search-ss-img{opacity:1;transform:scale(1.005)}
+.search-ss-overlay{position:absolute;bottom:16px;left:50%;transform:translateX(-50%);background:rgba(13,15,26,.88);border:1px solid var(--ac);color:var(--ac);padding:8px 20px;border-radius:20px;font-size:.8rem;font-weight:700;backdrop-filter:blur(6px);pointer-events:none;box-shadow:0 4px 14px rgba(109,40,217,.3)}
+.toast{position:fixed;bottom:24px;right:24px;background:var(--s);
+        border:1px solid var(--bd);border-radius:12px;padding:12px 20px;
+        font-size:.85rem;z-index:999;transform:translateY(60px);opacity:0;
+        transition:.3s;max-width:280px}
+.toast.show{transform:translateY(0);opacity:1}
+.toast.ok{border-color:rgba(52,211,153,.4);color:var(--gn)}
+.toast.err{border-color:rgba(248,113,113,.4);color:var(--rd)}
+.modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.96);z-index:9999;
+        justify-content:center;align-items:center;padding:20px}
+.modal.open{display:flex}
+.modal-img{max-width:95vw;max-height:90vh;border-radius:12px;border:2px solid var(--ac)}
+.modal-x{position:fixed;top:18px;right:28px;color:var(--ac);font-size:2.2rem;
+          cursor:pointer;z-index:10000;transition:.2s}
+.modal-x:hover{color:#fff;transform:scale(1.1)}
+.confirm-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.8);
+                  z-index:8888;justify-content:center;align-items:center}
+.confirm-overlay.open{display:flex}
+.confirm-box{background:var(--s);border:1px solid var(--rd);border-radius:18px;
+              padding:32px 36px;max-width:380px;text-align:center}
+.confirm-box h3{color:#fff;margin-bottom:10px;font-size:1.1rem}
+.confirm-box p{color:var(--mt);font-size:.88rem;margin-bottom:24px;line-height:1.6}
+.confirm-btns{display:flex;gap:12px;justify-content:center}
+.cb-cancel{padding:10px 24px;border-radius:9px;border:1px solid var(--bd);
+            background:var(--s2);color:var(--tx);cursor:pointer;font-size:.9rem}
+.cb-delete{padding:10px 24px;border-radius:9px;border:none;
+            background:linear-gradient(135deg,#b91c1c,var(--rd));color:#fff;
+            cursor:pointer;font-size:.9rem;font-weight:700}
+.collapse-toolbar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:18px;flex-wrap:wrap;background:var(--s);padding:12px 20px;border-radius:12px;border:1px solid var(--bd)}
+.tool-btn{background:var(--s2);border:1px solid var(--bd);color:var(--ac);padding:7px 15px;border-radius:8px;font-size:.82rem;font-weight:700;cursor:pointer;transition:.2s}
+.tool-btn:hover{background:var(--ac2);color:#fff;border-color:var(--ac)}
+.view-pref{display:flex;align-items:center;gap:12px;font-size:.82rem;color:var(--mt)}
+.view-pref label{display:inline-flex;align-items:center;gap:6px;cursor:pointer;color:var(--tx);font-weight:600}
+.view-pref input[type="radio"]{accent-color:var(--ac);cursor:pointer}
+</style></head><body>
+<div class="topbar">
+  <a href="/results/FF9B86F8" class="back" onclick="if(window.location.protocol==='file:'){this.href='../index.html'}">← Back to Job</a>
+  <div class="ttl"><h1>🔍 Sherri Kapke Oaks</h1>
+    <p>Location: Not specified · October 10, 2026 · 07:40 AM</p></div>
+  <div style="display:flex;gap:8px;margin-left:auto;flex-wrap:wrap">
+    <button class="social-top-btn" style="background:linear-gradient(135deg,#6d28d9,#a78bfa);color:#fff;cursor:pointer;border:none" onclick="redoReportLead('FF9B86F8', 45)" title="Re-run search for this lead">🔄 Re-do Search</button>
+    <a href="https://www.facebook.com/pfbid0tJBnfsXJTwj9jRP38pNBZ4spLGVYgbfS4H3ZFY4zsehuEF9Ucty5xYCVKctNb97Yl" target="_blank" rel="noopener noreferrer" class="social-top-btn" title="https://www.facebook.com/pfbid0tJBnfsXJTwj9jRP38pNBZ4spLGVYgbfS4H3ZFY4zsehuEF9Ucty5xYCVKctNb97Yl" onclick="event.stopPropagation()">🔗 Open Facebook</a>
+    
+    
+  </div>
+</div>
+<div class="stats">
+  <div class="sp hi"><div class="sv" id="active-count">10</div><div class="sl">Active Results</div></div>
+  <div class="sp"><div class="sv" style="color:var(--gn)">
+    ✓ Found</div><div class="sl">Status</div></div>
+  <div class="sp"><div class="sv" style="font-size:.9rem">N/A</div>
+    <div class="sl">Location</div></div>
+  <div class="sp"><div class="sv" style="font-size:.85rem"><a href="https://www.facebook.com/pfbid0tJBnfsXJTwj9jRP38pNBZ4spLGVYgbfS4H3ZFY4zsehuEF9Ucty5xYCVKctNb97Yl" target="_blank" rel="noopener noreferrer" class="url-link" title="https://www.facebook.com/pfbid0tJBnfsXJTwj9jRP38pNBZ4spLGVYgbfS4H3ZFY4zsehuEF9Ucty5xYCVKctNb97Yl" style="display:inline-block;max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;vertical-align:bottom">🔗 Facebook</a></div>
+    <div class="sl">Social Link</div></div>
+  <div class="sp"><div class="sv" style="font-size:.85rem"><span style="color:var(--mt)">N/A</span></div>
+    <div class="sl">Input Email</div></div>
+  <div class="sp"><div class="sv" style="font-size:.85rem"><span style="color:var(--mt)">N/A</span></div>
+    <div class="sl">Input Phone</div></div>
+</div>
+<div class="content">
+
+<div class="search-ss-card">
+  <div class="search-ss-hdr">
+    <div>
+      <div class="search-ss-title">🌐 FastPeopleSearch — Full Search Page Overview</div>
+      <div class="search-ss-sub">Live search results overview for "Sherri Kapke Oaks" (US)</div>
+    </div>
+  </div>
+  <div class="search-ss-body" onclick="openModal('Sherri_Kapke_Oaks_search_page.png')">
+    <img src="Sherri_Kapke_Oaks_search_page.png" class="search-ss-img" title="Click to view full search page screenshot">
+    <div class="search-ss-overlay">🔍 Click to View Full Search Page Screenshot</div>
+  </div>
+</div>
+<div class="collapse-toolbar">
+  <div style="display:flex;align-items:center;gap:10px">
+    <button class="tool-btn" onclick="setAllCards(false)">▸ Collapse All</button>
+    <button class="tool-btn" onclick="setAllCards(true)">▾ Expand All</button>
+  </div>
+  <div class="view-pref">
+    <span>Default View:</span>
+    <label><input type="radio" name="default_view_pref" value="collapsed" id="pref-collapsed" onchange="setDefaultPref('collapsed')"> Collapsed</label>
+    <label><input type="radio" name="default_view_pref" value="expanded" id="pref-expanded" onchange="setDefaultPref('expanded')"> Expanded</label>
+  </div>
+</div>
+
+<details class="rcard " id="rcard-0">
+  <summary class="rcard-hdr">
+    <span class="rnum">#1</span>
+    <span class="rname">Sherri Oaks · Age 54 · Lincoln, NE</span>
+    <span class="badge-group">
+      <span class="badge-tag">📞 10</span>
+      <span class="badge-tag">✉️ 6</span>
+    </span>
+    
+    <a href="https://www.fastpeoplesearch.com/sherri-oaks_id_G6778574821095731043" target="_blank" class="profile-btn" onclick="event.stopPropagation()">🔗 View Profile</a>
+    <span class="expand-indicator">▼ Expand</span>
+  </summary>
+  <div class="rcard-body">
+    <div class="rinfo">
+      <div class="frow"><span class="fl">Full Name:</span><span class="fv fname">Sherri Oaks</span></div>
+      <div class="frow"><span class="fl">Age:</span><span class="fv">54</span></div>
+      <div class="frow"><span class="fl">City / State:</span><span class="fv">Lincoln, NE</span></div>
+      <div class="frow"><span class="fl">Phone(s):</span><div class="addrs"><button class="copy-all-btn" onclick="copyList([&quot;(402) 326-2420&quot;, &quot;(402) 483-4041&quot;, &quot;(402) 489-7214&quot;, &quot;(402) 474-0600&quot;, &quot;(402) 483-4329&quot;, &quot;(402) 601-5444&quot;, &quot;(402) 805-0038&quot;, &quot;(402) 438-1829&quot;, &quot;(402) 480-0050&quot;, &quot;(308) 414-1316&quot;], 'Phones'); event.stopPropagation();">📋 Copy All Phones (10)</button><div class="addr-row">📞 <span>(402) 326-2420</span> <button class="copy-item-btn" onclick="copySingle('(402) 326-2420', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(402) 483-4041</span> <button class="copy-item-btn" onclick="copySingle('(402) 483-4041', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(402) 489-7214</span> <button class="copy-item-btn" onclick="copySingle('(402) 489-7214', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(402) 474-0600</span> <button class="copy-item-btn" onclick="copySingle('(402) 474-0600', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(402) 483-4329</span> <button class="copy-item-btn" onclick="copySingle('(402) 483-4329', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(402) 601-5444</span> <button class="copy-item-btn" onclick="copySingle('(402) 601-5444', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(402) 805-0038</span> <button class="copy-item-btn" onclick="copySingle('(402) 805-0038', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(402) 438-1829</span> <button class="copy-item-btn" onclick="copySingle('(402) 438-1829', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(402) 480-0050</span> <button class="copy-item-btn" onclick="copySingle('(402) 480-0050', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(308) 414-1316</span> <button class="copy-item-btn" onclick="copySingle('(308) 414-1316', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div></div></div>
+      <div class="frow"><span class="fl">Email(s):</span><div class="addrs"><button class="copy-all-btn" onclick="copyList([&quot;sherri.oaks72@gmail.com&quot;, &quot;sherrijo_8472@yahoo.com&quot;, &quot;sharjo@alltel.net&quot;, &quot;sherrijo@neb.rr.com&quot;, &quot;oaks73@neb.rr.com&quot;, &quot;oaksjokersdead@yahoo.com&quot;], 'Emails'); event.stopPropagation();">📋 Copy All Emails (6)</button><div class="addr-row">✉️ <span>sherri.oaks72@gmail.com</span> <button class="copy-item-btn" onclick="copySingle('sherri.oaks72@gmail.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>sherrijo_8472@yahoo.com</span> <button class="copy-item-btn" onclick="copySingle('sherrijo_8472@yahoo.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>sharjo@alltel.net</span> <button class="copy-item-btn" onclick="copySingle('sharjo@alltel.net', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>sherrijo@neb.rr.com</span> <button class="copy-item-btn" onclick="copySingle('sherrijo@neb.rr.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>oaks73@neb.rr.com</span> <button class="copy-item-btn" onclick="copySingle('oaks73@neb.rr.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>oaksjokersdead@yahoo.com</span> <button class="copy-item-btn" onclick="copySingle('oaksjokersdead@yahoo.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div></div></div>
+      <div class="frow"><span class="fl">Address(es):</span><div class="addrs"><div class="addr-row">📍 2535 Nw 8Th St · Lincoln, NE</div><div class="addr-row">📍 4935 Randolph St · Lincoln, NE</div><div class="addr-row">📍 325 Knox St · Lincoln, NE</div><div class="addr-row">📍 4233 D St · Lincoln, NE</div><div class="addr-row">📍 648 South St · Lincoln, NE</div><div class="addr-row">📍 4002 S 52Nd St · Lincoln, NE</div><div class="addr-row">📍 1130 Oak St · Lincoln, NE</div><div class="addr-row">📍 1516 S 21St St Unit 1 · Lincoln, NE</div><div class="addr-row">📍 924 Garfield St Unit 5 · Lincoln, NE</div></div></div>
+      <div class="frow"><span class="fl">Relatives:</span><span class="fv">James Oaks, Anthony Oaks, Douglas Kapke, Haley Oaks, Nancy Kapke</span></div>
+      <div class="frow"><span class="fl">AKA / Aliases:</span><span class="fv">Sherri J Kapke, Sherri Kapke</span></div>
+      <div class="frow"><span class="fl">Profile URL:</span>
+        <a href="https://www.fastpeoplesearch.com/sherri-oaks_id_G6778574821095731043" target="_blank" class="url-link">https://www.fastpeoplesearch.com/sherri-oaks_id_G6778574821095731043</a></div>
+    </div>
+    <div class="ss-wrap">
+                <img src="Sherri_Kapke_Oaks_result_1.png" class="ss-thumb"
+                     onclick="openModal('Sherri_Kapke_Oaks_result_1.png')"
+                     title="Click to view profile detail screenshot">
+                <div class="ss-lbl">📸 Profile Detail Screenshot — click to zoom</div>
+            </div>
+  </div>
+  
+  <div class="res-actions">
+    <button class="res-btn arch-btn" onclick="archiveResult(0)">🗃 Not This Person</button>
+    <button class="res-btn del-btn"  onclick="confirmDelete(0)">🗑 Delete Result</button>
+  </div>
+</details>
+<details class="rcard " id="rcard-1">
+  <summary class="rcard-hdr">
+    <span class="rnum">#2</span>
+    <span class="rname">Sherri Oaks · Age 63 · Superior, WI</span>
+    <span class="badge-group">
+      <span class="badge-tag">📞 12</span>
+      <span class="badge-tag">✉️ 10</span>
+    </span>
+    
+    <a href="https://www.fastpeoplesearch.com/sherri-oaks_id_G-3203777720255758745" target="_blank" class="profile-btn" onclick="event.stopPropagation()">🔗 View Profile</a>
+    <span class="expand-indicator">▼ Expand</span>
+  </summary>
+  <div class="rcard-body">
+    <div class="rinfo">
+      <div class="frow"><span class="fl">Full Name:</span><span class="fv fname">Sherri Oaks</span></div>
+      <div class="frow"><span class="fl">Age:</span><span class="fv">63</span></div>
+      <div class="frow"><span class="fl">City / State:</span><span class="fv">Superior, WI</span></div>
+      <div class="frow"><span class="fl">Phone(s):</span><div class="addrs"><button class="copy-all-btn" onclick="copyList([&quot;(218) 491-4406&quot;, &quot;(218) 232-1462&quot;, &quot;(715) 718-0182&quot;, &quot;(715) 718-0432&quot;, &quot;(715) 392-3398&quot;, &quot;(218) 464-1845&quot;, &quot;(218) 779-5169&quot;, &quot;(218) 288-1377&quot;, &quot;(218) 624-3550&quot;, &quot;(218) 722-8821&quot;, &quot;(218) 828-1377&quot;, &quot;(218) 628-1494&quot;], 'Phones'); event.stopPropagation();">📋 Copy All Phones (12)</button><div class="addr-row">📞 <span>(218) 491-4406</span> <button class="copy-item-btn" onclick="copySingle('(218) 491-4406', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(218) 232-1462</span> <button class="copy-item-btn" onclick="copySingle('(218) 232-1462', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(715) 718-0182</span> <button class="copy-item-btn" onclick="copySingle('(715) 718-0182', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(715) 718-0432</span> <button class="copy-item-btn" onclick="copySingle('(715) 718-0432', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(715) 392-3398</span> <button class="copy-item-btn" onclick="copySingle('(715) 392-3398', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(218) 464-1845</span> <button class="copy-item-btn" onclick="copySingle('(218) 464-1845', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(218) 779-5169</span> <button class="copy-item-btn" onclick="copySingle('(218) 779-5169', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(218) 288-1377</span> <button class="copy-item-btn" onclick="copySingle('(218) 288-1377', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(218) 624-3550</span> <button class="copy-item-btn" onclick="copySingle('(218) 624-3550', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(218) 722-8821</span> <button class="copy-item-btn" onclick="copySingle('(218) 722-8821', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(218) 828-1377</span> <button class="copy-item-btn" onclick="copySingle('(218) 828-1377', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(218) 628-1494</span> <button class="copy-item-btn" onclick="copySingle('(218) 628-1494', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div></div></div>
+      <div class="frow"><span class="fl">Email(s):</span><div class="addrs"><button class="copy-all-btn" onclick="copyList([&quot;sherrioaks1@hotmail.com&quot;, &quot;marcus7700@gmail.com&quot;, &quot;sherrioaks@gmail.com&quot;, &quot;gbttrcp@aol.com&quot;, &quot;sherrioaks@ymail.com&quot;, &quot;gbttrcp@frontiernet.net&quot;, &quot;oakssherri@ymail.com&quot;, &quot;sherrioaks214@yahoo.com&quot;, &quot;sherrioaks@gmx.com&quot;, &quot;sherri.oaks@yahoo.com&quot;], 'Emails'); event.stopPropagation();">📋 Copy All Emails (10)</button><div class="addr-row">✉️ <span>sherrioaks1@hotmail.com</span> <button class="copy-item-btn" onclick="copySingle('sherrioaks1@hotmail.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>marcus7700@gmail.com</span> <button class="copy-item-btn" onclick="copySingle('marcus7700@gmail.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>sherrioaks@gmail.com</span> <button class="copy-item-btn" onclick="copySingle('sherrioaks@gmail.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>gbttrcp@aol.com</span> <button class="copy-item-btn" onclick="copySingle('gbttrcp@aol.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>sherrioaks@ymail.com</span> <button class="copy-item-btn" onclick="copySingle('sherrioaks@ymail.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>gbttrcp@frontiernet.net</span> <button class="copy-item-btn" onclick="copySingle('gbttrcp@frontiernet.net', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>oakssherri@ymail.com</span> <button class="copy-item-btn" onclick="copySingle('oakssherri@ymail.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>sherrioaks214@yahoo.com</span> <button class="copy-item-btn" onclick="copySingle('sherrioaks214@yahoo.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>sherrioaks@gmx.com</span> <button class="copy-item-btn" onclick="copySingle('sherrioaks@gmx.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>sherri.oaks@yahoo.com</span> <button class="copy-item-btn" onclick="copySingle('sherri.oaks@yahoo.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div></div></div>
+      <div class="frow"><span class="fl">Address(es):</span><div class="addrs"><div class="addr-row">📍 2419 E 6Th St · Superior, WI</div><div class="addr-row">📍 18446 Hartley Lake Rd · Brainerd, MN</div><div class="addr-row">📍 2001 W Superior St Unit 310 · Duluth, MN</div><div class="addr-row">📍 129 E 1St St · Duluth, MN</div><div class="addr-row">📍 19745 See Gull Rd Unit 5 · Brainerd, MN</div><div class="addr-row">📍 303 N Central Ave Unit 4 · Duluth, MN</div><div class="addr-row">📍 107 2Nd Ave · Bovey, MN</div><div class="addr-row">📍 107 E 2Nd Ave · Denver, CO</div><div class="addr-row">📍 Po Box 102 · Bovey, MN</div><div class="addr-row">📍 802 S 10Th St Unit 1 · Brainerd, MN</div></div></div>
+      <div class="frow"><span class="fl">Relatives:</span><span class="fv">Kenneth Clark, Kristina Clark, Scott Oakes, Aaron Karjala, Brooke Clark</span></div>
+      <div class="frow"><span class="fl">AKA / Aliases:</span><span class="fv">Sherri Lynn Oaks, Sherri Clark</span></div>
+      <div class="frow"><span class="fl">Profile URL:</span>
+        <a href="https://www.fastpeoplesearch.com/sherri-oaks_id_G-3203777720255758745" target="_blank" class="url-link">https://www.fastpeoplesearch.com/sherri-oaks_id_G-3203777720255758745</a></div>
+    </div>
+    <div class="ss-wrap">
+                <img src="Sherri_Kapke_Oaks_result_2.png" class="ss-thumb"
+                     onclick="openModal('Sherri_Kapke_Oaks_result_2.png')"
+                     title="Click to view profile detail screenshot">
+                <div class="ss-lbl">📸 Profile Detail Screenshot — click to zoom</div>
+            </div>
+  </div>
+  
+  <div class="res-actions">
+    <button class="res-btn arch-btn" onclick="archiveResult(1)">🗃 Not This Person</button>
+    <button class="res-btn del-btn"  onclick="confirmDelete(1)">🗑 Delete Result</button>
+  </div>
+</details>
+<details class="rcard " id="rcard-2">
+  <summary class="rcard-hdr">
+    <span class="rnum">#3</span>
+    <span class="rname">Sherri Oaks · Age 68 · Independence, MO</span>
+    <span class="badge-group">
+      <span class="badge-tag">📞 5</span>
+      <span class="badge-tag">✉️ 10</span>
+    </span>
+    
+    <a href="https://www.fastpeoplesearch.com/sherri-oaks_id_G-672505849394610647" target="_blank" class="profile-btn" onclick="event.stopPropagation()">🔗 View Profile</a>
+    <span class="expand-indicator">▼ Expand</span>
+  </summary>
+  <div class="rcard-body">
+    <div class="rinfo">
+      <div class="frow"><span class="fl">Full Name:</span><span class="fv fname">Sherri Oaks</span></div>
+      <div class="frow"><span class="fl">Age:</span><span class="fv">68</span></div>
+      <div class="frow"><span class="fl">City / State:</span><span class="fv">Independence, MO</span></div>
+      <div class="frow"><span class="fl">Phone(s):</span><div class="addrs"><button class="copy-all-btn" onclick="copyList([&quot;(816) 365-8660&quot;, &quot;(816) 461-1352&quot;, &quot;(816) 353-5300&quot;, &quot;(270) 250-2385&quot;, &quot;(816) 461-3152&quot;], 'Phones'); event.stopPropagation();">📋 Copy All Phones (5)</button><div class="addr-row">📞 <span>(816) 365-8660</span> <button class="copy-item-btn" onclick="copySingle('(816) 365-8660', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(816) 461-1352</span> <button class="copy-item-btn" onclick="copySingle('(816) 461-1352', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(816) 353-5300</span> <button class="copy-item-btn" onclick="copySingle('(816) 353-5300', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(270) 250-2385</span> <button class="copy-item-btn" onclick="copySingle('(270) 250-2385', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(816) 461-3152</span> <button class="copy-item-btn" onclick="copySingle('(816) 461-3152', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div></div></div>
+      <div class="frow"><span class="fl">Email(s):</span><div class="addrs"><button class="copy-all-btn" onclick="copyList([&quot;sherri.oaks@gmail.com&quot;, &quot;bboaks@hotmail.com&quot;, &quot;ehwaldy@home.com&quot;, &quot;bboaks@aol.com&quot;, &quot;bboaks@bellsouth.net&quot;, &quot;bboaks@msn.com&quot;, &quot;bboaks@nc.rr.com&quot;, &quot;bboaks@yahoo.com&quot;, &quot;bboaks@iwon.com&quot;, &quot;bbo350@aol.com&quot;], 'Emails'); event.stopPropagation();">📋 Copy All Emails (10)</button><div class="addr-row">✉️ <span>sherri.oaks@gmail.com</span> <button class="copy-item-btn" onclick="copySingle('sherri.oaks@gmail.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>bboaks@hotmail.com</span> <button class="copy-item-btn" onclick="copySingle('bboaks@hotmail.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>ehwaldy@home.com</span> <button class="copy-item-btn" onclick="copySingle('ehwaldy@home.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>bboaks@aol.com</span> <button class="copy-item-btn" onclick="copySingle('bboaks@aol.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>bboaks@bellsouth.net</span> <button class="copy-item-btn" onclick="copySingle('bboaks@bellsouth.net', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>bboaks@msn.com</span> <button class="copy-item-btn" onclick="copySingle('bboaks@msn.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>bboaks@nc.rr.com</span> <button class="copy-item-btn" onclick="copySingle('bboaks@nc.rr.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>bboaks@yahoo.com</span> <button class="copy-item-btn" onclick="copySingle('bboaks@yahoo.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>bboaks@iwon.com</span> <button class="copy-item-btn" onclick="copySingle('bboaks@iwon.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>bbo350@aol.com</span> <button class="copy-item-btn" onclick="copySingle('bbo350@aol.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div></div></div>
+      <div class="frow"><span class="fl">Address(es):</span><div class="addrs"><div class="addr-row">📍 9528 Linwood Blvd · Independence, MO</div><div class="addr-row">📍 4109 Ne Davidson Rd Unit 392 · Kansas City, MO</div><div class="addr-row">📍 118 S Crescent Ave · Independence, MO</div><div class="addr-row">📍 118 S Crescent Ave · Independence, MO</div></div></div>
+      <div class="frow"><span class="fl">Relatives:</span><span class="fv">Gregory Oaks, David Streeter, Aaron Oaks, David Streeter, Deborah Kloster</span></div>
+      <div class="frow"><span class="fl">AKA / Aliases:</span><span class="fv">Sherri L Oaks, Sherri L Streeter, Sherril Oaks, S L Oaks</span></div>
+      <div class="frow"><span class="fl">Profile URL:</span>
+        <a href="https://www.fastpeoplesearch.com/sherri-oaks_id_G-672505849394610647" target="_blank" class="url-link">https://www.fastpeoplesearch.com/sherri-oaks_id_G-672505849394610647</a></div>
+    </div>
+    <div class="ss-wrap">
+                <img src="Sherri_Kapke_Oaks_result_3.png" class="ss-thumb"
+                     onclick="openModal('Sherri_Kapke_Oaks_result_3.png')"
+                     title="Click to view profile detail screenshot">
+                <div class="ss-lbl">📸 Profile Detail Screenshot — click to zoom</div>
+            </div>
+  </div>
+  
+  <div class="res-actions">
+    <button class="res-btn arch-btn" onclick="archiveResult(2)">🗃 Not This Person</button>
+    <button class="res-btn del-btn"  onclick="confirmDelete(2)">🗑 Delete Result</button>
+  </div>
+</details>
+<details class="rcard " id="rcard-3">
+  <summary class="rcard-hdr">
+    <span class="rnum">#4</span>
+    <span class="rname">Sherri Oakes · Age 56 · Miamisburg, OH</span>
+    <span class="badge-group">
+      <span class="badge-tag">📞 11</span>
+      <span class="badge-tag">✉️ 2</span>
+    </span>
+    
+    <a href="https://www.fastpeoplesearch.com/sherri-oakes_id_G-3059159262473472219" target="_blank" class="profile-btn" onclick="event.stopPropagation()">🔗 View Profile</a>
+    <span class="expand-indicator">▼ Expand</span>
+  </summary>
+  <div class="rcard-body">
+    <div class="rinfo">
+      <div class="frow"><span class="fl">Full Name:</span><span class="fv fname">Sherri Oakes</span></div>
+      <div class="frow"><span class="fl">Age:</span><span class="fv">56</span></div>
+      <div class="frow"><span class="fl">City / State:</span><span class="fv">Miamisburg, OH</span></div>
+      <div class="frow"><span class="fl">Phone(s):</span><div class="addrs"><button class="copy-all-btn" onclick="copyList([&quot;(937) 684-0927&quot;, &quot;(937) 247-9983&quot;, &quot;(937) 401-0500&quot;, &quot;(937) 865-9128&quot;, &quot;(937) 236-7124&quot;, &quot;(937) 726-9537&quot;, &quot;(832) 573-1643&quot;, &quot;(727) 560-4736&quot;, &quot;(832) 739-7835&quot;, &quot;(937) 236-6542&quot;, &quot;(937) 438-3964&quot;], 'Phones'); event.stopPropagation();">📋 Copy All Phones (11)</button><div class="addr-row">📞 <span>(937) 684-0927</span> <button class="copy-item-btn" onclick="copySingle('(937) 684-0927', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(937) 247-9983</span> <button class="copy-item-btn" onclick="copySingle('(937) 247-9983', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(937) 401-0500</span> <button class="copy-item-btn" onclick="copySingle('(937) 401-0500', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(937) 865-9128</span> <button class="copy-item-btn" onclick="copySingle('(937) 865-9128', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(937) 236-7124</span> <button class="copy-item-btn" onclick="copySingle('(937) 236-7124', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(937) 726-9537</span> <button class="copy-item-btn" onclick="copySingle('(937) 726-9537', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(832) 573-1643</span> <button class="copy-item-btn" onclick="copySingle('(832) 573-1643', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(727) 560-4736</span> <button class="copy-item-btn" onclick="copySingle('(727) 560-4736', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(832) 739-7835</span> <button class="copy-item-btn" onclick="copySingle('(832) 739-7835', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(937) 236-6542</span> <button class="copy-item-btn" onclick="copySingle('(937) 236-6542', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(937) 438-3964</span> <button class="copy-item-btn" onclick="copySingle('(937) 438-3964', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div></div></div>
+      <div class="frow"><span class="fl">Email(s):</span><div class="addrs"><button class="copy-all-btn" onclick="copyList([&quot;soaks@woh.rr.com&quot;, &quot;sherri.anderson@mchsi.com&quot;], 'Emails'); event.stopPropagation();">📋 Copy All Emails (2)</button><div class="addr-row">✉️ <span>soaks@woh.rr.com</span> <button class="copy-item-btn" onclick="copySingle('soaks@woh.rr.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>sherri.anderson@mchsi.com</span> <button class="copy-item-btn" onclick="copySingle('sherri.anderson@mchsi.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div></div></div>
+      <div class="frow"><span class="fl">Address(es):</span><div class="addrs"><div class="addr-row">📍 1237 Bonniebrook Dr · Miamisburg, OH</div><div class="addr-row">📍 7414 Jamaica Rd · Miamisburg, OH</div><div class="addr-row">📍 5908 Culzean Dr Unit 319 · Dayton, OH</div><div class="addr-row">📍 21 Community Dr · Dayton, OH</div><div class="addr-row">📍 2714 Catalpa Dr · Dayton, OH</div><div class="addr-row">📍 149 Grove Ave · Dayton, OH</div><div class="addr-row">📍 7523 Shady Water Ln · Dayton, OH</div><div class="addr-row">📍 5908 Culzean Dr Unit 319 · Trotwood, OH</div></div></div>
+      <div class="frow"><span class="fl">Relatives:</span><span class="fv">Timothy Anderson, Christine Oakes, Deborah Anderson, Hunter Anderson, Ramona Anderson</span></div>
+      <div class="frow"><span class="fl">AKA / Aliases:</span><span class="fv">Sherri Oakes Anderson, Sherri A Oaks, Sherri A Anderson, Sherri O Anderson</span></div>
+      <div class="frow"><span class="fl">Profile URL:</span>
+        <a href="https://www.fastpeoplesearch.com/sherri-oakes_id_G-3059159262473472219" target="_blank" class="url-link">https://www.fastpeoplesearch.com/sherri-oakes_id_G-3059159262473472219</a></div>
+    </div>
+    <div class="ss-wrap">
+                <img src="Sherri_Kapke_Oaks_result_4.png" class="ss-thumb"
+                     onclick="openModal('Sherri_Kapke_Oaks_result_4.png')"
+                     title="Click to view profile detail screenshot">
+                <div class="ss-lbl">📸 Profile Detail Screenshot — click to zoom</div>
+            </div>
+  </div>
+  
+  <div class="res-actions">
+    <button class="res-btn arch-btn" onclick="archiveResult(3)">🗃 Not This Person</button>
+    <button class="res-btn del-btn"  onclick="confirmDelete(3)">🗑 Delete Result</button>
+  </div>
+</details>
+<details class="rcard " id="rcard-4">
+  <summary class="rcard-hdr">
+    <span class="rnum">#5</span>
+    <span class="rname">Sherri Oakes · Age 58 · Flowery Branch, GA</span>
+    <span class="badge-group">
+      <span class="badge-tag">📞 12</span>
+      <span class="badge-tag">✉️ 10</span>
+    </span>
+    
+    <a href="https://www.fastpeoplesearch.com/sherri-oakes_id_G703110597145486509" target="_blank" class="profile-btn" onclick="event.stopPropagation()">🔗 View Profile</a>
+    <span class="expand-indicator">▼ Expand</span>
+  </summary>
+  <div class="rcard-body">
+    <div class="rinfo">
+      <div class="frow"><span class="fl">Full Name:</span><span class="fv fname">Sherri Oakes</span></div>
+      <div class="frow"><span class="fl">Age:</span><span class="fv">58</span></div>
+      <div class="frow"><span class="fl">City / State:</span><span class="fv">Flowery Branch, GA</span></div>
+      <div class="frow"><span class="fl">Phone(s):</span><div class="addrs"><button class="copy-all-btn" onclick="copyList([&quot;(678) 740-1787&quot;, &quot;(404) 229-4785&quot;, &quot;(770) 577-3869&quot;, &quot;(678) 521-9910&quot;, &quot;(909) 576-8157&quot;, &quot;(318) 255-6853&quot;, &quot;(678) 447-4749&quot;, &quot;(818) 674-1674&quot;, &quot;(909) 948-3137&quot;, &quot;(770) 942-3565&quot;, &quot;(909) 932-9421&quot;, &quot;(909) 944-9190&quot;], 'Phones'); event.stopPropagation();">📋 Copy All Phones (12)</button><div class="addr-row">📞 <span>(678) 740-1787</span> <button class="copy-item-btn" onclick="copySingle('(678) 740-1787', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(404) 229-4785</span> <button class="copy-item-btn" onclick="copySingle('(404) 229-4785', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(770) 577-3869</span> <button class="copy-item-btn" onclick="copySingle('(770) 577-3869', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(678) 521-9910</span> <button class="copy-item-btn" onclick="copySingle('(678) 521-9910', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(909) 576-8157</span> <button class="copy-item-btn" onclick="copySingle('(909) 576-8157', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(318) 255-6853</span> <button class="copy-item-btn" onclick="copySingle('(318) 255-6853', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(678) 447-4749</span> <button class="copy-item-btn" onclick="copySingle('(678) 447-4749', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(818) 674-1674</span> <button class="copy-item-btn" onclick="copySingle('(818) 674-1674', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(909) 948-3137</span> <button class="copy-item-btn" onclick="copySingle('(909) 948-3137', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(770) 942-3565</span> <button class="copy-item-btn" onclick="copySingle('(770) 942-3565', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(909) 932-9421</span> <button class="copy-item-btn" onclick="copySingle('(909) 932-9421', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(909) 944-9190</span> <button class="copy-item-btn" onclick="copySingle('(909) 944-9190', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div></div></div>
+      <div class="frow"><span class="fl">Email(s):</span><div class="addrs"><button class="copy-all-btn" onclick="copyList([&quot;shermcman04@gmail.com&quot;, &quot;14magnummashin88@gmail.com&quot;, &quot;banjoboy@hotmail.com&quot;, &quot;banjoboy01@hotmail.com&quot;, &quot;bnanasma@aol.com&quot;, &quot;banjoboy01@yahoo.com&quot;, &quot;banjoboy01@aol.com&quot;, &quot;sherrioakes@yahoo.com&quot;, &quot;sbryanoakes@netscape.net&quot;, &quot;sherrioakes@charter.net&quot;], 'Emails'); event.stopPropagation();">📋 Copy All Emails (10)</button><div class="addr-row">✉️ <span>shermcman04@gmail.com</span> <button class="copy-item-btn" onclick="copySingle('shermcman04@gmail.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>14magnummashin88@gmail.com</span> <button class="copy-item-btn" onclick="copySingle('14magnummashin88@gmail.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>banjoboy@hotmail.com</span> <button class="copy-item-btn" onclick="copySingle('banjoboy@hotmail.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>banjoboy01@hotmail.com</span> <button class="copy-item-btn" onclick="copySingle('banjoboy01@hotmail.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>bnanasma@aol.com</span> <button class="copy-item-btn" onclick="copySingle('bnanasma@aol.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>banjoboy01@yahoo.com</span> <button class="copy-item-btn" onclick="copySingle('banjoboy01@yahoo.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>banjoboy01@aol.com</span> <button class="copy-item-btn" onclick="copySingle('banjoboy01@aol.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>sherrioakes@yahoo.com</span> <button class="copy-item-btn" onclick="copySingle('sherrioakes@yahoo.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>sbryanoakes@netscape.net</span> <button class="copy-item-btn" onclick="copySingle('sbryanoakes@netscape.net', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>sherrioakes@charter.net</span> <button class="copy-item-btn" onclick="copySingle('sherrioakes@charter.net', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div></div></div>
+      <div class="frow"><span class="fl">Address(es):</span><div class="addrs"><div class="addr-row">📍 4856 Remington Dr · Flowery Branch, GA</div><div class="addr-row">📍 102 Foxgate Path · Carrollton, GA</div><div class="addr-row">📍 1007 Oak Chase Dr Unit I · Tucker, GA</div><div class="addr-row">📍 265 Whooping Creek Rd · Carrollton, GA</div><div class="addr-row">📍 3873 Willow Holw · Douglasville, GA</div><div class="addr-row">📍 7987 Hannah Rd · Winston, GA</div><div class="addr-row">📍 170 Old Harper Rd · Carrollton, GA</div><div class="addr-row">📍 7318 Greenbriar Pl · Rancho Cucamonga, CA</div><div class="addr-row">📍 1121 Clem Lowell Rd · Carrollton, GA</div><div class="addr-row">📍 256 Evergreen Dr · Villa Rica, GA</div></div></div>
+      <div class="frow"><span class="fl">Relatives:</span><span class="fv">Bryan Oakes, Amy McManus, Arnold McManus, Arnold McManus, Arnoldp McManus</span></div>
+      <div class="frow"><span class="fl">AKA / Aliases:</span><span class="fv">Sherri L Oakes, Sherri Bryan Oakes, Sherri O Oakes, Sherri L Bailey</span></div>
+      <div class="frow"><span class="fl">Profile URL:</span>
+        <a href="https://www.fastpeoplesearch.com/sherri-oakes_id_G703110597145486509" target="_blank" class="url-link">https://www.fastpeoplesearch.com/sherri-oakes_id_G703110597145486509</a></div>
+    </div>
+    <div class="ss-wrap">
+                <img src="Sherri_Kapke_Oaks_result_5.png" class="ss-thumb"
+                     onclick="openModal('Sherri_Kapke_Oaks_result_5.png')"
+                     title="Click to view profile detail screenshot">
+                <div class="ss-lbl">📸 Profile Detail Screenshot — click to zoom</div>
+            </div>
+  </div>
+  
+  <div class="res-actions">
+    <button class="res-btn arch-btn" onclick="archiveResult(4)">🗃 Not This Person</button>
+    <button class="res-btn del-btn"  onclick="confirmDelete(4)">🗑 Delete Result</button>
+  </div>
+</details>
+<details class="rcard " id="rcard-5">
+  <summary class="rcard-hdr">
+    <span class="rnum">#6</span>
+    <span class="rname">Sherri Oakes · Age 54 · Winston Salem, NC</span>
+    <span class="badge-group">
+      <span class="badge-tag">📞 9</span>
+      <span class="badge-tag">✉️ 3</span>
+    </span>
+    
+    <a href="https://www.fastpeoplesearch.com/sherri-oakes_id_G-984457487570648767" target="_blank" class="profile-btn" onclick="event.stopPropagation()">🔗 View Profile</a>
+    <span class="expand-indicator">▼ Expand</span>
+  </summary>
+  <div class="rcard-body">
+    <div class="rinfo">
+      <div class="frow"><span class="fl">Full Name:</span><span class="fv fname">Sherri Oakes</span></div>
+      <div class="frow"><span class="fl">Age:</span><span class="fv">54</span></div>
+      <div class="frow"><span class="fl">City / State:</span><span class="fv">Winston Salem, NC</span></div>
+      <div class="frow"><span class="fl">Phone(s):</span><div class="addrs"><button class="copy-all-btn" onclick="copyList([&quot;(303) 680-6269&quot;, &quot;(719) 683-7139&quot;, &quot;(303) 693-0221&quot;, &quot;(720) 542-8461&quot;, &quot;(336) 815-1034&quot;, &quot;(303) 337-7976&quot;, &quot;(303) 584-7836&quot;, &quot;(954) 584-7836&quot;, &quot;(954) 680-6269&quot;], 'Phones'); event.stopPropagation();">📋 Copy All Phones (9)</button><div class="addr-row">📞 <span>(303) 680-6269</span> <button class="copy-item-btn" onclick="copySingle('(303) 680-6269', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(719) 683-7139</span> <button class="copy-item-btn" onclick="copySingle('(719) 683-7139', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(303) 693-0221</span> <button class="copy-item-btn" onclick="copySingle('(303) 693-0221', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(720) 542-8461</span> <button class="copy-item-btn" onclick="copySingle('(720) 542-8461', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(336) 815-1034</span> <button class="copy-item-btn" onclick="copySingle('(336) 815-1034', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(303) 337-7976</span> <button class="copy-item-btn" onclick="copySingle('(303) 337-7976', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(303) 584-7836</span> <button class="copy-item-btn" onclick="copySingle('(303) 584-7836', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(954) 584-7836</span> <button class="copy-item-btn" onclick="copySingle('(954) 584-7836', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(954) 680-6269</span> <button class="copy-item-btn" onclick="copySingle('(954) 680-6269', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div></div></div>
+      <div class="frow"><span class="fl">Email(s):</span><div class="addrs"><button class="copy-all-btn" onclick="copyList([&quot;culley2121@aol.com&quot;, &quot;sherrio2190@yahoo.com&quot;, &quot;baddestchic60872@hotmail.com&quot;], 'Emails'); event.stopPropagation();">📋 Copy All Emails (3)</button><div class="addr-row">✉️ <span>culley2121@aol.com</span> <button class="copy-item-btn" onclick="copySingle('culley2121@aol.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>sherrio2190@yahoo.com</span> <button class="copy-item-btn" onclick="copySingle('sherrio2190@yahoo.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>baddestchic60872@hotmail.com</span> <button class="copy-item-btn" onclick="copySingle('baddestchic60872@hotmail.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div></div></div>
+      <div class="frow"><span class="fl">Address(es):</span><div class="addrs"><div class="addr-row">📍 4650 Hildebrand Dr · Winston Salem, NC</div><div class="addr-row">📍 105 Prestwick Ln · Rural Hall, NC</div><div class="addr-row">📍 4620 Hildebrand Dr · Winston Salem, NC</div><div class="addr-row">📍 3831 Nw 23Rd Pl · Coconut Creek, FL</div><div class="addr-row">📍 1358 E 97Th Pl · Thornton, CO</div><div class="addr-row">📍 5445 S Shawnee Way · Aurora, CO</div><div class="addr-row">📍 5780 S Orleans St · Centennial, CO</div><div class="addr-row">📍 20997 E Dorado Ct · Centennial, CO</div><div class="addr-row">📍 6413 Dewey St · Hollywood, FL</div><div class="addr-row">📍 1885 S Quebec Way Unit H24 · Denver, CO</div></div></div>
+      <div class="frow"><span class="fl">Relatives:</span><span class="fv">Donn Oakes, Cody Oakes, Culley Oakes, Donn Oakes, Lynn Voeltner</span></div>
+      <div class="frow"><span class="fl">AKA / Aliases:</span><span class="fv">Sherri M Oakes, Sherri Marie Oakes, Donn S Oakes, Sheri M Oakes Jr</span></div>
+      <div class="frow"><span class="fl">Profile URL:</span>
+        <a href="https://www.fastpeoplesearch.com/sherri-oakes_id_G-984457487570648767" target="_blank" class="url-link">https://www.fastpeoplesearch.com/sherri-oakes_id_G-984457487570648767</a></div>
+    </div>
+    <div class="ss-wrap">
+                <img src="Sherri_Kapke_Oaks_result_6.png" class="ss-thumb"
+                     onclick="openModal('Sherri_Kapke_Oaks_result_6.png')"
+                     title="Click to view profile detail screenshot">
+                <div class="ss-lbl">📸 Profile Detail Screenshot — click to zoom</div>
+            </div>
+  </div>
+  
+  <div class="res-actions">
+    <button class="res-btn arch-btn" onclick="archiveResult(5)">🗃 Not This Person</button>
+    <button class="res-btn del-btn"  onclick="confirmDelete(5)">🗑 Delete Result</button>
+  </div>
+</details>
+<details class="rcard " id="rcard-6">
+  <summary class="rcard-hdr">
+    <span class="rnum">#7</span>
+    <span class="rname">Sharri Oaks · Age 60 · Jeffersonville, KY</span>
+    <span class="badge-group">
+      <span class="badge-tag">📞 4</span>
+      <span class="badge-tag">✉️ 5</span>
+    </span>
+    
+    <a href="https://www.fastpeoplesearch.com/sharri-oaks_id_G-2869894158554658249" target="_blank" class="profile-btn" onclick="event.stopPropagation()">🔗 View Profile</a>
+    <span class="expand-indicator">▼ Expand</span>
+  </summary>
+  <div class="rcard-body">
+    <div class="rinfo">
+      <div class="frow"><span class="fl">Full Name:</span><span class="fv fname">Sharri Oaks</span></div>
+      <div class="frow"><span class="fl">Age:</span><span class="fv">60</span></div>
+      <div class="frow"><span class="fl">City / State:</span><span class="fv">Jeffersonville, KY</span></div>
+      <div class="frow"><span class="fl">Phone(s):</span><div class="addrs"><button class="copy-all-btn" onclick="copyList([&quot;(859) 398-0691&quot;, &quot;(859) 497-9455&quot;, &quot;(859) 585-5125&quot;, &quot;(859) 628-6783&quot;], 'Phones'); event.stopPropagation();">📋 Copy All Phones (4)</button><div class="addr-row">📞 <span>(859) 398-0691</span> <button class="copy-item-btn" onclick="copySingle('(859) 398-0691', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(859) 497-9455</span> <button class="copy-item-btn" onclick="copySingle('(859) 497-9455', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(859) 585-5125</span> <button class="copy-item-btn" onclick="copySingle('(859) 585-5125', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(859) 628-6783</span> <button class="copy-item-btn" onclick="copySingle('(859) 628-6783', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div></div></div>
+      <div class="frow"><span class="fl">Email(s):</span><div class="addrs"><button class="copy-all-btn" onclick="copyList([&quot;sharrio@mis.net&quot;, &quot;kymini66@gmail.com&quot;, &quot;shermanoaks@aol.com&quot;, &quot;nikkius@hotmail.com&quot;, &quot;nikki_18us@hotmail.com&quot;], 'Emails'); event.stopPropagation();">📋 Copy All Emails (5)</button><div class="addr-row">✉️ <span>sharrio@mis.net</span> <button class="copy-item-btn" onclick="copySingle('sharrio@mis.net', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>kymini66@gmail.com</span> <button class="copy-item-btn" onclick="copySingle('kymini66@gmail.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>shermanoaks@aol.com</span> <button class="copy-item-btn" onclick="copySingle('shermanoaks@aol.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>nikkius@hotmail.com</span> <button class="copy-item-btn" onclick="copySingle('nikkius@hotmail.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>nikki_18us@hotmail.com</span> <button class="copy-item-btn" onclick="copySingle('nikki_18us@hotmail.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div></div></div>
+      <div class="frow"><span class="fl">Address(es):</span><div class="addrs"><div class="addr-row">📍 1805 Ky Highway 599 · Jeffersonville, KY</div><div class="addr-row">📍 Po Box 69 · Jeffersonville, KY</div><div class="addr-row">📍 2629 W Cardinal St Unit 1 · Lecanto, FL</div><div class="addr-row">📍 712 Ne Us Highway 19 · Crystal River, FL</div><div class="addr-row">📍 100 Ky Highway 599 · Jeffersonville, KY</div><div class="addr-row">📍 Po Box 3690 · Crystal River, FL</div><div class="addr-row">📍 1805 Ky Highway 599 · Jeffersonvlle, KY</div><div class="addr-row">📍 Po Box 69 · Jeffersonvlle, KY</div></div></div>
+      <div class="frow"><span class="fl">Relatives:</span><span class="fv">Sherman Oaks, Stephanie Oaks, Hyman Oaks, Hyman Oaks, Juanita Oaks</span></div>
+      <div class="frow"><span class="fl">AKA / Aliases:</span><span class="fv">Sharri D Oaks, Sharri L Oaks, Sherri Oaks</span></div>
+      <div class="frow"><span class="fl">Profile URL:</span>
+        <a href="https://www.fastpeoplesearch.com/sharri-oaks_id_G-2869894158554658249" target="_blank" class="url-link">https://www.fastpeoplesearch.com/sharri-oaks_id_G-2869894158554658249</a></div>
+    </div>
+    <div class="ss-wrap">
+                <img src="Sherri_Kapke_Oaks_result_7.png" class="ss-thumb"
+                     onclick="openModal('Sherri_Kapke_Oaks_result_7.png')"
+                     title="Click to view profile detail screenshot">
+                <div class="ss-lbl">📸 Profile Detail Screenshot — click to zoom</div>
+            </div>
+  </div>
+  
+  <div class="res-actions">
+    <button class="res-btn arch-btn" onclick="archiveResult(6)">🗃 Not This Person</button>
+    <button class="res-btn del-btn"  onclick="confirmDelete(6)">🗑 Delete Result</button>
+  </div>
+</details>
+<details class="rcard " id="rcard-7">
+  <summary class="rcard-hdr">
+    <span class="rnum">#8</span>
+    <span class="rname">Sherry Oaks · Age 73 · Rosedale, MD</span>
+    <span class="badge-group">
+      <span class="badge-tag">📞 8</span>
+      <span class="badge-tag">✉️ 8</span>
+    </span>
+    
+    <a href="https://www.fastpeoplesearch.com/sherry-oaks_id_G1447328631036926643" target="_blank" class="profile-btn" onclick="event.stopPropagation()">🔗 View Profile</a>
+    <span class="expand-indicator">▼ Expand</span>
+  </summary>
+  <div class="rcard-body">
+    <div class="rinfo">
+      <div class="frow"><span class="fl">Full Name:</span><span class="fv fname">Sherry Oaks</span></div>
+      <div class="frow"><span class="fl">Age:</span><span class="fv">73</span></div>
+      <div class="frow"><span class="fl">City / State:</span><span class="fv">Rosedale, MD</span></div>
+      <div class="frow"><span class="fl">Phone(s):</span><div class="addrs"><button class="copy-all-btn" onclick="copyList([&quot;(410) 255-5210&quot;, &quot;(410) 866-8353&quot;, &quot;(410) 440-9269&quot;, &quot;(443) 305-2382&quot;, &quot;(828) 733-0527&quot;, &quot;(410) 866-2393&quot;, &quot;(410) 255-1399&quot;, &quot;(410) 866-6623&quot;], 'Phones'); event.stopPropagation();">📋 Copy All Phones (8)</button><div class="addr-row">📞 <span>(410) 255-5210</span> <button class="copy-item-btn" onclick="copySingle('(410) 255-5210', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(410) 866-8353</span> <button class="copy-item-btn" onclick="copySingle('(410) 866-8353', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(410) 440-9269</span> <button class="copy-item-btn" onclick="copySingle('(410) 440-9269', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(443) 305-2382</span> <button class="copy-item-btn" onclick="copySingle('(443) 305-2382', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(828) 733-0527</span> <button class="copy-item-btn" onclick="copySingle('(828) 733-0527', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(410) 866-2393</span> <button class="copy-item-btn" onclick="copySingle('(410) 866-2393', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(410) 255-1399</span> <button class="copy-item-btn" onclick="copySingle('(410) 255-1399', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(410) 866-6623</span> <button class="copy-item-btn" onclick="copySingle('(410) 866-6623', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div></div></div>
+      <div class="frow"><span class="fl">Email(s):</span><div class="addrs"><button class="copy-all-btn" onclick="copyList([&quot;oaksbal@aol.com&quot;, &quot;slocuts@bigfoot.com&quot;, &quot;cfcdeva@netzero.net&quot;, &quot;cfcdeva@go.com&quot;, &quot;cfcdeva@earthlink.net&quot;, &quot;soaks@cs.com&quot;, &quot;slocuts@aol.com&quot;, &quot;heyamanda25@yahoo.com&quot;], 'Emails'); event.stopPropagation();">📋 Copy All Emails (8)</button><div class="addr-row">✉️ <span>oaksbal@aol.com</span> <button class="copy-item-btn" onclick="copySingle('oaksbal@aol.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>slocuts@bigfoot.com</span> <button class="copy-item-btn" onclick="copySingle('slocuts@bigfoot.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>cfcdeva@netzero.net</span> <button class="copy-item-btn" onclick="copySingle('cfcdeva@netzero.net', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>cfcdeva@go.com</span> <button class="copy-item-btn" onclick="copySingle('cfcdeva@go.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>cfcdeva@earthlink.net</span> <button class="copy-item-btn" onclick="copySingle('cfcdeva@earthlink.net', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>soaks@cs.com</span> <button class="copy-item-btn" onclick="copySingle('soaks@cs.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>slocuts@aol.com</span> <button class="copy-item-btn" onclick="copySingle('slocuts@aol.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>heyamanda25@yahoo.com</span> <button class="copy-item-btn" onclick="copySingle('heyamanda25@yahoo.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div></div></div>
+      <div class="frow"><span class="fl">Address(es):</span><div class="addrs"><div class="addr-row">📍 1818 Wilhelm Ave · Rosedale, MD</div><div class="addr-row">📍 1051 Armistead Way · Baltimore, MD</div><div class="addr-row">📍 7916 Mayford Ave · Pasadena, MD</div><div class="addr-row">📍 715 212Th St · Pasadena, MD</div><div class="addr-row">📍 725B 214Th St · Pasadena, MD</div><div class="addr-row">📍 725 214Th St Unit B · Pasadena, MD</div><div class="addr-row">📍 723 213Th St Unit B · Pasadena, MD</div><div class="addr-row">📍 1818 Wilhelm Ave · Baltimore, MD</div><div class="addr-row">📍 8858 Trimble Way · Rosedale, MD</div><div class="addr-row">📍 723 213Th St Unit Md2112 · Pasadena, MD</div></div></div>
+      <div class="frow"><span class="fl">Relatives:</span><span class="fv">Amanda Oaks, Angela Dixon, Billy Oaks, Billy Oaks, Billy Oaks</span></div>
+      <div class="frow"><span class="fl">AKA / Aliases:</span><span class="fv">Sherry L Oaks, Sherry L Osks, Sherry L Aks, Sherry L Oakes</span></div>
+      <div class="frow"><span class="fl">Profile URL:</span>
+        <a href="https://www.fastpeoplesearch.com/sherry-oaks_id_G1447328631036926643" target="_blank" class="url-link">https://www.fastpeoplesearch.com/sherry-oaks_id_G1447328631036926643</a></div>
+    </div>
+    <div class="ss-wrap">
+                <img src="Sherri_Kapke_Oaks_result_8.png" class="ss-thumb"
+                     onclick="openModal('Sherri_Kapke_Oaks_result_8.png')"
+                     title="Click to view profile detail screenshot">
+                <div class="ss-lbl">📸 Profile Detail Screenshot — click to zoom</div>
+            </div>
+  </div>
+  
+  <div class="res-actions">
+    <button class="res-btn arch-btn" onclick="archiveResult(7)">🗃 Not This Person</button>
+    <button class="res-btn del-btn"  onclick="confirmDelete(7)">🗑 Delete Result</button>
+  </div>
+</details>
+<details class="rcard " id="rcard-8">
+  <summary class="rcard-hdr">
+    <span class="rnum">#9</span>
+    <span class="rname">Sherri Patrick · Age 61 · Somerset, KY</span>
+    <span class="badge-group">
+      <span class="badge-tag">📞 6</span>
+      <span class="badge-tag">✉️ 4</span>
+    </span>
+    
+    <a href="https://www.fastpeoplesearch.com/sherri-patrick_id_G-3993631209245490616" target="_blank" class="profile-btn" onclick="event.stopPropagation()">🔗 View Profile</a>
+    <span class="expand-indicator">▼ Expand</span>
+  </summary>
+  <div class="rcard-body">
+    <div class="rinfo">
+      <div class="frow"><span class="fl">Full Name:</span><span class="fv fname">Sherri Patrick</span></div>
+      <div class="frow"><span class="fl">Age:</span><span class="fv">61</span></div>
+      <div class="frow"><span class="fl">City / State:</span><span class="fv">Somerset, KY</span></div>
+      <div class="frow"><span class="fl">Phone(s):</span><div class="addrs"><button class="copy-all-btn" onclick="copyList([&quot;(606) 669-7412&quot;, &quot;(606) 365-3004&quot;, &quot;(606) 676-8710&quot;, &quot;(606) 379-6090&quot;, &quot;(606) 307-4424&quot;, &quot;(606) 872-0752&quot;], 'Phones'); event.stopPropagation();">📋 Copy All Phones (6)</button><div class="addr-row">📞 <span>(606) 669-7412</span> <button class="copy-item-btn" onclick="copySingle('(606) 669-7412', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(606) 365-3004</span> <button class="copy-item-btn" onclick="copySingle('(606) 365-3004', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(606) 676-8710</span> <button class="copy-item-btn" onclick="copySingle('(606) 676-8710', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(606) 379-6090</span> <button class="copy-item-btn" onclick="copySingle('(606) 379-6090', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(606) 307-4424</span> <button class="copy-item-btn" onclick="copySingle('(606) 307-4424', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(606) 872-0752</span> <button class="copy-item-btn" onclick="copySingle('(606) 872-0752', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div></div></div>
+      <div class="frow"><span class="fl">Email(s):</span><div class="addrs"><button class="copy-all-btn" onclick="copyList([&quot;patr3370@bellsouth.net&quot;, &quot;sherripatrick@cs.com&quot;, &quot;spatrick05@hotmail.com&quot;, &quot;sherri47@windstream.net&quot;], 'Emails'); event.stopPropagation();">📋 Copy All Emails (4)</button><div class="addr-row">✉️ <span>patr3370@bellsouth.net</span> <button class="copy-item-btn" onclick="copySingle('patr3370@bellsouth.net', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>sherripatrick@cs.com</span> <button class="copy-item-btn" onclick="copySingle('sherripatrick@cs.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>spatrick05@hotmail.com</span> <button class="copy-item-btn" onclick="copySingle('spatrick05@hotmail.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>sherri47@windstream.net</span> <button class="copy-item-btn" onclick="copySingle('sherri47@windstream.net', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div></div></div>
+      <div class="frow"><span class="fl">Address(es):</span><div class="addrs"><div class="addr-row">📍 175 Enchanted Dr · Somerset, KY</div><div class="addr-row">📍 968 Tarr Ridge Rd · Frenchburg, KY</div><div class="addr-row">📍 27 Highway 674 · Monticello, KY</div><div class="addr-row">📍 2603 W Highway 92 · Monticello, KY</div><div class="addr-row">📍 4702 Ky Highway 1781 · Waynesburg, KY</div><div class="addr-row">📍 262 Sam Baughman Rd · Stanford, KY</div><div class="addr-row">📍 4125 Ky Highway 1948 · Waynesburg, KY</div><div class="addr-row">📍 3939 Highway 789 · Monticello, KY</div><div class="addr-row">📍 1087 Kelley Lane Spann Hill Rd · Monticello, KY</div><div class="addr-row">📍 435 Strawberry Rd · Monticello, KY</div></div></div>
+      <div class="frow"><span class="fl">Relatives:</span><span class="fv">Jepp Patrick, Carol Oaks, Carol Oaks, Glenn Dalton, Glora Patrick</span></div>
+      <div class="frow"><span class="fl">AKA / Aliases:</span><span class="fv">Sherri Oaks, Sherri B Turpin, Sherri Beth Dalton, Sherri O Patrick</span></div>
+      <div class="frow"><span class="fl">Profile URL:</span>
+        <a href="https://www.fastpeoplesearch.com/sherri-patrick_id_G-3993631209245490616" target="_blank" class="url-link">https://www.fastpeoplesearch.com/sherri-patrick_id_G-3993631209245490616</a></div>
+    </div>
+    <div class="ss-wrap">
+                <img src="Sherri_Kapke_Oaks_result_9.png" class="ss-thumb"
+                     onclick="openModal('Sherri_Kapke_Oaks_result_9.png')"
+                     title="Click to view profile detail screenshot">
+                <div class="ss-lbl">📸 Profile Detail Screenshot — click to zoom</div>
+            </div>
+  </div>
+  
+  <div class="res-actions">
+    <button class="res-btn arch-btn" onclick="archiveResult(8)">🗃 Not This Person</button>
+    <button class="res-btn del-btn"  onclick="confirmDelete(8)">🗑 Delete Result</button>
+  </div>
+</details>
+<details class="rcard " id="rcard-9">
+  <summary class="rcard-hdr">
+    <span class="rnum">#10</span>
+    <span class="rname">Sherri Aragon · Age 63 · Fresno, CA</span>
+    <span class="badge-group">
+      <span class="badge-tag">📞 12</span>
+      <span class="badge-tag">✉️ 9</span>
+    </span>
+    
+    <a href="https://www.fastpeoplesearch.com/sherri-aragon_id_G-4366798540099512871" target="_blank" class="profile-btn" onclick="event.stopPropagation()">🔗 View Profile</a>
+    <span class="expand-indicator">▼ Expand</span>
+  </summary>
+  <div class="rcard-body">
+    <div class="rinfo">
+      <div class="frow"><span class="fl">Full Name:</span><span class="fv fname">Sherri Aragon</span></div>
+      <div class="frow"><span class="fl">Age:</span><span class="fv">63</span></div>
+      <div class="frow"><span class="fl">City / State:</span><span class="fv">Fresno, CA</span></div>
+      <div class="frow"><span class="fl">Phone(s):</span><div class="addrs"><button class="copy-all-btn" onclick="copyList([&quot;(559) 274-8260&quot;, &quot;(559) 271-3162&quot;, &quot;(559) 271-3165&quot;, &quot;(559) 496-0899&quot;, &quot;(559) 457-0844&quot;, &quot;(949) 929-3102&quot;, &quot;(209) 271-3162&quot;, &quot;(714) 757-0548&quot;, &quot;(949) 939-4735&quot;, &quot;(559) 266-1297&quot;, &quot;(559) 284-8530&quot;, &quot;(209) 266-1297&quot;], 'Phones'); event.stopPropagation();">📋 Copy All Phones (12)</button><div class="addr-row">📞 <span>(559) 274-8260</span> <button class="copy-item-btn" onclick="copySingle('(559) 274-8260', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(559) 271-3162</span> <button class="copy-item-btn" onclick="copySingle('(559) 271-3162', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(559) 271-3165</span> <button class="copy-item-btn" onclick="copySingle('(559) 271-3165', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(559) 496-0899</span> <button class="copy-item-btn" onclick="copySingle('(559) 496-0899', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(559) 457-0844</span> <button class="copy-item-btn" onclick="copySingle('(559) 457-0844', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(949) 929-3102</span> <button class="copy-item-btn" onclick="copySingle('(949) 929-3102', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(209) 271-3162</span> <button class="copy-item-btn" onclick="copySingle('(209) 271-3162', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(714) 757-0548</span> <button class="copy-item-btn" onclick="copySingle('(714) 757-0548', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(949) 939-4735</span> <button class="copy-item-btn" onclick="copySingle('(949) 939-4735', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(559) 266-1297</span> <button class="copy-item-btn" onclick="copySingle('(559) 266-1297', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(559) 284-8530</span> <button class="copy-item-btn" onclick="copySingle('(559) 284-8530', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(209) 266-1297</span> <button class="copy-item-btn" onclick="copySingle('(209) 266-1297', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div></div></div>
+      <div class="frow"><span class="fl">Email(s):</span><div class="addrs"><button class="copy-all-btn" onclick="copyList([&quot;sherriaragon44@yahoo.com&quot;, &quot;sherriaragon@comcast.net&quot;, &quot;sherria@cox.net&quot;, &quot;sar6224928@yahoo.com&quot;, &quot;sar6224928@cs.com&quot;, &quot;sar6224928@aol.com&quot;, &quot;sheltonblueshell2@sbcglobal.net&quot;, &quot;sar6224928@hotmail.com&quot;, &quot;dshill@gmail.com&quot;], 'Emails'); event.stopPropagation();">📋 Copy All Emails (9)</button><div class="addr-row">✉️ <span>sherriaragon44@yahoo.com</span> <button class="copy-item-btn" onclick="copySingle('sherriaragon44@yahoo.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>sherriaragon@comcast.net</span> <button class="copy-item-btn" onclick="copySingle('sherriaragon@comcast.net', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>sherria@cox.net</span> <button class="copy-item-btn" onclick="copySingle('sherria@cox.net', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>sar6224928@yahoo.com</span> <button class="copy-item-btn" onclick="copySingle('sar6224928@yahoo.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>sar6224928@cs.com</span> <button class="copy-item-btn" onclick="copySingle('sar6224928@cs.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>sar6224928@aol.com</span> <button class="copy-item-btn" onclick="copySingle('sar6224928@aol.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>sheltonblueshell2@sbcglobal.net</span> <button class="copy-item-btn" onclick="copySingle('sheltonblueshell2@sbcglobal.net', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>sar6224928@hotmail.com</span> <button class="copy-item-btn" onclick="copySingle('sar6224928@hotmail.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>dshill@gmail.com</span> <button class="copy-item-btn" onclick="copySingle('dshill@gmail.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div></div></div>
+      <div class="frow"><span class="fl">Address(es):</span><div class="addrs"><div class="addr-row">📍 2509 S Rose Ave · Fresno, CA</div><div class="addr-row">📍 5722 W Belmont Ave Unit Trlr · Fresno, CA</div><div class="addr-row">📍 3035 E Norwich Ave · Fresno, CA</div><div class="addr-row">📍 3583 W Madison Ave · Fresno, CA</div><div class="addr-row">📍 4088 W Terrace Ave · Fresno, CA</div><div class="addr-row">📍 3231 E Washington Ave · Fresno, CA</div><div class="addr-row">📍 2110 N Lassen Ave · Kerman, CA</div></div></div>
+      <div class="frow"><span class="fl">Relatives:</span><span class="fv">Robert Aragon, Gary Oaks, John Oaks, Julie Aragon, Richard Aragon</span></div>
+      <div class="frow"><span class="fl">AKA / Aliases:</span><span class="fv">Sherri A Aragon, Sherri Ann Oaks, Sherri A Oaks, Sherri A Silence</span></div>
+      <div class="frow"><span class="fl">Profile URL:</span>
+        <a href="https://www.fastpeoplesearch.com/sherri-aragon_id_G-4366798540099512871" target="_blank" class="url-link">https://www.fastpeoplesearch.com/sherri-aragon_id_G-4366798540099512871</a></div>
+    </div>
+    <div class="ss-wrap">
+                <img src="Sherri_Kapke_Oaks_result_10.png" class="ss-thumb"
+                     onclick="openModal('Sherri_Kapke_Oaks_result_10.png')"
+                     title="Click to view profile detail screenshot">
+                <div class="ss-lbl">📸 Profile Detail Screenshot — click to zoom</div>
+            </div>
+  </div>
+  
+  <div class="res-actions">
+    <button class="res-btn arch-btn" onclick="archiveResult(9)">🗃 Not This Person</button>
+    <button class="res-btn del-btn"  onclick="confirmDelete(9)">🗑 Delete Result</button>
+  </div>
+</details>
+</div>
+<div class="toast" id="toast"></div>
+<div class="modal" id="modal" onclick="if(event.target===this)this.classList.remove('open')">
+  <span class="modal-x" onclick="document.getElementById('modal').classList.remove('open')">✕</span>
+  <img id="modal-img" src="" class="modal-img" onclick="event.stopPropagation()">
+</div>
+<div class="confirm-overlay" id="confirm-overlay">
+  <div class="confirm-box">
+    <h3>🗑 Delete This Result?</h3>
+    <p>This will permanently remove the result and its screenshot.<br>This <strong>cannot be undone</strong>.</p>
+    <div class="confirm-btns">
+      <button class="cb-cancel" onclick="closeConfirm()">Cancel</button>
+      <button class="cb-delete" id="cb-confirm-btn" onclick="doDelete()">Delete Permanently</button>
+    </div>
+  </div>
+</div>
+<script>
+const JOB_ID   = 'FF9B86F8';
+const LEAD_IDX = 45;
+const API      = (window.location.protocol.startsWith('http') ? window.location.origin : 'http://localhost:5050');
+let _pendingDeleteIdx = null;
+
+function copySingle(val, label) {
+  navigator.clipboard.writeText(val).then(() => {
+    showToast(label + ' copied to clipboard!', 'ok');
+  }).catch(() => {
+    const ta = document.createElement('textarea');
+    ta.value = val;
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    showToast(label + ' copied!', 'ok');
+  });
+}
+
+function copyList(arr, label) {
+  if (!arr || !arr.length) return;
+  const text = arr.join('\\n');
+  navigator.clipboard.writeText(text).then(() => {
+    showToast(arr.length + ' ' + label + ' copied to clipboard!', 'ok');
+  }).catch(() => {
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    showToast(arr.length + ' ' + label + ' copied!', 'ok');
+  });
+}
+
+function openModal(src){
+  document.getElementById('modal-img').src=src;
+  document.getElementById('modal').classList.add('open');
+}
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape'){
+    document.getElementById('modal').classList.remove('open');
+    closeConfirm();
+  }
+});
+
+function showToast(msg, type='ok'){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast ' + type + ' show';
+  setTimeout(()=>t.classList.remove('show'), 3500);
+}
+
+function confirmDelete(idx){
+  _pendingDeleteIdx = idx;
+  document.getElementById('confirm-overlay').classList.add('open');
+}
+function closeConfirm(){
+  document.getElementById('confirm-overlay').classList.remove('open');
+  _pendingDeleteIdx = null;
+}
+async function doDelete(){
+  const idx = _pendingDeleteIdx;
+  closeConfirm();
+  if (idx === null || !JOB_ID) return;
+  await deleteResult(idx);
+}
+async function deleteResult(idx){
+  if (!JOB_ID) { showToast('No job ID — open via dashboard', 'err'); return; }
+  const card = document.getElementById('rcard-' + idx);
+  if (card) card.classList.add('removing');
+  try {
+    const r = await fetch(`${API}/api/jobs/${JOB_ID}/leads/${LEAD_IDX}/results/${idx}/delete`,
+                          {method:'POST'});
+    const d = await r.json();
+    if (r.ok) {
+      setTimeout(()=>{ if(card) card.remove(); updateCount(-1); }, 250);
+      showToast('Result deleted permanently', 'ok');
+    } else {
+      if (card) card.classList.remove('removing');
+      showToast(d.error || 'Delete failed', 'err');
+    }
+  } catch(e) {
+    if (card) card.classList.remove('removing');
+    showToast('Network error: ' + (e.message || e), 'err');
+  }
+}
+async function archiveResult(idx){
+  if (!JOB_ID) { showToast('No job ID — open via dashboard', 'err'); return; }
+  const card = document.getElementById('rcard-' + idx);
+  if (card) {
+    card.style.transition = '0.25s all';
+    card.style.opacity = '0.3';
+    card.style.transform = 'scale(0.98)';
+  }
+  showToast('Updating status...', 'ok');
+  try {
+    const r = await fetch(`${API}/api/jobs/${JOB_ID}/leads/${LEAD_IDX}/results/${idx}/archive`,
+                          {method:'POST'});
+    const d = await r.json();
+    if (r.ok) {
+      showToast('Marked as Not This Person', 'ok');
+      setTimeout(()=>{
+        const u = new URL(window.location.href);
+        u.searchParams.set('_t', Date.now());
+        window.location.replace(u.href);
+      }, 300);
+    } else {
+      if (card) { card.style.opacity = '1'; card.style.transform = 'none'; }
+      showToast(d.error || 'Archive failed', 'err');
+    }
+  } catch(e) {
+    if (card) { card.style.opacity = '1'; card.style.transform = 'none'; }
+    showToast('Network error: ' + (e.message || e), 'err');
+  }
+}
+async function unarchiveResult(idx){
+  if (!JOB_ID) return;
+  const card = document.getElementById('rcard-' + idx);
+  if (card) {
+    card.style.transition = '0.25s all';
+    card.style.opacity = '0.3';
+  }
+  showToast('Restoring result...', 'ok');
+  try {
+    const r = await fetch(`${API}/api/jobs/${JOB_ID}/leads/${LEAD_IDX}/results/${idx}/unarchive`,
+                          {method:'POST'});
+    const d = await r.json();
+    if (r.ok) {
+      showToast('Result restored', 'ok');
+      setTimeout(()=>{
+        const u = new URL(window.location.href);
+        u.searchParams.set('_t', Date.now());
+        window.location.replace(u.href);
+      }, 300);
+    } else {
+      if (card) { card.style.opacity = '1'; card.style.transform = 'none'; }
+      showToast(d.error || 'Restore failed', 'err');
+    }
+  } catch(e) {
+    if (card) { card.style.opacity = '1'; card.style.transform = 'none'; }
+    showToast('Network error: ' + (e.message || e), 'err');
+  }
+}
+function setAllCards(expanded) {
+  document.querySelectorAll('details.rcard:not(.archived-card)').forEach(d => d.open = expanded);
+}
+function setDefaultPref(pref) {
+  localStorage.setItem('leadsosint_default_view', pref);
+  showToast('Default view saved: ' + (pref === 'expanded' ? 'Expanded' : 'Collapsed'), 'ok');
+  setAllCards(pref === 'expanded');
+}
+(function() {
+  const pref = localStorage.getItem('leadsosint_default_view') || 'collapsed';
+  if (pref === 'expanded') {
+    const el = document.getElementById('pref-expanded');
+    if (el) el.checked = true;
+    setAllCards(true);
+  } else {
+    const el = document.getElementById('pref-collapsed');
+    if (el) el.checked = true;
+    setAllCards(false);
+  }
+})();
+function updateCount(delta){
+  const el = document.getElementById('active-count');
+  if (el) el.textContent = Math.max(0, parseInt(el.textContent||'0') + delta);
+}
+async function redoReportLead(jobId, idx){
+  if (!confirm('Re-run search for this lead now?')) return;
+  try {
+    const r = await fetch(`${API}/api/jobs/${jobId}/leads/${idx}/retry`, {method:'POST'});
+    if (r.ok) {
+      showToast('Re-starting search...', 'ok');
+      setTimeout(()=>location.reload(), 2000);
+    } else {
+      const d = await r.json().catch(()=>({}));
+      showToast(d.error || 'Retry error', 'err');
+    }
+  } catch(e) {
+    showToast('Network error: ' + (e.message || e), 'err');
+  }
+}
+</script>
+</body></html>

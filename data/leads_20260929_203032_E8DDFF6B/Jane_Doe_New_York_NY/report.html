@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Jane Doe — LeadsOSINT</title>
+<style>
+:root{--bg:#0d0f1a;--surface:#1a1d3a;--surface2:#22264a;--border:#3a3f7a;--accent:#a78bfa;--accent2:#6d28d9;--text:#e0e6ff;--muted:#8b95c4;--green:#34d399;--red:#f87171}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:"Segoe UI",system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+a{color:var(--accent);text-decoration:none}
+
+/* Header */
+.top-bar{background:linear-gradient(135deg,#1a1d3a,#0d0f1a);border-bottom:1px solid var(--border);padding:20px 40px;display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.back-btn{background:var(--surface2);border:1px solid var(--border);color:var(--accent);padding:10px 20px;border-radius:10px;display:inline-flex;align-items:center;gap:8px;transition:.2s;font-size:.9rem}
+.back-btn:hover{border-color:var(--accent);background:var(--accent2);color:#fff}
+.top-title{flex:1}
+.top-title h1{font-size:1.6rem;color:#fff;font-weight:700}
+.top-title p{color:var(--muted);font-size:.85rem;margin-top:4px}
+
+/* Stats */
+.stats-row{display:flex;gap:16px;padding:24px 40px;flex-wrap:wrap;background:var(--surface);border-bottom:1px solid var(--border)}
+.stat-pill{background:var(--bg);border:1px solid var(--border);border-radius:12px;padding:14px 24px;text-align:center;min-width:110px}
+.stat-pill.highlight{border-color:var(--accent);background:rgba(167,139,250,.08)}
+.sp-val{font-size:1.6rem;font-weight:800;color:var(--accent)}
+.sp-lbl{font-size:.75rem;color:var(--muted);margin-top:3px;text-transform:uppercase;letter-spacing:.5px}
+
+/* Content */
+.content{padding:32px 40px;max-width:1400px;margin:0 auto}
+
+/* Result cards */
+.rcard{background:var(--surface);border:1px solid var(--border);border-radius:18px;margin-bottom:28px;overflow:hidden;transition:.25s all}
+.rcard:hover{border-color:var(--accent);transform:translateY(-3px);box-shadow:0 12px 40px rgba(109,40,217,.2)}
+.rcard-header{background:linear-gradient(135deg,var(--surface2),var(--surface));padding:16px 28px;display:flex;align-items:center;gap:16px;border-bottom:1px solid var(--border);flex-wrap:wrap}
+.rnum{background:linear-gradient(135deg,var(--accent2),var(--accent));color:#fff;font-size:.8rem;font-weight:700;padding:5px 14px;border-radius:20px;letter-spacing:.5px}
+.rname{font-size:1.2rem;font-weight:700;color:#fff;flex:1}
+.profile-btn{background:linear-gradient(135deg,#4c3d8f,var(--accent2));color:#fff;padding:10px 22px;border-radius:10px;font-size:.875rem;font-weight:600;transition:.2s;white-space:nowrap}
+.profile-btn:hover{background:linear-gradient(135deg,var(--accent2),var(--accent));transform:translateY(-1px);box-shadow:0 6px 20px rgba(109,40,217,.4);color:#fff}
+.rcard-body{display:flex;gap:32px;padding:28px;flex-wrap:wrap}
+.rinfo{flex:1;min-width:280px}
+.field-row{margin-bottom:16px;display:flex;gap:12px;align-items:flex-start}
+.fl{color:var(--muted);font-size:.75rem;text-transform:uppercase;letter-spacing:.5px;min-width:100px;padding-top:3px}
+.fv{color:var(--text);font-size:1rem;font-weight:500}
+.fname{font-size:1.15rem;font-weight:700;color:#fff}
+.addrs{display:flex;flex-direction:column;gap:6px}
+.addr-item{color:#c4caf0;font-size:.9rem;padding:5px 10px;background:rgba(255,255,255,.04);border-radius:8px;border:1px solid var(--border)}
+.url-link{color:#60a5fa;font-size:.85rem;word-break:break-all;text-decoration:underline}
+.url-link:hover{color:var(--accent)}
+
+/* Screenshot */
+.ss-wrap{flex:0 0 340px;display:flex;flex-direction:column;align-items:center}
+.ss-thumb{width:100%;border-radius:12px;border:2px solid var(--border);cursor:pointer;transition:.2s;display:block}
+.ss-thumb:hover{border-color:var(--accent);transform:scale(1.02);box-shadow:0 8px 30px rgba(167,139,250,.3)}
+.ss-label{color:var(--muted);font-size:.8rem;margin-top:10px;text-align:center}
+.ss-btn{margin-top:12px;background:var(--surface2);border:1px solid var(--border);color:var(--accent);padding:10px 20px;border-radius:10px;cursor:pointer;font-size:.85rem;transition:.2s;width:100%;text-align:center}
+.ss-btn:hover{border-color:var(--accent);background:rgba(167,139,250,.1)}
+
+.empty-state{background:var(--surface);border:2px dashed var(--border);border-radius:18px;padding:60px;text-align:center;color:var(--muted);font-size:1.1rem}
+
+/* Modal */
+.modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.95);z-index:9999;justify-content:center;align-items:center;padding:20px;cursor:zoom-out}
+.modal.open{display:flex}
+.modal-img{max-width:95vw;max-height:90vh;border-radius:14px;border:2px solid var(--accent);box-shadow:0 0 60px rgba(167,139,250,.3);cursor:default}
+.modal-x{position:fixed;top:20px;right:30px;color:var(--accent);font-size:2.5rem;cursor:pointer;z-index:10000;line-height:1;transition:.2s}
+.modal-x:hover{color:#fff;transform:scale(1.1)}
+</style>
+</head>
+<body>
+<div class="top-bar">
+    <a href="../index.html" class="back-btn">← All Leads</a>
+    <div class="top-title">
+        <h1>🔍 Jane Doe</h1>
+        <p>Location: New York NY &nbsp;·&nbsp; September 29, 2026 · 08:34 PM</p>
+    </div>
+</div>
+
+<div class="stats-row">
+    <div class="stat-pill highlight">
+        <div class="sp-val">10</div>
+        <div class="sp-lbl">Results Found</div>
+    </div>
+    <div class="stat-pill">
+        <div class="sp-val" style="color:var(--green)">
+            ✓ Found</div>
+        <div class="sp-lbl">Status</div>
+    </div>
+    <div class="stat-pill">
+        <div class="sp-val" style="font-size:1rem">New York NY</div>
+        <div class="sp-lbl">Location</div>
+    </div>
+</div>
+
+<div class="content">
+
+        <div class="rcard" id="result-1">
+            <div class="rcard-header">
+                <span class="rnum">#1</span>
+                <span class="rname">Janie Devens</span>
+                <a href="https://www.fastpeoplesearch.com/janie-devens_id_G7438076749509676119" target="_blank" class="profile-btn">🔗 View Profile</a>
+            </div>
+            <div class="rcard-body">
+                <div class="rinfo">
+                    <div class="field-row"><span class="fl">Full Name</span><span class="fv fname">Janie Devens</span></div>
+                    <div class="field-row"><span class="fl">Age</span><span class="fv">N/A</span></div>
+                    <div class="field-row"><span class="fl">City / State</span><span class="fv">N/A</span></div>
+                    <div class="field-row"><span class="fl">Address(es)</span>
+                        <div class="addrs"><div class="addr-item">📍 1840 Ivy St, CARSON CITY NV 89703</div><div class="addr-item">📍 Po Box 151212, ELY NV 89315</div><div class="addr-item">📍 2231 N 21St St W, ELY NV 89301</div><div class="addr-item">📍 39401 Riverbend St, PALMDALE CA 93551</div></div></div>
+                    <div class="field-row"><span class="fl">Phone</span><span class="fv">N/A</span></div>
+                    <div class="field-row"><span class="fl">Profile URL</span>
+                        <a href="https://www.fastpeoplesearch.com/janie-devens_id_G7438076749509676119" target="_blank" class="url-link">https://www.fastpeoplesearch.com/janie-devens_id_G7438076749509676119</a></div>
+                </div>
+                <div class="ss-wrap">
+                <img src="result_1.png" class="ss-thumb" onclick="openModal('result_1.png')" title="Click to view full screenshot">
+                <div class="ss-label">📸 Click to view full screenshot</div>
+            </div>
+            </div>
+        </div>
+        <div class="rcard" id="result-2">
+            <div class="rcard-header">
+                <span class="rnum">#2</span>
+                <span class="rname">Jane Ehrhardt</span>
+                <a href="https://www.fastpeoplesearch.com/jane-ehrhardt_id_G-91265785930954337" target="_blank" class="profile-btn">🔗 View Profile</a>
+            </div>
+            <div class="rcard-body">
+                <div class="rinfo">
+                    <div class="field-row"><span class="fl">Full Name</span><span class="fv fname">Jane Ehrhardt</span></div>
+                    <div class="field-row"><span class="fl">Age</span><span class="fv">N/A</span></div>
+                    <div class="field-row"><span class="fl">City / State</span><span class="fv">N/A</span></div>
+                    <div class="field-row"><span class="fl">Address(es)</span>
+                        <div class="addrs"><div class="addr-item">📍 Po Box 823, POCONO SUMMIT PA 18346</div><div class="addr-item">📍 Po Box 323, HENRYVILLE PA 18332</div><div class="addr-item">📍 5676 Paradise Valley Rd, CRESCO PA 18326</div><div class="addr-item">📍 112 Sky High Dr, BARTONSVILLE PA 18321</div></div></div>
+                    <div class="field-row"><span class="fl">Phone</span><span class="fv">N/A</span></div>
+                    <div class="field-row"><span class="fl">Profile URL</span>
+                        <a href="https://www.fastpeoplesearch.com/jane-ehrhardt_id_G-91265785930954337" target="_blank" class="url-link">https://www.fastpeoplesearch.com/jane-ehrhardt_id_G-91265785930954337</a></div>
+                </div>
+                <div class="ss-wrap">
+                <img src="result_2.png" class="ss-thumb" onclick="openModal('result_2.png')" title="Click to view full screenshot">
+                <div class="ss-label">📸 Click to view full screenshot</div>
+            </div>
+            </div>
+        </div>
+        <div class="rcard" id="result-3">
+            <div class="rcard-header">
+                <span class="rnum">#3</span>
+                <span class="rname">Jane Spielberger</span>
+                <a href="https://www.fastpeoplesearch.com/jane-spielberger_id_G-4468152570359116072" target="_blank" class="profile-btn">🔗 View Profile</a>
+            </div>
+            <div class="rcard-body">
+                <div class="rinfo">
+                    <div class="field-row"><span class="fl">Full Name</span><span class="fv fname">Jane Spielberger</span></div>
+                    <div class="field-row"><span class="fl">Age</span><span class="fv">N/A</span></div>
+                    <div class="field-row"><span class="fl">City / State</span><span class="fv">N/A</span></div>
+                    <div class="field-row"><span class="fl">Address(es)</span>
+                        <div class="addrs"><div class="addr-item">📍 8 Holbrook Ct, TOWACO NJ 07082</div><div class="addr-item">📍 30 Mckinley St, LONG BRANCH NJ 07740</div><div class="addr-item">📍 7002 Kennedy Blvd E, GUTTENBERG NJ 07093</div><div class="addr-item">📍 201 E 86Th St Unit 15D, NEW YORK NY 10028</div></div></div>
+                    <div class="field-row"><span class="fl">Phone</span><span class="fv">N/A</span></div>
+                    <div class="field-row"><span class="fl">Profile URL</span>
+                        <a href="https://www.fastpeoplesearch.com/jane-spielberger_id_G-4468152570359116072" target="_blank" class="url-link">https://www.fastpeoplesearch.com/jane-spielberger_id_G-4468152570359116072</a></div>
+                </div>
+                <div class="ss-wrap">
+                <img src="result_3.png" class="ss-thumb" onclick="openModal('result_3.png')" title="Click to view full screenshot">
+                <div class="ss-label">📸 Click to view full screenshot</div>
+            </div>
+            </div>
+        </div>
+        <div class="rcard" id="result-4">
+            <div class="rcard-header">
+                <span class="rnum">#4</span>
+                <span class="rname">Jane Cavalear</span>
+                <a href="https://www.fastpeoplesearch.com/jane-cavalear_id_G-2821808087615280251" target="_blank" class="profile-btn">🔗 View Profile</a>
+            </div>
+            <div class="rcard-body">
+                <div class="rinfo">
+                    <div class="field-row"><span class="fl">Full Name</span><span class="fv fname">Jane Cavalear</span></div>
+                    <div class="field-row"><span class="fl">Age</span><span class="fv">N/A</span></div>
+                    <div class="field-row"><span class="fl">City / State</span><span class="fv">N/A</span></div>
+                    <div class="field-row"><span class="fl">Address(es)</span>
+                        <div class="addrs"><div class="addr-item">📍 5159 State Highway 41 Unit 4, SMITHVILLE FLATS NY 13841</div><div class="addr-item">📍 474 Montana Rd, WASHINGTON NJ 07882</div><div class="addr-item">📍 126 Montana Rd, WASHINGTON NJ 07882</div><div class="addr-item">📍 11 August Ln, SUSSEX NJ 07461</div></div></div>
+                    <div class="field-row"><span class="fl">Phone</span><span class="fv">N/A</span></div>
+                    <div class="field-row"><span class="fl">Profile URL</span>
+                        <a href="https://www.fastpeoplesearch.com/jane-cavalear_id_G-2821808087615280251" target="_blank" class="url-link">https://www.fastpeoplesearch.com/jane-cavalear_id_G-2821808087615280251</a></div>
+                </div>
+                <div class="ss-wrap">
+                <img src="result_4.png" class="ss-thumb" onclick="openModal('result_4.png')" title="Click to view full screenshot">
+                <div class="ss-label">📸 Click to view full screenshot</div>
+            </div>
+            </div>
+        </div>
+        <div class="rcard" id="result-5">
+            <div class="rcard-header">
+                <span class="rnum">#5</span>
+                <span class="rname">Janie Alejo</span>
+                <a href="https://www.fastpeoplesearch.com/janie-alejo_id_G900529857974362954" target="_blank" class="profile-btn">🔗 View Profile</a>
+            </div>
+            <div class="rcard-body">
+                <div class="rinfo">
+                    <div class="field-row"><span class="fl">Full Name</span><span class="fv fname">Janie Alejo</span></div>
+                    <div class="field-row"><span class="fl">Age</span><span class="fv">N/A</span></div>
+                    <div class="field-row"><span class="fl">City / State</span><span class="fv">N/A</span></div>
+                    <div class="field-row"><span class="fl">Address(es)</span>
+                        <div class="addrs"><div class="addr-item">📍 10010 Palomino Cyn, CONVERSE TX 78109</div><div class="addr-item">📍 1919 Jamar Blvd Unit 201, SAN ANTONIO TX 78226</div><div class="addr-item">📍 150 Oriental Ave, SAN ANTONIO TX 78204</div><div class="addr-item">📍 500 Tomar Dr Unit 34C, SAN ANTONIO TX 78227</div></div></div>
+                    <div class="field-row"><span class="fl">Phone</span><span class="fv">N/A</span></div>
+                    <div class="field-row"><span class="fl">Profile URL</span>
+                        <a href="https://www.fastpeoplesearch.com/janie-alejo_id_G900529857974362954" target="_blank" class="url-link">https://www.fastpeoplesearch.com/janie-alejo_id_G900529857974362954</a></div>
+                </div>
+                <div class="ss-wrap">
+                <img src="result_5.png" class="ss-thumb" onclick="openModal('result_5.png')" title="Click to view full screenshot">
+                <div class="ss-label">📸 Click to view full screenshot</div>
+            </div>
+            </div>
+        </div>
+        <div class="rcard" id="result-6">
+            <div class="rcard-header">
+                <span class="rnum">#6</span>
+                <span class="rname">Candice Criswell</span>
+                <a href="https://www.fastpeoplesearch.com/candice-criswell_id_G-1511716339324979113" target="_blank" class="profile-btn">🔗 View Profile</a>
+            </div>
+            <div class="rcard-body">
+                <div class="rinfo">
+                    <div class="field-row"><span class="fl">Full Name</span><span class="fv fname">Candice Criswell</span></div>
+                    <div class="field-row"><span class="fl">Age</span><span class="fv">N/A</span></div>
+                    <div class="field-row"><span class="fl">City / State</span><span class="fv">N/A</span></div>
+                    <div class="field-row"><span class="fl">Address(es)</span>
+                        <div class="addrs"><div class="addr-item">📍 695 Westmoreland Dr Unit 207, VERNON HILLS IL 60061</div><div class="addr-item">📍 350 Gyorr Ave Unit 1315, SOUTH ELGIN IL 60177</div><div class="addr-item">📍 350 Gyorr Ave Unit 910, SOUTH ELGIN IL 60177</div><div class="addr-item">📍 2291 Flagstone Ln, CARPENTERSVILLE IL 60110</div></div></div>
+                    <div class="field-row"><span class="fl">Phone</span><span class="fv">N/A</span></div>
+                    <div class="field-row"><span class="fl">Profile URL</span>
+                        <a href="https://www.fastpeoplesearch.com/candice-criswell_id_G-1511716339324979113" target="_blank" class="url-link">https://www.fastpeoplesearch.com/candice-criswell_id_G-1511716339324979113</a></div>
+                </div>
+                <div class="ss-wrap">
+                <img src="result_6.png" class="ss-thumb" onclick="openModal('result_6.png')" title="Click to view full screenshot">
+                <div class="ss-label">📸 Click to view full screenshot</div>
+            </div>
+            </div>
+        </div>
+        <div class="rcard" id="result-7">
+            <div class="rcard-header">
+                <span class="rnum">#7</span>
+                <span class="rname">Janet Miazga</span>
+                <a href="https://www.fastpeoplesearch.com/janet-miazga_id_G1866674546270393438" target="_blank" class="profile-btn">🔗 View Profile</a>
+            </div>
+            <div class="rcard-body">
+                <div class="rinfo">
+                    <div class="field-row"><span class="fl">Full Name</span><span class="fv fname">Janet Miazga</span></div>
+                    <div class="field-row"><span class="fl">Age</span><span class="fv">N/A</span></div>
+                    <div class="field-row"><span class="fl">City / State</span><span class="fv">N/A</span></div>
+                    <div class="field-row"><span class="fl">Address(es)</span>
+                        <div class="addrs"><div class="addr-item">📍 2168 N 164Th Ave, GOODYEAR AZ 85395</div><div class="addr-item">📍 Po Box 1804, LITCHFIELD PARK AZ 85340</div><div class="addr-item">📍 3465 E Foothill Blvd, PASADENA CA 91107</div><div class="addr-item">📍 5653 Bergamo Ct, SAN JOSE CA 95118</div></div></div>
+                    <div class="field-row"><span class="fl">Phone</span><span class="fv">N/A</span></div>
+                    <div class="field-row"><span class="fl">Profile URL</span>
+                        <a href="https://www.fastpeoplesearch.com/janet-miazga_id_G1866674546270393438" target="_blank" class="url-link">https://www.fastpeoplesearch.com/janet-miazga_id_G1866674546270393438</a></div>
+                </div>
+                <div class="ss-wrap">
+                <img src="result_7.png" class="ss-thumb" onclick="openModal('result_7.png')" title="Click to view full screenshot">
+                <div class="ss-label">📸 Click to view full screenshot</div>
+            </div>
+            </div>
+        </div>
+        <div class="rcard" id="result-8">
+            <div class="rcard-header">
+                <span class="rnum">#8</span>
+                <span class="rname">Bryant Inman</span>
+                <a href="https://www.fastpeoplesearch.com/bryant-inman_id_G1092068814917621973" target="_blank" class="profile-btn">🔗 View Profile</a>
+            </div>
+            <div class="rcard-body">
+                <div class="rinfo">
+                    <div class="field-row"><span class="fl">Full Name</span><span class="fv fname">Bryant Inman</span></div>
+                    <div class="field-row"><span class="fl">Age</span><span class="fv">N/A</span></div>
+                    <div class="field-row"><span class="fl">City / State</span><span class="fv">N/A</span></div>
+                    <div class="field-row"><span class="fl">Address(es)</span>
+                        <div class="addrs"><div class="addr-item">📍 967 Highpoint Dr, ANNAPOLIS MD 21409</div><div class="addr-item">📍 4104 Summit Heights Way Unit 332, FAIRFAX VA 22030</div><div class="addr-item">📍 8023 Edinburgh Dr, SPRINGFIELD VA 22153</div><div class="addr-item">📍 5808 Wild Flower Ct, DERWOOD MD 20855</div></div></div>
+                    <div class="field-row"><span class="fl">Phone</span><span class="fv">N/A</span></div>
+                    <div class="field-row"><span class="fl">Profile URL</span>
+                        <a href="https://www.fastpeoplesearch.com/bryant-inman_id_G1092068814917621973" target="_blank" class="url-link">https://www.fastpeoplesearch.com/bryant-inman_id_G1092068814917621973</a></div>
+                </div>
+                <div class="ss-wrap">
+                <img src="result_8.png" class="ss-thumb" onclick="openModal('result_8.png')" title="Click to view full screenshot">
+                <div class="ss-label">📸 Click to view full screenshot</div>
+            </div>
+            </div>
+        </div>
+        <div class="rcard" id="result-9">
+            <div class="rcard-header">
+                <span class="rnum">#9</span>
+                <span class="rname">Shalini Bhatia</span>
+                <a href="https://www.fastpeoplesearch.com/shalini-bhatia_id_G-5150653615881817276" target="_blank" class="profile-btn">🔗 View Profile</a>
+            </div>
+            <div class="rcard-body">
+                <div class="rinfo">
+                    <div class="field-row"><span class="fl">Full Name</span><span class="fv fname">Shalini Bhatia</span></div>
+                    <div class="field-row"><span class="fl">Age</span><span class="fv">N/A</span></div>
+                    <div class="field-row"><span class="fl">City / State</span><span class="fv">N/A</span></div>
+                    <div class="field-row"><span class="fl">Address(es)</span>
+                        <div class="addrs"><div class="addr-item">📍 47 Desert Highlands Dr, HENDERSON NV 89052</div><div class="addr-item">📍 11 Canoa Hills Dr, HENDERSON NV 89052</div><div class="addr-item">📍 16 Contra Costa Pl, HENDERSON NV 89052</div><div class="addr-item">📍 79 Timberline Dr, WAYNE NJ 07470</div></div></div>
+                    <div class="field-row"><span class="fl">Phone</span><span class="fv">N/A</span></div>
+                    <div class="field-row"><span class="fl">Profile URL</span>
+                        <a href="https://www.fastpeoplesearch.com/shalini-bhatia_id_G-5150653615881817276" target="_blank" class="url-link">https://www.fastpeoplesearch.com/shalini-bhatia_id_G-5150653615881817276</a></div>
+                </div>
+                <div class="ss-wrap">
+                <img src="result_9.png" class="ss-thumb" onclick="openModal('result_9.png')" title="Click to view full screenshot">
+                <div class="ss-label">📸 Click to view full screenshot</div>
+            </div>
+            </div>
+        </div>
+        <div class="rcard" id="result-10">
+            <div class="rcard-header">
+                <span class="rnum">#10</span>
+                <span class="rname">Deborah Foust</span>
+                <a href="https://www.fastpeoplesearch.com/deborah-foust_id_G-5397891849032043136" target="_blank" class="profile-btn">🔗 View Profile</a>
+            </div>
+            <div class="rcard-body">
+                <div class="rinfo">
+                    <div class="field-row"><span class="fl">Full Name</span><span class="fv fname">Deborah Foust</span></div>
+                    <div class="field-row"><span class="fl">Age</span><span class="fv">N/A</span></div>
+                    <div class="field-row"><span class="fl">City / State</span><span class="fv">N/A</span></div>
+                    <div class="field-row"><span class="fl">Address(es)</span>
+                        <div class="addrs"><div class="addr-item">📍 9985 Cooks Lake Rd, LUMBERTON TX 77657</div><div class="addr-item">📍 520 Ivy Ln, VIDOR TX 77662</div><div class="addr-item">📍 3772 Carters Ferry Rd E, MILAM TX 75959</div><div class="addr-item">📍 190 Oldbury St, VIDOR TX 77662</div></div></div>
+                    <div class="field-row"><span class="fl">Phone</span><span class="fv">N/A</span></div>
+                    <div class="field-row"><span class="fl">Profile URL</span>
+                        <a href="https://www.fastpeoplesearch.com/deborah-foust_id_G-5397891849032043136" target="_blank" class="url-link">https://www.fastpeoplesearch.com/deborah-foust_id_G-5397891849032043136</a></div>
+                </div>
+                <div class="ss-wrap">
+                <img src="result_10.png" class="ss-thumb" onclick="openModal('result_10.png')" title="Click to view full screenshot">
+                <div class="ss-label">📸 Click to view full screenshot</div>
+            </div>
+            </div>
+        </div>
+</div>
+
+<div class="modal" id="modal" onclick="closeModal(event)">
+    <span class="modal-x" onclick="document.getElementById('modal').classList.remove('open')">✕</span>
+    <img id="modal-img" src="" class="modal-img" onclick="event.stopPropagation()">
+</div>
+
+<script>
+function openModal(src){
+    document.getElementById('modal-img').src = src;
+    document.getElementById('modal').classList.add('open');
+}
+function closeModal(e){
+    if(e.target===document.getElementById('modal'))
+        document.getElementById('modal').classList.remove('open');
+}
+document.addEventListener('keydown', e => {
+    if(e.key==='Escape') document.getElementById('modal').classList.remove('open');
+});
+</script>
+</body>
+</html>

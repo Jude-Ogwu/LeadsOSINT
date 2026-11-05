@@ -1,0 +1,880 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>david.miller@gmail.com — LeadsOSINT</title>
+<style>
+:root{--bg:#0d0f1a;--s:#1a1d3a;--s2:#22264a;--bd:#3a3f7a;--ac:#a78bfa;--ac2:#6d28d9;
+      --tx:#e0e6ff;--mt:#8b95c4;--gn:#34d399;--rd:#f87171;--bl:#60a5fa;--yw:#fbbf24}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:"Segoe UI",system-ui,sans-serif;background:var(--bg);color:var(--tx);min-height:100vh}
+.topbar{background:linear-gradient(135deg,#1a1d3a,#0d0f1a);border-bottom:1px solid var(--bd);
+         padding:18px 40px;display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.back{background:var(--s2);border:1px solid var(--bd);color:var(--ac);padding:9px 18px;
+       border-radius:9px;font-size:.85rem;text-decoration:none;transition:.2s}
+.back:hover{border-color:var(--ac);background:var(--ac2);color:#fff}
+.ttl h1{font-size:1.5rem;color:#fff;font-weight:700}
+.ttl p{color:var(--mt);font-size:.8rem;margin-top:3px}
+.social-top-btn{background:linear-gradient(135deg,#2563eb,#60a5fa);color:#fff;padding:8px 16px;border-radius:9px;font-size:.82rem;font-weight:700;text-decoration:none;transition:.2s;box-shadow:0 4px 14px rgba(37,99,235,.3)}
+.social-top-btn:hover{transform:translateY(-1px);color:#fff;box-shadow:0 6px 20px rgba(96,165,250,.4)}
+.stats{display:flex;gap:14px;padding:20px 40px;background:var(--s);border-bottom:1px solid var(--bd);flex-wrap:wrap}
+.sp{background:var(--bg);border:1px solid var(--bd);border-radius:10px;
+     padding:12px 20px;text-align:center}
+.sp.hi{border-color:var(--ac);background:rgba(167,139,250,.07)}
+.sv{font-size:1.4rem;font-weight:800;color:var(--ac)}
+.sl{font-size:.7rem;color:var(--mt);text-transform:uppercase;letter-spacing:.5px;margin-top:2px}
+.content{padding:28px 40px;max-width:1400px;margin:0 auto}
+.rcard{background:var(--s);border:1px solid var(--bd);border-radius:16px;
+        margin-bottom:24px;overflow:hidden;transition:.4s all}
+.rcard:hover{border-color:var(--ac);transform:translateY(-2px);
+              box-shadow:0 10px 36px rgba(109,40,217,.2)}
+.rcard.removing{opacity:0;transform:translateY(-12px) scale(.97);pointer-events:none}
+.archived-card{opacity:.55;border-style:dashed;filter:grayscale(.3)}
+.rcard-hdr{background:linear-gradient(135deg,var(--s2),var(--s));padding:16px 24px;
+            display:flex;align-items:center;gap:14px;border-bottom:1px solid var(--bd);flex-wrap:wrap;cursor:pointer;list-style:none}
+.rcard-hdr::-webkit-details-marker{display:none}
+.rnum{background:linear-gradient(135deg,var(--ac2),var(--ac));color:#fff;
+       font-size:.78rem;font-weight:700;padding:4px 12px;border-radius:16px;flex-shrink:0}
+.rname{font-size:1.15rem;font-weight:700;color:#fff;flex:1}
+.rcard-hdr-top{display:flex;align-items:center;justify-content:space-between;width:100%;gap:10px}
+.rname-person{font-size:1.15rem;font-weight:800;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rcard-hdr-meta{display:flex;align-items:center;justify-content:space-between;width:100%;gap:8px;flex-wrap:wrap}
+.rcard-meta-left{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.rcard-meta-pill{font-size:.78rem;color:var(--mt);font-weight:600;display:inline-flex;align-items:center;gap:4px}
+.badge-group{display:flex;gap:6px;align-items:center}
+.badge-tag{background:rgba(167,139,250,.15);border:1px solid rgba(167,139,250,.3);color:var(--ac);font-size:.75rem;padding:3px 8px;border-radius:6px;font-weight:600}
+.expand-indicator{color:var(--ac);font-size:.8rem;font-weight:700;margin-left:8px}
+.arch-tag{background:rgba(251,191,36,.15);border:1px solid rgba(251,191,36,.3);
+           color:var(--yw);font-size:.72rem;padding:3px 10px;border-radius:10px;flex-shrink:0}
+.profile-btn{background:linear-gradient(135deg,#4c3d8f,var(--ac2));color:#fff;
+              padding:8px 16px;border-radius:9px;font-size:.8rem;
+              font-weight:600;text-decoration:none;transition:.2s;flex-shrink:0}
+.profile-btn:hover{background:linear-gradient(135deg,var(--ac2),var(--ac));
+                    transform:translateY(-1px);color:#fff}
+.copy-all-btn{background:linear-gradient(135deg,var(--ac2),var(--ac3));color:#fff;border:none;padding:5px 12px;border-radius:6px;font-size:.75rem;font-weight:600;cursor:pointer;margin-bottom:6px;display:inline-block}
+.copy-all-btn:hover{background:var(--ac2)}
+.copy-item-btn{background:transparent;border:none;color:var(--mt);cursor:pointer;font-size:.8rem;padding:0 4px;margin-left:auto}
+.copy-item-btn:hover{color:var(--ac)}
+.addr-row{color:#c4caf0;font-size:.88rem;padding:6px 12px;
+           background:rgba(255,255,255,.03);border-radius:7px;border:1px solid var(--bd);display:flex;align-items:center;gap:8px}
+.url-link{color:var(--bl);font-size:.82rem;word-break:break-all;text-decoration:underline}
+.url-link:hover{color:var(--ac)}
+.rcard-body{padding:24px 28px;display:flex;gap:24px;align-items:flex-start;flex-wrap:wrap}
+.rinfo{flex:1;min-width:320px;display:flex;flex-direction:column;gap:14px}
+.frow{display:grid;grid-template-columns:140px 1fr;gap:12px;align-items:start;font-size:.92rem}
+.fl{font-weight:700;color:var(--mt);font-size:.85rem;letter-spacing:.3px;padding-top:4px}
+.fv{color:#fff;font-weight:600;line-height:1.5}
+.fname{font-size:1.15rem;color:var(--ac);font-weight:700}
+.bg-report-row{align-items:start}
+.bg-report-box{background:var(--s2);border:1px solid var(--bd);border-radius:10px;padding:12px 14px;display:flex;flex-direction:column;gap:10px}
+.bg-report-hdr{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.bg-report-title{font-weight:700;color:var(--ac);font-size:.88rem;display:flex;align-items:center;gap:6px}
+.bg-report-text{color:var(--tx);font-size:.86rem;line-height:1.6;user-select:text;background:rgba(13,15,26,0.6);padding:10px 12px;border-radius:8px;border:1px solid rgba(255,255,255,0.05);word-break:break-word}
+.ss-wrap{flex:0 0 320px;display:flex;flex-direction:column;align-items:center}
+.ss-thumb{width:100%;border-radius:10px;border:2px solid var(--bd);cursor:pointer;
+           transition:.2s;display:block}
+.ss-thumb:hover{border-color:var(--ac);transform:scale(1.02);
+                 box-shadow:0 6px 24px rgba(167,139,250,.3)}
+.ss-lbl{color:var(--mt);font-size:.78rem;margin-top:8px;text-align:center}
+.ss-missing{color:var(--mt);font-size:.82rem;padding:20px;text-align:center;
+             background:var(--s2);border-radius:10px;border:1px dashed var(--bd)}
+.res-actions{padding:14px 24px;border-top:1px solid var(--bd);
+              display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.res-actions.arch-mode{background:rgba(251,191,36,.04)}
+.res-btn{padding:8px 16px;border-radius:8px;font-size:.8rem;font-weight:600;
+          cursor:pointer;transition:.2s;border:1px solid;background:transparent}
+.arch-btn{border-color:rgba(251,191,36,.5);color:var(--yw);}
+.arch-btn:hover{background:rgba(251,191,36,.1)}
+.del-btn{border-color:rgba(248,113,113,.5);color:var(--rd);}
+.del-btn:hover{background:rgba(248,113,113,.1)}
+.unarch-btn{border-color:rgba(96,165,250,.5);color:var(--bl);}
+.unarch-btn:hover{background:rgba(96,165,250,.1)}
+.arch-label{font-size:.8rem;color:var(--yw);flex:1}
+.arch-section{margin-top:10px;border-radius:14px;border:1px dashed var(--bd);overflow:hidden}
+.arch-section summary{padding:14px 20px;cursor:pointer;color:var(--mt);font-size:.9rem;
+                       font-weight:600;list-style:none;background:var(--s2);
+                       display:flex;align-items:center;gap:8px}
+.arch-section summary:hover{color:var(--tx)}
+.arch-section summary span{font-size:.75rem;font-weight:400;margin-left:auto;color:var(--mt)}
+.arch-inner{padding:16px}
+.empty{background:var(--s);border:2px dashed var(--bd);border-radius:14px;
+        padding:50px;text-align:center;color:var(--mt);font-size:1rem}
+.search-ss-card{background:var(--s);border:1px solid var(--bd);border-radius:16px;margin-bottom:28px;overflow:hidden;box-shadow:0 4px 20px rgba(0,0,0,0.3)}
+.search-ss-hdr{background:linear-gradient(135deg,var(--s2),var(--s));padding:16px 24px;border-bottom:1px solid var(--bd);display:flex;justify-content:space-between;align-items:center}
+.search-ss-title{font-weight:700;color:#fff;font-size:1.05rem}
+.search-ss-sub{font-size:.78rem;color:var(--mt);margin-top:2px}
+.search-ss-body{position:relative;cursor:pointer;max-height:380px;overflow:hidden;background:#0d0f1a}
+.search-ss-img{width:100%;display:block;opacity:.88;transition:.3s all}
+.search-ss-body:hover .search-ss-img{opacity:1;transform:scale(1.005)}
+.search-ss-overlay{position:absolute;bottom:16px;left:50%;transform:translateX(-50%);background:rgba(13,15,26,.88);border:1px solid var(--ac);color:var(--ac);padding:8px 20px;border-radius:20px;font-size:.8rem;font-weight:700;backdrop-filter:blur(6px);pointer-events:none;box-shadow:0 4px 14px rgba(109,40,217,.3)}
+.toast{position:fixed;bottom:24px;right:24px;background:var(--s);
+        border:1px solid var(--bd);border-radius:12px;padding:12px 20px;
+        font-size:.85rem;z-index:999;transform:translateY(60px);opacity:0;
+        transition:.3s;max-width:280px}
+.toast.show{transform:translateY(0);opacity:1}
+.toast.ok{border-color:rgba(52,211,153,.4);color:var(--gn)}
+.toast.err{border-color:rgba(248,113,113,.4);color:var(--rd)}
+.modal{display:none;position:fixed;inset:0;background:#060813;z-index:99999;
+        overflow-y:auto;overflow-x:hidden;padding:70px 20px 40px 20px;-webkit-overflow-scrolling:touch}
+.modal.open{display:block}
+.modal-bar{position:fixed;top:0;left:0;right:0;height:56px;background:rgba(19,23,46,0.96);border-bottom:1px solid var(--bd);display:flex;align-items:center;justify-content:space-between;padding:0 24px;z-index:100000}
+.modal-bar-ttl{font-size:.92rem;font-weight:700;color:#fff;display:flex;align-items:center;gap:8px}
+.modal-bar-actions{display:flex;align-items:center;gap:12px}
+.modal-bar-btn{background:var(--s2);border:1px solid var(--bd);color:var(--tx);padding:7px 16px;border-radius:7px;font-size:.82rem;font-weight:600;cursor:pointer;text-decoration:none;transition:.2s;display:inline-flex;align-items:center;gap:6px}
+.modal-bar-btn:hover{background:var(--ac2);color:#fff;border-color:var(--ac)}
+.modal-wrap{max-width:1040px;margin:10px auto 40px auto;text-align:center;position:relative}
+.modal-img{width:100%;max-width:1040px;height:auto;margin:0 auto;display:none;border-radius:8px;border:1px solid var(--bd);box-shadow:0 12px 48px rgba(0,0,0,0.9);background:#fff}
+.modal-loading{display:none;padding:40px 20px;color:var(--ac);font-weight:700;font-size:1rem}
+.confirm-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.8);
+                  z-index:8888;justify-content:center;align-items:center}
+.confirm-overlay.open{display:flex}
+.confirm-box{background:var(--s);border:1px solid var(--rd);border-radius:18px;
+              padding:32px 36px;max-width:380px;text-align:center}
+.confirm-box h3{color:#fff;margin-bottom:10px;font-size:1.1rem}
+.confirm-box p{color:var(--mt);font-size:.88rem;margin-bottom:24px;line-height:1.6}
+.confirm-btns{display:flex;gap:12px;justify-content:center}
+.cb-cancel{padding:10px 24px;border-radius:9px;border:1px solid var(--bd);
+            background:var(--s2);color:var(--tx);cursor:pointer;font-size:.9rem}
+.cb-delete{padding:10px 24px;border-radius:9px;border:none;
+            background:linear-gradient(135deg,#b91c1c,var(--rd));color:#fff;
+            cursor:pointer;font-size:.9rem;font-weight:700}
+.collapse-toolbar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:18px;flex-wrap:wrap;background:var(--s);padding:12px 20px;border-radius:12px;border:1px solid var(--bd)}
+.tool-btn{background:var(--s2);border:1px solid var(--bd);color:var(--ac);padding:7px 15px;border-radius:8px;font-size:.82rem;font-weight:700;cursor:pointer;transition:.2s}
+.tool-btn:hover{background:var(--ac2);color:#fff;border-color:var(--ac)}
+.view-pref{display:flex;align-items:center;gap:12px;font-size:.82rem;color:var(--mt)}
+.view-pref label{display:inline-flex;align-items:center;gap:6px;cursor:pointer;color:var(--tx);font-weight:600}
+.view-pref input[type="radio"]{accent-color:var(--ac);cursor:pointer}
+.back-to-top{position:fixed;bottom:28px;right:28px;z-index:999;background:linear-gradient(135deg,var(--ac2),var(--ac));color:#fff;border:none;padding:11px 18px;border-radius:30px;font-size:.85rem;font-weight:700;cursor:pointer;box-shadow:0 6px 20px rgba(109,40,217,.4);transition:all .3s ease;opacity:0;pointer-events:none;display:flex;align-items:center;gap:6px}
+.back-to-top.visible{opacity:1;pointer-events:auto;transform:translateY(0)}
+.back-to-top:hover{transform:translateY(-3px);box-shadow:0 10px 25px rgba(109,40,217,.6)}
+.share-modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:99999;justify-content:center;align-items:center;padding:20px;backdrop-filter:blur(6px)}
+.share-modal.open{display:flex}
+.share-box{background:var(--s);border:1px solid var(--bd);border-radius:18px;padding:26px;max-width:480px;width:100%;box-shadow:0 10px 30px rgba(0,0,0,.5)}
+.share-hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.share-hdr h3{color:#fff;font-size:1.15rem}
+.share-close{color:var(--mt);font-size:1.4rem;cursor:pointer}
+.share-close:hover{color:#fff}
+.share-box p{color:var(--mt);font-size:.85rem;margin-bottom:18px;line-height:1.5}
+.share-input-wrap{display:flex;gap:8px;margin-bottom:20px}
+.share-input-wrap input{flex:1;background:var(--s2);border:1px solid var(--bd);border-radius:8px;padding:10px 14px;color:#fff;font-size:.85rem;outline:none}
+.share-copy-btn{background:linear-gradient(135deg,var(--ac2),var(--ac));color:#fff;border:none;border-radius:8px;padding:0 18px;font-weight:700;cursor:pointer;font-size:.85rem}
+.share-socials{display:flex;gap:10px;flex-wrap:wrap}
+.soc-btn{flex:1;min-width:110px;text-align:center;padding:10px;border-radius:8px;font-size:.82rem;font-weight:700;color:#fff;text-decoration:none;transition:.2s}
+.soc-wa{background:#16a34a}
+.soc-tg{background:#0284c7}
+.soc-x{background:#0f172a;border:1px solid var(--bd)}
+.soc-btn:hover{opacity:.9;transform:translateY(-1px)}
+@media (max-width:768px){
+  .topbar{flex-direction:column;align-items:stretch;gap:12px;padding:14px 16px}
+  .topbar > div:last-child{width:100%;justify-content:flex-start;display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:6px}
+  .social-top-btn{width:100%;text-align:center;justify-content:center;padding:7px 10px;font-size:.78rem}
+  /* Compact & beautiful stats bar on mobile */
+  .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(105px,1fr));gap:6px;padding:10px 12px}
+  .sp{padding:8px 10px}
+  .sv{font-size:1.15rem}
+  .sl{font-size:.65rem}
+  .content{padding:14px 10px}
+  .search-ss-hdr{padding:12px 14px}
+  .search-ss-title{font-size:.92rem}
+  .search-ss-body{max-height:180px}
+  .search-ss-overlay{font-size:.72rem;padding:6px 12px;width:90%;text-align:center}
+  .rcard{margin-bottom:14px;border-radius:12px}
+  .rcard-hdr{padding:12px 14px;gap:8px;flex-direction:column;align-items:stretch}
+  .rname-person{font-size:1.05rem}
+  .rcard-meta-pill{font-size:.74rem}
+  .badge-tag{font-size:.7rem;padding:2px 6px}
+  .expand-indicator{font-size:.75rem}
+  .rcard-body{flex-direction:column;padding:14px 12px;gap:14px}
+  .rinfo{min-width:100%}
+  .frow{grid-template-columns:1fr;gap:4px}
+  .fl{font-size:.76rem}
+  .fv{font-size:.85rem}
+  .ss-wrap{width:100%;flex:1 1 100%}
+  .modal{padding:54px 8px 24px 8px}
+  .modal-bar{padding:0 10px;height:48px}
+  .modal-bar-ttl span{display:none}
+  .modal-bar-btn{padding:6px 8px;font-size:.72rem}
+  .modal-wrap{max-width:100%;margin:4px auto 16px auto}
+  .modal-img{width:100%;max-width:100%}
+}
+</style></head><body>
+<div class="topbar">
+  <a href="/results/59E1372D" class="back" onclick="if(window.location.protocol==='file:'){this.href='../index.html'}">← Back to Job</a>
+  <div class="ttl"><h1>🔍 david.miller@gmail.com</h1>
+    <p>Location: Not specified · November 02, 2026 · 05:56 PM</p></div>
+  <div style="display:flex;gap:8px;margin-left:auto;flex-wrap:wrap">
+    <button class="social-top-btn" style="background:linear-gradient(135deg,#0284c7,#38bdf8);color:#fff;cursor:pointer;border:none" onclick="openShareModal()" title="Share Result">🔗 Share</button>
+    <button class="social-top-btn" style="background:linear-gradient(135deg,#6d28d9,#a78bfa);color:#fff;cursor:pointer;border:none" onclick="redoReportLead('59E1372D', 1)" title="Re-run search for this lead">🔄 Re-do Search</button>
+    
+    
+    
+  </div>
+</div>
+<div class="stats">
+  <div class="sp hi"><div class="sv" id="active-count">6</div><div class="sl">Active Results</div></div>
+  <div class="sp"><div class="sv" style="color:var(--gn)">
+    ✓ Found</div><div class="sl">Status</div></div>
+  <div class="sp"><div class="sv" style="font-size:.9rem">N/A</div>
+    <div class="sl">Location</div></div>
+  <div class="sp"><div class="sv" style="font-size:.85rem"><span style="color:var(--mt)">N/A</span></div>
+    <div class="sl">Social Link</div></div>
+  <div class="sp"><div class="sv" style="font-size:.85rem"><span style="color:var(--mt)">N/A</span></div>
+    <div class="sl">Input Email</div></div>
+  <div class="sp"><div class="sv" style="font-size:.85rem"><span style="color:var(--mt)">N/A</span></div>
+    <div class="sl">Input Phone</div></div>
+</div>
+<div class="content">
+
+<div class="search-ss-card">
+  <div class="search-ss-hdr">
+    <div>
+      <div class="search-ss-title">🌐 Live Public Records Overview</div>
+      <div class="search-ss-sub">Live search results overview for "david.miller@gmail.com" (US)</div>
+    </div>
+  </div>
+  <div class="search-ss-body" onclick="openModal('david_miller_gmail_com_2_search_page.png')">
+    <img src="david_miller_gmail_com_2_search_page.png" class="search-ss-img" title="Click to view full search page screenshot">
+    <div class="search-ss-overlay">🔍 Click to View Full Search Page Screenshot</div>
+  </div>
+</div>
+<div class="collapse-toolbar">
+  <div style="display:flex;align-items:center;gap:10px">
+    <button class="tool-btn" onclick="setAllCards(false)">▸ Collapse All</button>
+    <button class="tool-btn" onclick="setAllCards(true)">▾ Expand All</button>
+  </div>
+  <div class="view-pref">
+    <span>Default View:</span>
+    <label><input type="radio" name="default_view_pref" value="collapsed" id="pref-collapsed" onchange="setDefaultPref('collapsed')"> Collapsed</label>
+    <label><input type="radio" name="default_view_pref" value="expanded" id="pref-expanded" onchange="setDefaultPref('expanded')"> Expanded</label>
+  </div>
+</div>
+
+<details class="rcard " id="rcard-0">
+  <summary class="rcard-hdr">
+    <div class="rcard-hdr-top">
+      <div style="display:flex;align-items:center;gap:8px;min-width:0">
+        <span class="rnum">#1</span>
+        <span class="rname-person">David Miller</span>
+        
+      </div>
+      <span class="expand-indicator">▼ Expand</span>
+    </div>
+    <div class="rcard-hdr-meta">
+      <div class="rcard-meta-left">
+        <span class="rcard-meta-pill">🎂 Age 61</span>
+        <span class="rcard-meta-pill">📍 Wyoming, MN</span>
+      </div>
+      <div class="badge-group">
+        <span class="badge-tag">📞 9</span>
+        <span class="badge-tag">✉️ 2</span>
+      </div>
+    </div>
+  </summary>
+  <div class="rcard-body">
+    <div class="rinfo">
+      <div class="frow"><span class="fl">Full Name:</span><span class="fv fname">David Miller</span></div>
+      <div class="frow"><span class="fl">Age:</span><span class="fv">61</span></div>
+      <div class="frow"><span class="fl">City / State:</span><span class="fv">Wyoming, MN</span></div>
+      <div class="frow"><span class="fl">Phone(s):</span><div class="addrs"><button class="copy-all-btn" onclick="copyList([&quot;(763) 607-1066&quot;, &quot;(763) 434-2635&quot;, &quot;(727) 593-3108&quot;, &quot;(651) 462-4170&quot;, &quot;(716) 832-5110&quot;, &quot;(410) 335-8480&quot;, &quot;(651) 492-7562&quot;, &quot;(763) 607-1085&quot;, &quot;(612) 424-4416&quot;], 'Phones'); event.stopPropagation();">📋 Copy All Phones (9)</button><div class="addr-row">📞 <span>(763) 607-1066</span> <button class="copy-item-btn" onclick="copySingle('(763) 607-1066', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(763) 434-2635</span> <button class="copy-item-btn" onclick="copySingle('(763) 434-2635', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(727) 593-3108</span> <button class="copy-item-btn" onclick="copySingle('(727) 593-3108', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(651) 462-4170</span> <button class="copy-item-btn" onclick="copySingle('(651) 462-4170', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(716) 832-5110</span> <button class="copy-item-btn" onclick="copySingle('(716) 832-5110', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(410) 335-8480</span> <button class="copy-item-btn" onclick="copySingle('(410) 335-8480', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(651) 492-7562</span> <button class="copy-item-btn" onclick="copySingle('(651) 492-7562', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(763) 607-1085</span> <button class="copy-item-btn" onclick="copySingle('(763) 607-1085', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(612) 424-4416</span> <button class="copy-item-btn" onclick="copySingle('(612) 424-4416', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div></div></div>
+      <div class="frow"><span class="fl">Email(s):</span><div class="addrs"><button class="copy-all-btn" onclick="copyList([&quot;penskyemiller@gmail.com&quot;, &quot;ivanmatos1@worldnet.att.net&quot;], 'Emails'); event.stopPropagation();">📋 Copy All Emails (2)</button><div class="addr-row">✉️ <span>penskyemiller@gmail.com</span> <button class="copy-item-btn" onclick="copySingle('penskyemiller@gmail.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>ivanmatos1@worldnet.att.net</span> <button class="copy-item-btn" onclick="copySingle('ivanmatos1@worldnet.att.net', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div></div></div>
+      <div class="frow"><span class="fl">Address(es):</span><div class="addrs"><div class="addr-row">📍 3800 189Th Ave Ne · Wyoming, MN</div><div class="addr-row">📍 7838 83Rd Ct N · Minneapolis, MN</div><div class="addr-row">📍 7838 83Rd Ct N · Brooklyn Park, MN</div><div class="addr-row">📍 Po Box 149 · Wayzata, MN</div><div class="addr-row">📍 3900 189Th Ave Ne · Wyoming, MN</div><div class="addr-row">📍 14500 34Th Ave N Unit 133 · Plymouth, MN</div><div class="addr-row">📍 3800 189Th Ave Ne · East Bethel, MN</div><div class="addr-row">📍 18424 83Rd Ave N · Maple Grove, MN</div><div class="addr-row">📍 4397 Wilshire Blvd Unit E202 · Mound, MN</div><div class="addr-row">📍 14500 34Th Ave N · Minneapolis, MN</div></div></div>
+      <div class="frow"><span class="fl">Relatives:</span><span class="fv">Cindy Miller, David Miller, David Miller, David Miller, David Miller</span></div>
+      <div class="frow"><span class="fl">AKA / Aliases:</span><span class="fv">David G Miller, Dave Miller, Davida Miller</span></div>
+      
+      <div class="frow bg-report-row">
+        <span class="fl">Background:</span>
+        <div class="bg-report-box">
+          <div class="bg-report-hdr">
+            <span class="bg-report-title">📄 FREE Background Report</span>
+            <button class="copy-all-btn" onclick="copyBgReport(0); event.stopPropagation();">📋 Copy Report Text</button>
+          </div>
+          <div class="bg-report-text" id="bg-report-0">David A Miller is 61 years old and was born in September of 1965. Currently David lives at the address 3800 189th Ave NE, Wyoming MN 55092 . David has lived at this Wyoming, MN address for about 30 years, after moving in around March of 1996. David previously lived at 7838 83rd CT N, Minneapolis MN 55445 for 7 years, starting in June of 1992. Going further back, starting in June of 1992, David lived at 7838 83rd CT N, Brooklyn Park MN 55445 for 7 years. Public records do not indicate that David A Miller is currently married. The following people are relatives or close associates of David: Cindy Miller (68), David Miller (61), David Miller (55), David Miller (68), David Miller (90), Jacqueline Miller (52), Joseph Miller (28), Natalie Miller (23), Stephanie Miller (56), Alison Miller (52) and Allison Miller (51). David&#x27;s current phone number is (763) 607-1066 . This Wireless number was issued by &#x27;Cellco Partnership dba Verizon Wireless - CA&#x27;, first reported in public records on January of 2024. Past phone numbers for David include (763) 434-2635 , (727) 593-3108 and (651) 462-4170 . The primary email address for David is penskyemiller@gmail.com . David has also used the following email accounts: and ivanmatos1@worldnet.att.net .</div>
+        </div>
+      </div>
+    </div>
+    <div class="ss-wrap">
+                <img src="david_miller_gmail_com_2_result_1.png" class="ss-thumb"
+                     onclick="openModal('david_miller_gmail_com_2_result_1.png')"
+                     title="Click to view profile detail screenshot">
+                <div class="ss-lbl">📸 Profile Detail Screenshot — click to zoom</div>
+            </div>
+  </div>
+  
+  <div class="res-actions">
+    <button class="res-btn arch-btn" onclick="archiveResult(0)">🗃 Not This Person</button>
+    <button class="res-btn del-btn"  onclick="confirmDelete(0)">🗑 Delete Result</button>
+  </div>
+</details>
+<details class="rcard " id="rcard-1">
+  <summary class="rcard-hdr">
+    <div class="rcard-hdr-top">
+      <div style="display:flex;align-items:center;gap:8px;min-width:0">
+        <span class="rnum">#2</span>
+        <span class="rname-person">David Miller</span>
+        
+      </div>
+      <span class="expand-indicator">▼ Expand</span>
+    </div>
+    <div class="rcard-hdr-meta">
+      <div class="rcard-meta-left">
+        <span class="rcard-meta-pill">🎂 Age 38</span>
+        <span class="rcard-meta-pill">📍 Grand Junction, CO</span>
+      </div>
+      <div class="badge-group">
+        <span class="badge-tag">📞 7</span>
+        <span class="badge-tag">✉️ 9</span>
+      </div>
+    </div>
+  </summary>
+  <div class="rcard-body">
+    <div class="rinfo">
+      <div class="frow"><span class="fl">Full Name:</span><span class="fv fname">David Miller</span></div>
+      <div class="frow"><span class="fl">Age:</span><span class="fv">38</span></div>
+      <div class="frow"><span class="fl">City / State:</span><span class="fv">Grand Junction, CO</span></div>
+      <div class="frow"><span class="fl">Phone(s):</span><div class="addrs"><button class="copy-all-btn" onclick="copyList([&quot;(707) 558-8290&quot;, &quot;(510) 964-4374&quot;, &quot;(410) 574-3974&quot;, &quot;(410) 867-0130&quot;, &quot;(910) 933-4382&quot;, &quot;(707) 643-4308&quot;, &quot;(707) 552-1417&quot;], 'Phones'); event.stopPropagation();">📋 Copy All Phones (7)</button><div class="addr-row">📞 <span>(707) 558-8290</span> <button class="copy-item-btn" onclick="copySingle('(707) 558-8290', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(510) 964-4374</span> <button class="copy-item-btn" onclick="copySingle('(510) 964-4374', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(410) 574-3974</span> <button class="copy-item-btn" onclick="copySingle('(410) 574-3974', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(410) 867-0130</span> <button class="copy-item-btn" onclick="copySingle('(410) 867-0130', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(910) 933-4382</span> <button class="copy-item-btn" onclick="copySingle('(910) 933-4382', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(707) 643-4308</span> <button class="copy-item-btn" onclick="copySingle('(707) 643-4308', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(707) 552-1417</span> <button class="copy-item-btn" onclick="copySingle('(707) 552-1417', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div></div></div>
+      <div class="frow"><span class="fl">Email(s):</span><div class="addrs"><button class="copy-all-btn" onclick="copyList([&quot;cuztomcuzz9700@gmail.com&quot;, &quot;cuztomcuzz970@gmail.com&quot;, &quot;woodie707x4@aol.com&quot;, &quot;davyd14@pacbell.net&quot;, &quot;davyd14@aol.com&quot;, &quot;davyd1@aol.com&quot;, &quot;dmille134@aol.com&quot;, &quot;jdavydq90@aol.com&quot;, &quot;dmille134@msn.com&quot;], 'Emails'); event.stopPropagation();">📋 Copy All Emails (9)</button><div class="addr-row">✉️ <span>cuztomcuzz9700@gmail.com</span> <button class="copy-item-btn" onclick="copySingle('cuztomcuzz9700@gmail.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>cuztomcuzz970@gmail.com</span> <button class="copy-item-btn" onclick="copySingle('cuztomcuzz970@gmail.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>woodie707x4@aol.com</span> <button class="copy-item-btn" onclick="copySingle('woodie707x4@aol.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>davyd14@pacbell.net</span> <button class="copy-item-btn" onclick="copySingle('davyd14@pacbell.net', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>davyd14@aol.com</span> <button class="copy-item-btn" onclick="copySingle('davyd14@aol.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>davyd1@aol.com</span> <button class="copy-item-btn" onclick="copySingle('davyd1@aol.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>dmille134@aol.com</span> <button class="copy-item-btn" onclick="copySingle('dmille134@aol.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>jdavydq90@aol.com</span> <button class="copy-item-btn" onclick="copySingle('jdavydq90@aol.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>dmille134@msn.com</span> <button class="copy-item-btn" onclick="copySingle('dmille134@msn.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div></div></div>
+      <div class="frow"><span class="fl">Address(es):</span><div class="addrs"><div class="addr-row">📍 1173 Santa Clara Ave · Grand Junction, CO</div><div class="addr-row">📍 380 N Maple St · Fruita, CO</div><div class="addr-row">📍 3008 Ladore St · Grand Junction, CO</div><div class="addr-row">📍 1700 Pablo Vista Ave · San Pablo, CA</div><div class="addr-row">📍 1809 Marlesta Ct Unit D · Pinole, CA</div><div class="addr-row">📍 22976 Old Highway 30 · Caldwell, ID</div><div class="addr-row">📍 585 25 1 2 Rd Unit 125 · Grand Junction, CO</div><div class="addr-row">📍 585 1 2 N 25Th St · Grand Junction, CO</div><div class="addr-row">📍 246 Belford Ave Unit 15 · Grand Junction, CO</div><div class="addr-row">📍 2100 Stanton Ave Unit A · San Pablo, CA</div></div></div>
+      <div class="frow"><span class="fl">Relatives:</span><span class="fv">April Miller, David Miller, Henry Miller, Lawrence Miller, Lisa Chavez</span></div>
+      <div class="frow"><span class="fl">AKA / Aliases:</span><span class="fv">David A Miller, Dazid A Miller, Dave Miller</span></div>
+      
+      <div class="frow bg-report-row">
+        <span class="fl">Background:</span>
+        <div class="bg-report-box">
+          <div class="bg-report-hdr">
+            <span class="bg-report-title">📄 FREE Background Report</span>
+            <button class="copy-all-btn" onclick="copyBgReport(1); event.stopPropagation();">📋 Copy Report Text</button>
+          </div>
+          <div class="bg-report-text" id="bg-report-1">David Andrew Miller is 38 years old and was born in March of 1988. Currently David lives at the address 1173 Santa Clara Ave, Grand Junction CO 81503 . David has lived at this Grand Junction, CO address for about 36 years, after moving in around September of 1990. David previously lived at 380 N Maple ST, Fruita CO 81521 for 2 days, starting in February of 2013. Going further back, starting in March of 2013, David lived at 3008 Ladore ST, Grand Junction CO 81504 for 3 months. Public records do not indicate that David Andrew Miller is currently married. The following people are relatives or close associates of David: April Miller (55), David Miller (74), Henry Miller (52), Lawrence Miller (55), Lisa Chavez (56), Mindy Miller (37), Nadine Spiegel (87), Steven Miller (36), Andrew Ramirez (50), Angela Ryan (29) and Anne Wenzel (67). David&#x27;s current phone number is (707) 558-8290 . This Voip number was issued by &#x27;Vonage America LLC&#x27;, first reported in public records on April of 2014. Past phone numbers for David include (510) 964-4374 , (410) 574-3974 and (410) 867-0130 . The primary email address for David is cuztomcuzz9700@gmail.com . David has also used the following email accounts: cuztomcuzz970@gmail.com , woodie707x4@aol.com , davyd14@pacbell.net , davyd14@aol.com , davyd1@aol.com , dmille134@aol.com .</div>
+        </div>
+      </div>
+    </div>
+    <div class="ss-wrap">
+                <img src="david_miller_gmail_com_2_result_2.png" class="ss-thumb"
+                     onclick="openModal('david_miller_gmail_com_2_result_2.png')"
+                     title="Click to view profile detail screenshot">
+                <div class="ss-lbl">📸 Profile Detail Screenshot — click to zoom</div>
+            </div>
+  </div>
+  
+  <div class="res-actions">
+    <button class="res-btn arch-btn" onclick="archiveResult(1)">🗃 Not This Person</button>
+    <button class="res-btn del-btn"  onclick="confirmDelete(1)">🗑 Delete Result</button>
+  </div>
+</details>
+<details class="rcard " id="rcard-2">
+  <summary class="rcard-hdr">
+    <div class="rcard-hdr-top">
+      <div style="display:flex;align-items:center;gap:8px;min-width:0">
+        <span class="rnum">#3</span>
+        <span class="rname-person">David Miller</span>
+        
+      </div>
+      <span class="expand-indicator">▼ Expand</span>
+    </div>
+    <div class="rcard-hdr-meta">
+      <div class="rcard-meta-left">
+        <span class="rcard-meta-pill">🎂 Age 86</span>
+        <span class="rcard-meta-pill">📍 Spartanburg, SC</span>
+      </div>
+      <div class="badge-group">
+        <span class="badge-tag">📞 11</span>
+        <span class="badge-tag">✉️ 8</span>
+      </div>
+    </div>
+  </summary>
+  <div class="rcard-body">
+    <div class="rinfo">
+      <div class="frow"><span class="fl">Full Name:</span><span class="fv fname">David Miller</span></div>
+      <div class="frow"><span class="fl">Age:</span><span class="fv">86</span></div>
+      <div class="frow"><span class="fl">City / State:</span><span class="fv">Spartanburg, SC</span></div>
+      <div class="frow"><span class="fl">Phone(s):</span><div class="addrs"><button class="copy-all-btn" onclick="copyList([&quot;(706) 284-9733&quot;, &quot;(706) 303-8929&quot;, &quot;(706) 432-9086&quot;, &quot;(706) 798-5747&quot;, &quot;(706) 793-1215&quot;, &quot;(864) 597-0482&quot;, &quot;(706) 496-7532&quot;, &quot;(706) 790-5088&quot;, &quot;(706) 772-4233&quot;, &quot;(706) 790-3594&quot;, &quot;(706) 793-7698&quot;], 'Phones'); event.stopPropagation();">📋 Copy All Phones (11)</button><div class="addr-row">📞 <span>(706) 284-9733</span> <button class="copy-item-btn" onclick="copySingle('(706) 284-9733', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(706) 303-8929</span> <button class="copy-item-btn" onclick="copySingle('(706) 303-8929', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(706) 432-9086</span> <button class="copy-item-btn" onclick="copySingle('(706) 432-9086', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(706) 798-5747</span> <button class="copy-item-btn" onclick="copySingle('(706) 798-5747', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(706) 793-1215</span> <button class="copy-item-btn" onclick="copySingle('(706) 793-1215', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(864) 597-0482</span> <button class="copy-item-btn" onclick="copySingle('(864) 597-0482', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(706) 496-7532</span> <button class="copy-item-btn" onclick="copySingle('(706) 496-7532', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(706) 790-5088</span> <button class="copy-item-btn" onclick="copySingle('(706) 790-5088', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(706) 772-4233</span> <button class="copy-item-btn" onclick="copySingle('(706) 772-4233', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(706) 790-3594</span> <button class="copy-item-btn" onclick="copySingle('(706) 790-3594', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(706) 793-7698</span> <button class="copy-item-btn" onclick="copySingle('(706) 793-7698', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div></div></div>
+      <div class="frow"><span class="fl">Email(s):</span><div class="addrs"><button class="copy-all-btn" onclick="copyList([&quot;revdrdavidmiller77@att.net&quot;, &quot;miller77752@comcast.net&quot;, &quot;miller77752@yahoo.com&quot;, &quot;davidcmiller13@yahoo.com&quot;, &quot;davidmiller757@rocketmail.com&quot;, &quot;s.c.hweizermar.k.9.11@gmail.com&quot;, &quot;sammiller@spartanburg.net&quot;, &quot;smiller@udrt.com&quot;], 'Emails'); event.stopPropagation();">📋 Copy All Emails (8)</button><div class="addr-row">✉️ <span>revdrdavidmiller77@att.net</span> <button class="copy-item-btn" onclick="copySingle('revdrdavidmiller77@att.net', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>miller77752@comcast.net</span> <button class="copy-item-btn" onclick="copySingle('miller77752@comcast.net', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>miller77752@yahoo.com</span> <button class="copy-item-btn" onclick="copySingle('miller77752@yahoo.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>davidcmiller13@yahoo.com</span> <button class="copy-item-btn" onclick="copySingle('davidcmiller13@yahoo.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>davidmiller757@rocketmail.com</span> <button class="copy-item-btn" onclick="copySingle('davidmiller757@rocketmail.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>s.c.hweizermar.k.9.11@gmail.com</span> <button class="copy-item-btn" onclick="copySingle('s.c.hweizermar.k.9.11@gmail.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>sammiller@spartanburg.net</span> <button class="copy-item-btn" onclick="copySingle('sammiller@spartanburg.net', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>smiller@udrt.com</span> <button class="copy-item-btn" onclick="copySingle('smiller@udrt.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div></div></div>
+      <div class="frow"><span class="fl">Address(es):</span><div class="addrs"><div class="addr-row">📍 101 Marion Ave Unit 208 · Spartanburg, SC</div><div class="addr-row">📍 406 Artmus St · Augusta, GA</div><div class="addr-row">📍 408 Artmus St · Augusta, GA</div><div class="addr-row">📍 2506 Lumpkin Rd Unit E1 · Augusta, GA</div><div class="addr-row">📍 3530 Prince Rd · Augusta, GA</div><div class="addr-row">📍 200 Heywood Ave Unit 1106 · Spartanburg, SC</div><div class="addr-row">📍 317 Parsons Rd · Woodruff, SC</div><div class="addr-row">📍 24 Somersett Dr Unit 160 · Spartanburg, SC</div><div class="addr-row">📍 1500 Shadicrest Ter · Spartanburg, SC</div><div class="addr-row">📍 213 Saratoga Ave · Spartanburg, SC</div></div></div>
+      <div class="frow"><span class="fl">Relatives:</span><span class="fv">Sandra Roseburgh, Ashley Miller, Clint Miller, Crystal Miller, David Miller</span></div>
+      <div class="frow"><span class="fl">AKA / Aliases:</span><span class="fv">David C Miller, David Miller Sr, David M Miller, David S Miller</span></div>
+      
+      <div class="frow bg-report-row">
+        <span class="fl">Background:</span>
+        <div class="bg-report-box">
+          <div class="bg-report-hdr">
+            <span class="bg-report-title">📄 FREE Background Report</span>
+            <button class="copy-all-btn" onclick="copyBgReport(2); event.stopPropagation();">📋 Copy Report Text</button>
+          </div>
+          <div class="bg-report-text" id="bg-report-2">David C Miller SR is 86 years old and was born in July of 1940. Currently David lives at the address 101 Marion Ave, Unit 208, Spartanburg SC 29306 . David has lived at this Spartanburg, SC address for about 8 months, after moving in around March of 2026. David previously lived at 406 Artmus ST, Augusta GA 30901 for 5 years, starting in August of 2013. Going further back, starting in May of 2020, David lived at 408 Artmus ST, Augusta GA 30901 for 3 years. It is likely that David Miller is married to 67 year old Sandra Anita Roseburgh . The following people are relatives or close associates of David: Ashley Miller (56), Clint Miller (34), Crystal Miller (44), David Miller (84), David Miller (46), Donnat Miller (60), Jason Miller (53), Joseph Miller (57), Jr Miller (106) and Kevin Miller (54). David&#x27;s current phone number is (706) 284-9733 . This Wireless number was issued by &#x27;New Cingular Wireless PCS LLC - GA&#x27;, first reported in public records on May of 2020. Past phone numbers for David include (706) 303-8929 , (706) 432-9086 and (706) 798-5747 . The primary email address for David is revdrdavidmiller77@att.net . David has also used the following email accounts: miller77752@comcast.net , miller77752@yahoo.com , davidcmiller13@yahoo.com , davidmiller757@rocketmail.com , s.c.hweizermar.k.9.11@gmail.com , sammiller@spartanburg.net .</div>
+        </div>
+      </div>
+    </div>
+    <div class="ss-wrap">
+                <img src="david_miller_gmail_com_2_result_3.png" class="ss-thumb"
+                     onclick="openModal('david_miller_gmail_com_2_result_3.png')"
+                     title="Click to view profile detail screenshot">
+                <div class="ss-lbl">📸 Profile Detail Screenshot — click to zoom</div>
+            </div>
+  </div>
+  
+  <div class="res-actions">
+    <button class="res-btn arch-btn" onclick="archiveResult(2)">🗃 Not This Person</button>
+    <button class="res-btn del-btn"  onclick="confirmDelete(2)">🗑 Delete Result</button>
+  </div>
+</details>
+<details class="rcard " id="rcard-3">
+  <summary class="rcard-hdr">
+    <div class="rcard-hdr-top">
+      <div style="display:flex;align-items:center;gap:8px;min-width:0">
+        <span class="rnum">#4</span>
+        <span class="rname-person">David Miller</span>
+        
+      </div>
+      <span class="expand-indicator">▼ Expand</span>
+    </div>
+    <div class="rcard-hdr-meta">
+      <div class="rcard-meta-left">
+        <span class="rcard-meta-pill">🎂 Age 52</span>
+        <span class="rcard-meta-pill">📍 Vail, AZ</span>
+      </div>
+      <div class="badge-group">
+        <span class="badge-tag">📞 6</span>
+        <span class="badge-tag">✉️ 1</span>
+      </div>
+    </div>
+  </summary>
+  <div class="rcard-body">
+    <div class="rinfo">
+      <div class="frow"><span class="fl">Full Name:</span><span class="fv fname">David Miller</span></div>
+      <div class="frow"><span class="fl">Age:</span><span class="fv">52</span></div>
+      <div class="frow"><span class="fl">City / State:</span><span class="fv">Vail, AZ</span></div>
+      <div class="frow"><span class="fl">Phone(s):</span><div class="addrs"><button class="copy-all-btn" onclick="copyList([&quot;(602) 802-9957&quot;, &quot;(913) 777-6912&quot;, &quot;(913) 244-4386&quot;, &quot;(913) 608-5454&quot;, &quot;(913) 608-5798&quot;, &quot;(913) 677-4068&quot;], 'Phones'); event.stopPropagation();">📋 Copy All Phones (6)</button><div class="addr-row">📞 <span>(602) 802-9957</span> <button class="copy-item-btn" onclick="copySingle('(602) 802-9957', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(913) 777-6912</span> <button class="copy-item-btn" onclick="copySingle('(913) 777-6912', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(913) 244-4386</span> <button class="copy-item-btn" onclick="copySingle('(913) 244-4386', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(913) 608-5454</span> <button class="copy-item-btn" onclick="copySingle('(913) 608-5454', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(913) 608-5798</span> <button class="copy-item-btn" onclick="copySingle('(913) 608-5798', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(913) 677-4068</span> <button class="copy-item-btn" onclick="copySingle('(913) 677-4068', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div></div></div>
+      <div class="frow"><span class="fl">Email(s):</span><div class="addrs"><button class="copy-all-btn" onclick="copyList([&quot;david.miller@gmail.com&quot;], 'Emails'); event.stopPropagation();">📋 Copy All Emails (1)</button><div class="addr-row">✉️ <span>david.miller@gmail.com</span> <button class="copy-item-btn" onclick="copySingle('david.miller@gmail.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div></div></div>
+      <div class="frow"><span class="fl">Address(es):</span><div class="addrs"><div class="addr-row">📍 217 S Richmond Dr · Vail, AZ</div><div class="addr-row">📍 7808 Prospect Hill Cir · New Port Richey, FL</div><div class="addr-row">📍 11406 E Vail Crest Dr · Tucson, AZ</div><div class="addr-row">📍 2635 N Hayden Rd Unit 105 · Scottsdale, AZ</div><div class="addr-row">📍 11504 W 67Th Ter · Shawnee, KS</div><div class="addr-row">📍 7740 E Glenrosa Ave Unit 236 · Scottsdale, AZ</div><div class="addr-row">📍 5444 Douglas Ave · Kansas City, KS</div><div class="addr-row">📍 8223 E Rovey Ave · Scottsdale, AZ</div><div class="addr-row">📍 630 N Poplar St · Ottawa, KS</div><div class="addr-row">📍 7306 W 62Nd St Unit 2 · Mission, KS</div></div></div>
+      <div class="frow"><span class="fl">Relatives:</span><span class="fv">Alicia Miller, Christina Miller, Christina Miller, David Miller, Ilene Miller</span></div>
+      <div class="frow"><span class="fl">AKA / Aliases:</span><span class="fv">David P Miller, Dave Miller, David Pmiller</span></div>
+      
+      <div class="frow bg-report-row">
+        <span class="fl">Background:</span>
+        <div class="bg-report-box">
+          <div class="bg-report-hdr">
+            <span class="bg-report-title">📄 FREE Background Report</span>
+            <button class="copy-all-btn" onclick="copyBgReport(3); event.stopPropagation();">📋 Copy Report Text</button>
+          </div>
+          <div class="bg-report-text" id="bg-report-3">David Paul Miller is 52 years old and was born in May of 1974. Currently David lives at the address 217 S Richmond Dr, Vail AZ 85641 . David has lived at this Vail, AZ address for about 2 years, after moving in around May of 2024. David previously lived at 7808 Prospect Hill CIR, New Port Richey FL 34654 for 11 months, starting in June of 2023. Going further back, starting in April of 2022, David lived at 11406 E Vail Crest DR, Tucson AZ 85747 for 9 months. Public records do not indicate that David Paul Miller is currently married. The following people are relatives or close associates of David: Alicia Miller (52), Christina Miller (47), Christina Miller (42), David Miller (42), Ilene Miller (105), John Mills (62), Joshua Miller (21), Kara Talley (42), Karen Miller (83), Kimberley Miller (56) and Kimberly Miller (54). David&#x27;s current phone number is (602) 802-9957 . This Wireless number was issued by &#x27;T-Mobile USA Inc&#x27;, first reported in public records on August of 2021. Past phone numbers for David include (913) 777-6912 , (913) 244-4386 and (913) 608-5454 .</div>
+        </div>
+      </div>
+    </div>
+    <div class="ss-wrap">
+                <img src="david_miller_gmail_com_2_result_4.png" class="ss-thumb"
+                     onclick="openModal('david_miller_gmail_com_2_result_4.png')"
+                     title="Click to view profile detail screenshot">
+                <div class="ss-lbl">📸 Profile Detail Screenshot — click to zoom</div>
+            </div>
+  </div>
+  
+  <div class="res-actions">
+    <button class="res-btn arch-btn" onclick="archiveResult(3)">🗃 Not This Person</button>
+    <button class="res-btn del-btn"  onclick="confirmDelete(3)">🗑 Delete Result</button>
+  </div>
+</details>
+<details class="rcard " id="rcard-4">
+  <summary class="rcard-hdr">
+    <div class="rcard-hdr-top">
+      <div style="display:flex;align-items:center;gap:8px;min-width:0">
+        <span class="rnum">#5</span>
+        <span class="rname-person">David Miller</span>
+        
+      </div>
+      <span class="expand-indicator">▼ Expand</span>
+    </div>
+    <div class="rcard-hdr-meta">
+      <div class="rcard-meta-left">
+        <span class="rcard-meta-pill">🎂 Age 76</span>
+        <span class="rcard-meta-pill">📍 Loveland, CO</span>
+      </div>
+      <div class="badge-group">
+        <span class="badge-tag">📞 8</span>
+        <span class="badge-tag">✉️ 10</span>
+      </div>
+    </div>
+  </summary>
+  <div class="rcard-body">
+    <div class="rinfo">
+      <div class="frow"><span class="fl">Full Name:</span><span class="fv fname">David Miller</span></div>
+      <div class="frow"><span class="fl">Age:</span><span class="fv">76</span></div>
+      <div class="frow"><span class="fl">City / State:</span><span class="fv">Loveland, CO</span></div>
+      <div class="frow"><span class="fl">Phone(s):</span><div class="addrs"><button class="copy-all-btn" onclick="copyList([&quot;(262) 473-7611&quot;, &quot;(352) 751-5108&quot;, &quot;(352) 205-8614&quot;, &quot;(417) 553-8003&quot;, &quot;(417) 589-8051&quot;, &quot;(920) 473-7611&quot;, &quot;(510) 581-4816&quot;, &quot;(262) 473-7376&quot;], 'Phones'); event.stopPropagation();">📋 Copy All Phones (8)</button><div class="addr-row">📞 <span>(262) 473-7611</span> <button class="copy-item-btn" onclick="copySingle('(262) 473-7611', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(352) 751-5108</span> <button class="copy-item-btn" onclick="copySingle('(352) 751-5108', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(352) 205-8614</span> <button class="copy-item-btn" onclick="copySingle('(352) 205-8614', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(417) 553-8003</span> <button class="copy-item-btn" onclick="copySingle('(417) 553-8003', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(417) 589-8051</span> <button class="copy-item-btn" onclick="copySingle('(417) 589-8051', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(920) 473-7611</span> <button class="copy-item-btn" onclick="copySingle('(920) 473-7611', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(510) 581-4816</span> <button class="copy-item-btn" onclick="copySingle('(510) 581-4816', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(262) 473-7376</span> <button class="copy-item-btn" onclick="copySingle('(262) 473-7376', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div></div></div>
+      <div class="frow"><span class="fl">Email(s):</span><div class="addrs"><button class="copy-all-btn" onclick="copyList([&quot;dwmiller716@yahoo.com&quot;, &quot;dwmiller1@wi.rr.com&quot;, &quot;davidm2684@yahoo.com&quot;, &quot;dwmiller1@excite.com&quot;, &quot;deibailey1@yahoo.com&quot;, &quot;dwmiller@tampabay.rr.com&quot;, &quot;dwmiller@excite.com&quot;, &quot;dwmiller1@tampabay.rr.com&quot;, &quot;clmrescue@yahoo.com&quot;, &quot;djm_questor_software@yahoo.com&quot;], 'Emails'); event.stopPropagation();">📋 Copy All Emails (10)</button><div class="addr-row">✉️ <span>dwmiller716@yahoo.com</span> <button class="copy-item-btn" onclick="copySingle('dwmiller716@yahoo.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>dwmiller1@wi.rr.com</span> <button class="copy-item-btn" onclick="copySingle('dwmiller1@wi.rr.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>davidm2684@yahoo.com</span> <button class="copy-item-btn" onclick="copySingle('davidm2684@yahoo.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>dwmiller1@excite.com</span> <button class="copy-item-btn" onclick="copySingle('dwmiller1@excite.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>deibailey1@yahoo.com</span> <button class="copy-item-btn" onclick="copySingle('deibailey1@yahoo.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>dwmiller@tampabay.rr.com</span> <button class="copy-item-btn" onclick="copySingle('dwmiller@tampabay.rr.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>dwmiller@excite.com</span> <button class="copy-item-btn" onclick="copySingle('dwmiller@excite.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>dwmiller1@tampabay.rr.com</span> <button class="copy-item-btn" onclick="copySingle('dwmiller1@tampabay.rr.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>clmrescue@yahoo.com</span> <button class="copy-item-btn" onclick="copySingle('clmrescue@yahoo.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>djm_questor_software@yahoo.com</span> <button class="copy-item-btn" onclick="copySingle('djm_questor_software@yahoo.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div></div></div>
+      <div class="frow"><span class="fl">Address(es):</span><div class="addrs"><div class="addr-row">📍 3114 Thorn Cir · Loveland, CO</div><div class="addr-row">📍 3186 Thorn Cir · Loveland, CO</div><div class="addr-row">📍 203 E Main St Unit 147 · Waunakee, WI</div><div class="addr-row">📍 3145 Foxtail Ln Unit 298 · Evans, CO</div><div class="addr-row">📍 5093 W Mohawk Dr · Eloy, AZ</div><div class="addr-row">📍 3022 Carney St · Loveland, CO</div><div class="addr-row">📍 Po Box 463 · Loveland, CO</div><div class="addr-row">📍 1671 Kensington Pl · The Villages, FL</div><div class="addr-row">📍 884 Emporia Pl · The Villages, FL</div><div class="addr-row">📍 1676 Zanzibar Pl · The Villages, FL</div></div></div>
+      <div class="frow"><span class="fl">Relatives:</span><span class="fv">Carol Miller, Anita Miller, Audrey Miller, Carol Miller, David Miller</span></div>
+      <div class="frow"><span class="fl">AKA / Aliases:</span><span class="fv">David W Miller, David M Miller, David L Miller, David R Miller</span></div>
+      
+      <div class="frow bg-report-row">
+        <span class="fl">Background:</span>
+        <div class="bg-report-box">
+          <div class="bg-report-hdr">
+            <span class="bg-report-title">📄 FREE Background Report</span>
+            <button class="copy-all-btn" onclick="copyBgReport(4); event.stopPropagation();">📋 Copy Report Text</button>
+          </div>
+          <div class="bg-report-text" id="bg-report-4">David Walker Miller is 76 years old and was born in July of 1950. Currently David lives at the address 3114 Thorn CIR, Loveland CO 80538 . David has lived at this Loveland, CO address for about 5 years, after moving in around January of 2021. David previously lived at 3186 Thorn CIR, Loveland CO 80538 for 10 months, starting in December of 2018. Going further back, starting in January of 2020, David lived at 203 E Main ST, Unit 147, Waunakee WI 53597 for 3 years. It is likely that David Miller is married to 73 year old Carol Lynn Miller , and they have lived together in at least 28 different locations. The following people are relatives or close associates of David: Anita Miller (75), Audrey Miller (107), Carol Miller (77), David Miller (78), Misty Miller (60), Paul Miller (110), Ryan Miller (50), Sandra Hofmann (47), Sarah Kenyon (47) and Todd Miller (47). David&#x27;s current phone number is (262) 473-7611 . This Landline number was issued by &#x27;Ameritech Wisconsin&#x27;, first reported in public records on October of 2011. Past phone numbers for David include (352) 751-5108 , (352) 205-8614 and (417) 553-8003 . The primary email address for David is dwmiller716@yahoo.com . David has also used the following email accounts: dwmiller1@wi.rr.com , davidm2684@yahoo.com , dwmiller1@excite.com , deibailey1@yahoo.com , dwmiller@tampabay.rr.com , dwmiller@excite.com .</div>
+        </div>
+      </div>
+    </div>
+    <div class="ss-wrap">
+                <img src="david_miller_gmail_com_2_result_5.png" class="ss-thumb"
+                     onclick="openModal('david_miller_gmail_com_2_result_5.png')"
+                     title="Click to view profile detail screenshot">
+                <div class="ss-lbl">📸 Profile Detail Screenshot — click to zoom</div>
+            </div>
+  </div>
+  
+  <div class="res-actions">
+    <button class="res-btn arch-btn" onclick="archiveResult(4)">🗃 Not This Person</button>
+    <button class="res-btn del-btn"  onclick="confirmDelete(4)">🗑 Delete Result</button>
+  </div>
+</details>
+<details class="rcard " id="rcard-5">
+  <summary class="rcard-hdr">
+    <div class="rcard-hdr-top">
+      <div style="display:flex;align-items:center;gap:8px;min-width:0">
+        <span class="rnum">#6</span>
+        <span class="rname-person">David Milne</span>
+        
+      </div>
+      <span class="expand-indicator">▼ Expand</span>
+    </div>
+    <div class="rcard-hdr-meta">
+      <div class="rcard-meta-left">
+        <span class="rcard-meta-pill">🎂 Age 68</span>
+        <span class="rcard-meta-pill">📍 Honolulu, HI</span>
+      </div>
+      <div class="badge-group">
+        <span class="badge-tag">📞 8</span>
+        <span class="badge-tag">✉️ 1</span>
+      </div>
+    </div>
+  </summary>
+  <div class="rcard-body">
+    <div class="rinfo">
+      <div class="frow"><span class="fl">Full Name:</span><span class="fv fname">David Milne</span></div>
+      <div class="frow"><span class="fl">Age:</span><span class="fv">68</span></div>
+      <div class="frow"><span class="fl">City / State:</span><span class="fv">Honolulu, HI</span></div>
+      <div class="frow"><span class="fl">Phone(s):</span><div class="addrs"><button class="copy-all-btn" onclick="copyList([&quot;(808) 734-2787&quot;, &quot;(808) 845-3605&quot;, &quot;(808) 285-9974&quot;, &quot;(808) 847-4553&quot;, &quot;(831) 637-4321&quot;, &quot;(808) 847-0000&quot;, &quot;(808) 841-8413&quot;, &quot;(808) 423-1732&quot;], 'Phones'); event.stopPropagation();">📋 Copy All Phones (8)</button><div class="addr-row">📞 <span>(808) 734-2787</span> <button class="copy-item-btn" onclick="copySingle('(808) 734-2787', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(808) 845-3605</span> <button class="copy-item-btn" onclick="copySingle('(808) 845-3605', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(808) 285-9974</span> <button class="copy-item-btn" onclick="copySingle('(808) 285-9974', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(808) 847-4553</span> <button class="copy-item-btn" onclick="copySingle('(808) 847-4553', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(831) 637-4321</span> <button class="copy-item-btn" onclick="copySingle('(831) 637-4321', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(808) 847-0000</span> <button class="copy-item-btn" onclick="copySingle('(808) 847-0000', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(808) 841-8413</span> <button class="copy-item-btn" onclick="copySingle('(808) 841-8413', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(808) 423-1732</span> <button class="copy-item-btn" onclick="copySingle('(808) 423-1732', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div></div></div>
+      <div class="frow"><span class="fl">Email(s):</span><div class="addrs"><button class="copy-all-btn" onclick="copyList([&quot;tantalusd5@gmail.com&quot;], 'Emails'); event.stopPropagation();">📋 Copy All Emails (1)</button><div class="addr-row">✉️ <span>tantalusd5@gmail.com</span> <button class="copy-item-btn" onclick="copySingle('tantalusd5@gmail.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div></div></div>
+      <div class="frow"><span class="fl">Address(es):</span><div class="addrs"><div class="addr-row">📍 1734 Noe St · Honolulu, HI</div><div class="addr-row">📍 1465 Lehia St · Honolulu, HI</div></div></div>
+      <div class="frow"><span class="fl">Relatives:</span><span class="fv">Mary Fonzo, Beth Barrett, David Klein, David Klein, Elizabeth Klein</span></div>
+      <div class="frow"><span class="fl">AKA / Aliases:</span><span class="fv">David L Milne, David L Miller, David L Milney, David L Milme</span></div>
+      
+      <div class="frow bg-report-row">
+        <span class="fl">Background:</span>
+        <div class="bg-report-box">
+          <div class="bg-report-hdr">
+            <span class="bg-report-title">📄 FREE Background Report</span>
+            <button class="copy-all-btn" onclick="copyBgReport(5); event.stopPropagation();">📋 Copy Report Text</button>
+          </div>
+          <div class="bg-report-text" id="bg-report-5">David L Milne JR is 68 years old and was born in December of 1957. Currently David lives at the address 1734 Noe St, Honolulu HI 96819 . David has lived at this Honolulu, HI address for about 36 years, after moving in around January of 1990. David previously lived at 1465 Lehia ST, Honolulu HI 96818 for 25 years, starting in May of 1990. Public records do not indicate that David L Milne JR is currently married. The following people are relatives or close associates of David: Mary Fonzo (93), Beth Barrett (62), David Klein (45), David Klein (62), Elizabeth Klein (30), Ralph Fonzo (92), Vincent Fonzo (67), Alexander Klein (41), Andrea Klein (77), Barbara Klein (96) and Barbara Klein (79). David&#x27;s current phone number is (808) 734-2787 . This Landline number was issued by &#x27;Hawaiian Telcom Inc - HI&#x27;, first reported in public records on September of 2014. Past phone numbers for David include (808) 845-3605 , (808) 285-9974 and (808) 847-4553 . The primary email address for David is tantalusd5@gmail.com .</div>
+        </div>
+      </div>
+    </div>
+    <div class="ss-wrap">
+                <img src="david_miller_gmail_com_2_result_6.png" class="ss-thumb"
+                     onclick="openModal('david_miller_gmail_com_2_result_6.png')"
+                     title="Click to view profile detail screenshot">
+                <div class="ss-lbl">📸 Profile Detail Screenshot — click to zoom</div>
+            </div>
+  </div>
+  
+  <div class="res-actions">
+    <button class="res-btn arch-btn" onclick="archiveResult(5)">🗃 Not This Person</button>
+    <button class="res-btn del-btn"  onclick="confirmDelete(5)">🗑 Delete Result</button>
+  </div>
+</details>
+</div>
+<div class="toast" id="toast"></div>
+<div class="modal" id="modal" onclick="if(event.target===this||event.target.classList.contains('modal-wrap'))closeModal()">
+  <div class="modal-bar">
+    <div class="modal-bar-ttl">📸 <span>Verified Public Record Intelligence Screenshot</span></div>
+    <div class="modal-bar-actions">
+      <a id="modal-dl-btn" href="#" download="screenshot.png" class="modal-bar-btn" target="_blank">⬇ Download Original</a>
+      <button class="modal-bar-btn" onclick="closeModal()" style="background:#dc2626;border-color:#ef4444;color:#fff">✕ Close</button>
+    </div>
+  </div>
+  <div class="modal-wrap">
+    <div id="modal-loading" class="modal-loading">⏳ Loading authentic screenshot...</div>
+    <img id="modal-img" src="" class="modal-img" onclick="event.stopPropagation()">
+  </div>
+</div>
+<div class="confirm-overlay" id="confirm-overlay">
+  <div class="confirm-box">
+    <h3>🗑 Delete This Result?</h3>
+    <p>This will permanently remove the result and its screenshot.<br>This <strong>cannot be undone</strong>.</p>
+    <div class="confirm-btns">
+      <button class="cb-cancel" onclick="closeConfirm()">Cancel</button>
+      <button class="cb-delete" id="cb-confirm-btn" onclick="doDelete()">Delete Permanently</button>
+    </div>
+  </div>
+</div>
+
+
+
+<div class="share-modal" id="share-modal" onclick="if(event.target===this)closeShareModal()">
+  <div class="share-box">
+    <div class="share-hdr">
+      <h3>🔗 Share Result Link</h3>
+      <span class="share-close" onclick="closeShareModal()">✕</span>
+    </div>
+    <p>Anyone with this direct link can view these results in read-only mode.<br><strong style="color:var(--ac)">⚡ Active while account is in good standing. Automatically freezes if account is paused or leads are depleted.</strong></p>
+    <div class="share-input-wrap">
+      <input type="text" id="share-url-input" readonly value="">
+      <button class="share-copy-btn" onclick="copyShareLink()">Copy</button>
+    </div>
+    <div class="share-socials">
+      <a id="share-wa" href="#" target="_blank" class="soc-btn soc-wa">📱 WhatsApp</a>
+      <a id="share-tg" href="#" target="_blank" class="soc-btn soc-tg">✈️ Telegram</a>
+    </div>
+  </div>
+</div>
+
+<script>
+const JOB_ID   = '59E1372D';
+const LEAD_IDX = 1;
+const API      = (window.location.protocol.startsWith('http') ? window.location.origin : 'http://localhost:5050');
+let _pendingDeleteIdx = null;
+
+window.addEventListener('scroll', () => {
+  const b = document.getElementById('back-to-top-btn');
+  if (b) {
+    if (window.scrollY > 280) b.classList.add('visible');
+    else b.classList.remove('visible');
+  }
+});
+
+function openShareModal() {
+  const url = window.location.href;
+  document.getElementById('share-url-input').value = url;
+  const encodedUrl = encodeURIComponent(url);
+  const text = encodeURIComponent('LeadsOSINT Report: david.miller@gmail.com');
+  document.getElementById('share-wa').href = 'https://api.whatsapp.com/send?text=' + text + '%20' + encodedUrl;
+  document.getElementById('share-tg').href = 'https://t.me/share/url?url=' + encodedUrl + '&text=' + text;
+  document.getElementById('share-modal').classList.add('open');
+}
+function closeShareModal() {
+  document.getElementById('share-modal').classList.remove('open');
+}
+function copyShareLink() {
+  const input = document.getElementById('share-url-input');
+  copySingle(input.value, 'Share Link');
+}
+
+function copySingle(val, label) {
+  navigator.clipboard.writeText(val).then(() => {
+    showToast(label + ' copied to clipboard!', 'ok');
+  }).catch(() => {
+    const ta = document.createElement('textarea');
+    ta.value = val;
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    showToast(label + ' copied!', 'ok');
+  });
+}
+
+function copyList(arr, label) {
+  if (!arr || !arr.length) return;
+  const text = arr.join('\\n');
+  navigator.clipboard.writeText(text).then(() => {
+    showToast(arr.length + ' ' + label + ' copied to clipboard!', 'ok');
+  }).catch(() => {
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    showToast(arr.length + ' ' + label + ' copied!', 'ok');
+  });
+}
+
+function copyBgReport(idx) {
+  const el = document.getElementById('bg-report-' + idx);
+  if (el) {
+    copySingle(el.innerText || el.textContent, 'Free Background Report');
+  }
+}
+
+function openModal(src){
+  const m = document.getElementById('modal');
+  const img = document.getElementById('modal-img');
+  const loader = document.getElementById('modal-loading');
+  const dl = document.getElementById('modal-dl-btn');
+  
+  if (dl) dl.href = src;
+  loader.textContent = '⏳ Loading authentic screenshot...';
+  loader.style.display = 'block';
+  img.style.display = 'none';
+  m.classList.add('open');
+  document.body.style.overflow = 'hidden';
+  
+  img.onload = () => {
+    loader.style.display = 'none';
+    img.style.display = 'block';
+  };
+  img.onerror = () => {
+    loader.textContent = '⚠️ Screenshot could not be loaded.';
+  };
+  img.src = src;
+}
+
+function closeModal(){
+  const m = document.getElementById('modal');
+  if (m) m.classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape'){
+    closeModal();
+    closeConfirm();
+  }
+});
+
+function showToast(msg, type='ok'){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast ' + type + ' show';
+  setTimeout(()=>t.classList.remove('show'), 3500);
+}
+
+function confirmDelete(idx){
+  _pendingDeleteIdx = idx;
+  document.getElementById('confirm-overlay').classList.add('open');
+}
+function closeConfirm(){
+  document.getElementById('confirm-overlay').classList.remove('open');
+  _pendingDeleteIdx = null;
+}
+async function doDelete(){
+  const idx = _pendingDeleteIdx;
+  closeConfirm();
+  if (idx === null || !JOB_ID) return;
+  await deleteResult(idx);
+}
+async function deleteResult(idx){
+  if (!JOB_ID) { showToast('No job ID — open via dashboard', 'err'); return; }
+  const card = document.getElementById('rcard-' + idx);
+  if (card) card.classList.add('removing');
+  try {
+    const r = await fetch(`${API}/api/jobs/${JOB_ID}/leads/${LEAD_IDX}/results/${idx}/delete`,
+                          {method:'POST'});
+    const d = await r.json();
+    if (r.ok) {
+      setTimeout(()=>{ if(card) card.remove(); updateCount(-1); }, 250);
+      showToast('Result deleted permanently', 'ok');
+    } else {
+      if (card) card.classList.remove('removing');
+      showToast(d.error || 'Delete failed', 'err');
+    }
+  } catch(e) {
+    if (card) card.classList.remove('removing');
+    showToast('Network error: ' + (e.message || e), 'err');
+  }
+}
+async function archiveResult(idx){
+  if (!JOB_ID) { showToast('No job ID — open via dashboard', 'err'); return; }
+  const card = document.getElementById('rcard-' + idx);
+  if (card) {
+    card.style.transition = '0.25s all';
+    card.style.opacity = '0.3';
+    card.style.transform = 'scale(0.98)';
+  }
+  showToast('Updating status...', 'ok');
+  try {
+    const r = await fetch(`${API}/api/jobs/${JOB_ID}/leads/${LEAD_IDX}/results/${idx}/archive`,
+                          {method:'POST'});
+    const d = await r.json();
+    if (r.ok) {
+      showToast('Marked as Not This Person', 'ok');
+      setTimeout(()=>{
+        const u = new URL(window.location.href);
+        u.searchParams.set('_t', Date.now());
+        window.location.replace(u.href);
+      }, 300);
+    } else {
+      if (card) { card.style.opacity = '1'; card.style.transform = 'none'; }
+      showToast(d.error || 'Archive failed', 'err');
+    }
+  } catch(e) {
+    if (card) { card.style.opacity = '1'; card.style.transform = 'none'; }
+    showToast('Network error: ' + (e.message || e), 'err');
+  }
+}
+async function unarchiveResult(idx){
+  if (!JOB_ID) return;
+  const card = document.getElementById('rcard-' + idx);
+  if (card) {
+    card.style.transition = '0.25s all';
+    card.style.opacity = '0.3';
+  }
+  showToast('Restoring result...', 'ok');
+  try {
+    const r = await fetch(`${API}/api/jobs/${JOB_ID}/leads/${LEAD_IDX}/results/${idx}/unarchive`,
+                          {method:'POST'});
+    const d = await r.json();
+    if (r.ok) {
+      showToast('Result restored', 'ok');
+      setTimeout(()=>{
+        const u = new URL(window.location.href);
+        u.searchParams.set('_t', Date.now());
+        window.location.replace(u.href);
+      }, 300);
+    } else {
+      if (card) { card.style.opacity = '1'; card.style.transform = 'none'; }
+      showToast(d.error || 'Restore failed', 'err');
+    }
+  } catch(e) {
+    if (card) { card.style.opacity = '1'; card.style.transform = 'none'; }
+    showToast('Network error: ' + (e.message || e), 'err');
+  }
+}
+function setAllCards(expanded) {
+  document.querySelectorAll('details.rcard:not(.archived-card)').forEach(d => d.open = expanded);
+}
+function setDefaultPref(pref) {
+  localStorage.setItem('leadsosint_default_view', pref);
+  showToast('Default view saved: ' + (pref === 'expanded' ? 'Expanded' : 'Collapsed'), 'ok');
+  setAllCards(pref === 'expanded');
+}
+(function() {
+  const pref = localStorage.getItem('leadsosint_default_view') || 'collapsed';
+  if (pref === 'expanded') {
+    const el = document.getElementById('pref-expanded');
+    if (el) el.checked = true;
+    setAllCards(true);
+  } else {
+    const el = document.getElementById('pref-collapsed');
+    if (el) el.checked = true;
+    setAllCards(false);
+  }
+})();
+function updateCount(delta){
+  const el = document.getElementById('active-count');
+  if (el) el.textContent = Math.max(0, parseInt(el.textContent||'0') + delta);
+}
+async function redoReportLead(jobId, idx){
+  if (!confirm('Re-run search for this lead now?')) return;
+  try {
+    const r = await fetch(`${API}/api/jobs/${jobId}/leads/${idx}/retry`, {method:'POST'});
+    if (r.ok) {
+      showToast('Re-starting search...', 'ok');
+      setTimeout(()=>location.reload(), 2000);
+    } else {
+      const d = await r.json().catch(()=>({}));
+      showToast(d.error || 'Retry error', 'err');
+    }
+  } catch(e) {
+    showToast('Network error: ' + (e.message || e), 'err');
+  }
+}
+window.addEventListener('scroll', () => {
+  const b = document.getElementById('btt-btn');
+  if (b) b.style.display = (window.scrollY > 200) ? 'inline-flex' : 'none';
+});
+</script>
+<button id="btt-btn" style="position:fixed;bottom:24px;right:24px;z-index:999;background:rgba(30,41,59,.92);border:1px solid var(--ac);color:#fff;padding:9px 16px;border-radius:30px;font-size:.8rem;font-weight:700;display:none;align-items:center;gap:6px;cursor:pointer;box-shadow:0 8px 24px rgba(0,0,0,.6);backdrop-filter:blur(8px);transition:.2s" onclick="window.scrollTo({top:0,behavior:'smooth'})" title="Back to top">↑ Back to Top</button>
+</body></html>

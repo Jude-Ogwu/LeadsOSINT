@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>LeadsOSINT Results</title>
+<style>
+:root{--bg:#0d0f1a;--surface:#1a1d3a;--surface2:#22264a;--border:#3a3f7a;--accent:#a78bfa;--accent2:#6d28d9;--text:#e0e6ff;--muted:#8b95c4}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:"Segoe UI",system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+
+/* Hero */
+.hero{background:linear-gradient(135deg,#1a1d3a 0%,#0d0f1a 100%);border-bottom:1px solid var(--border);padding:50px 50px 40px}
+.hero-top{display:flex;align-items:center;gap:20px;margin-bottom:30px}
+.logo{font-size:2.5rem}
+.hero h1{font-size:2.4rem;font-weight:800;background:linear-gradient(135deg,var(--accent),#60a5fa);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.hero p{color:var(--muted);font-size:.9rem;margin-top:6px}
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:16px;max-width:800px}
+.stat{background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:14px;padding:20px 24px;text-align:center;transition:.2s}
+.stat:hover{border-color:var(--accent)}
+.sv{font-size:2.2rem;font-weight:800;color:var(--accent)}
+.sl{font-size:.75rem;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-top:6px}
+
+/* Grid */
+.grid{padding:40px 50px;display:grid;grid-template-columns:repeat(auto-fill,minmax(400px,1fr));gap:16px}
+.lead-card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:20px 24px;display:flex;align-items:center;gap:18px;text-decoration:none;color:inherit;transition:.25s all;cursor:pointer}
+.lead-card:hover{transform:translateY(-4px);box-shadow:0 16px 50px rgba(109,40,217,.25);background:var(--surface2)}
+.card-found{border-left:4px solid var(--accent)}
+.card-none{border-left:4px solid var(--border);opacity:.65}
+.lc-icon{font-size:1.8rem;flex-shrink:0}
+.lc-info{flex:1;min-width:0}
+.lc-name{font-size:1.05rem;font-weight:700;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lc-loc{font-size:.8rem;color:var(--muted);margin-top:5px}
+.lc-count{text-align:center;flex-shrink:0}
+.lc-num{font-size:2rem;font-weight:800;color:var(--accent)}
+.lc-lbl{font-size:.7rem;color:var(--muted);text-transform:uppercase;letter-spacing:.5px}
+
+.footer{text-align:center;padding:40px;color:var(--muted);font-size:.85rem;border-top:1px solid var(--border)}
+</style>
+</head>
+<body>
+<div class="hero">
+    <div class="hero-top">
+        <div class="logo">🔍</div>
+        <div>
+            <h1>LeadsOSINT Results</h1>
+            <p>Job ID: E8DDFF6B &nbsp;·&nbsp; September 29, 2026 · 08:35 PM</p>
+        </div>
+    </div>
+    <div class="stats-grid">
+        <div class="stat"><div class="sv">3</div><div class="sl">Total Leads</div></div>
+        <div class="stat"><div class="sv">3</div><div class="sl">Leads Found</div></div>
+        <div class="stat"><div class="sv">0</div><div class="sl">Not Found</div></div>
+        <div class="stat"><div class="sv">30</div><div class="sl">Total Results</div></div>
+    </div>
+</div>
+<div class="grid">
+        <a href="John_Smith_TX/report.html" class="lead-card card-found">
+            <div class="lc-icon">✅</div>
+            <div class="lc-info">
+                <div class="lc-name">John Smith</div>
+                <div class="lc-loc">TX</div>
+            </div>
+            <div class="lc-count">
+                <div class="lc-num">10</div>
+                <div class="lc-lbl">results</div>
+            </div>
+        </a>
+        <a href="Jane_Doe_New_York_NY/report.html" class="lead-card card-found">
+            <div class="lc-icon">✅</div>
+            <div class="lc-info">
+                <div class="lc-name">Jane Doe</div>
+                <div class="lc-loc">New York NY</div>
+            </div>
+            <div class="lc-count">
+                <div class="lc-num">10</div>
+                <div class="lc-lbl">results</div>
+            </div>
+        </a>
+        <a href="Michael_Johnson/report.html" class="lead-card card-found">
+            <div class="lc-icon">✅</div>
+            <div class="lc-info">
+                <div class="lc-name">Michael Johnson</div>
+                <div class="lc-loc">No location specified</div>
+            </div>
+            <div class="lc-count">
+                <div class="lc-num">10</div>
+                <div class="lc-lbl">results</div>
+            </div>
+        </a></div>
+<div class="footer">LeadsOSINT · FastPeopleSearch via Bright Data Web Unlocker</div>
+</body>
+</html>

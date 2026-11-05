@@ -91,7 +91,7 @@ SCRAPER_PROVIDER = "brightdata"
 # -- Bright Data Credentials --------------------
 BD_API_KEY = os.environ.get("BD_API_KEY", "88c5b773-fbd9-4602-abcc-3772d16891cb").strip()
 BD_ZONE    = "web_unlocker1"
-OUT_DIR    = os.environ.get("OUT_DIR", r"C:\Users\JUDE\OSINT_Reports" if sys.platform == 'win32' else os.path.join(os.path.dirname(__file__), 'data'))
+OUT_DIR    = os.environ.get("OUT_DIR", os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data'))
 os.makedirs(OUT_DIR, exist_ok=True)
 JOBS_FILE  = os.path.join(OUT_DIR, "jobs_registry.json")
 PORT       = int(os.environ.get("PORT", 5050))

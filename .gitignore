@@ -4,12 +4,16 @@ __pycache__/
 *.log
 .env
 output/
-*.db
 *.sqlite3
 *.sqlite
+venv/
+.venv/
 fsp_real_app.css
 scratch_*.py
 test_bd_output.html
 test_phoenix_output.html
 test_ss.png
 test_styled_ss.py
+# Allow data folder (jobs + DB for beta sharing)
+!data/
+!data/**

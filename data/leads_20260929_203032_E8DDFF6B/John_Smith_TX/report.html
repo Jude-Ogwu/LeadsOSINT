@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>John Smith — LeadsOSINT</title>
+<style>
+:root{--bg:#0d0f1a;--surface:#1a1d3a;--surface2:#22264a;--border:#3a3f7a;--accent:#a78bfa;--accent2:#6d28d9;--text:#e0e6ff;--muted:#8b95c4;--green:#34d399;--red:#f87171}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:"Segoe UI",system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+a{color:var(--accent);text-decoration:none}
+
+/* Header */
+.top-bar{background:linear-gradient(135deg,#1a1d3a,#0d0f1a);border-bottom:1px solid var(--border);padding:20px 40px;display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.back-btn{background:var(--surface2);border:1px solid var(--border);color:var(--accent);padding:10px 20px;border-radius:10px;display:inline-flex;align-items:center;gap:8px;transition:.2s;font-size:.9rem}
+.back-btn:hover{border-color:var(--accent);background:var(--accent2);color:#fff}
+.top-title{flex:1}
+.top-title h1{font-size:1.6rem;color:#fff;font-weight:700}
+.top-title p{color:var(--muted);font-size:.85rem;margin-top:4px}
+
+/* Stats */
+.stats-row{display:flex;gap:16px;padding:24px 40px;flex-wrap:wrap;background:var(--surface);border-bottom:1px solid var(--border)}
+.stat-pill{background:var(--bg);border:1px solid var(--border);border-radius:12px;padding:14px 24px;text-align:center;min-width:110px}
+.stat-pill.highlight{border-color:var(--accent);background:rgba(167,139,250,.08)}
+.sp-val{font-size:1.6rem;font-weight:800;color:var(--accent)}
+.sp-lbl{font-size:.75rem;color:var(--muted);margin-top:3px;text-transform:uppercase;letter-spacing:.5px}
+
+/* Content */
+.content{padding:32px 40px;max-width:1400px;margin:0 auto}
+
+/* Result cards */
+.rcard{background:var(--surface);border:1px solid var(--border);border-radius:18px;margin-bottom:28px;overflow:hidden;transition:.25s all}
+.rcard:hover{border-color:var(--accent);transform:translateY(-3px);box-shadow:0 12px 40px rgba(109,40,217,.2)}
+.rcard-header{background:linear-gradient(135deg,var(--surface2),var(--surface));padding:16px 28px;display:flex;align-items:center;gap:16px;border-bottom:1px solid var(--border);flex-wrap:wrap}
+.rnum{background:linear-gradient(135deg,var(--accent2),var(--accent));color:#fff;font-size:.8rem;font-weight:700;padding:5px 14px;border-radius:20px;letter-spacing:.5px}
+.rname{font-size:1.2rem;font-weight:700;color:#fff;flex:1}
+.profile-btn{background:linear-gradient(135deg,#4c3d8f,var(--accent2));color:#fff;padding:10px 22px;border-radius:10px;font-size:.875rem;font-weight:600;transition:.2s;white-space:nowrap}
+.profile-btn:hover{background:linear-gradient(135deg,var(--accent2),var(--accent));transform:translateY(-1px);box-shadow:0 6px 20px rgba(109,40,217,.4);color:#fff}
+.rcard-body{display:flex;gap:32px;padding:28px;flex-wrap:wrap}
+.rinfo{flex:1;min-width:280px}
+.field-row{margin-bottom:16px;display:flex;gap:12px;align-items:flex-start}
+.fl{color:var(--muted);font-size:.75rem;text-transform:uppercase;letter-spacing:.5px;min-width:100px;padding-top:3px}
+.fv{color:var(--text);font-size:1rem;font-weight:500}
+.fname{font-size:1.15rem;font-weight:700;color:#fff}
+.addrs{display:flex;flex-direction:column;gap:6px}
+.addr-item{color:#c4caf0;font-size:.9rem;padding:5px 10px;background:rgba(255,255,255,.04);border-radius:8px;border:1px solid var(--border)}
+.url-link{color:#60a5fa;font-size:.85rem;word-break:break-all;text-decoration:underline}
+.url-link:hover{color:var(--accent)}
+
+/* Screenshot */
+.ss-wrap{flex:0 0 340px;display:flex;flex-direction:column;align-items:center}
+.ss-thumb{width:100%;border-radius:12px;border:2px solid var(--border);cursor:pointer;transition:.2s;display:block}
+.ss-thumb:hover{border-color:var(--accent);transform:scale(1.02);box-shadow:0 8px 30px rgba(167,139,250,.3)}
+.ss-label{color:var(--muted);font-size:.8rem;margin-top:10px;text-align:center}
+.ss-btn{margin-top:12px;background:var(--surface2);border:1px solid var(--border);color:var(--accent);padding:10px 20px;border-radius:10px;cursor:pointer;font-size:.85rem;transition:.2s;width:100%;text-align:center}
+.ss-btn:hover{border-color:var(--accent);background:rgba(167,139,250,.1)}
+
+.empty-state{background:var(--surface);border:2px dashed var(--border);border-radius:18px;padding:60px;text-align:center;color:var(--muted);font-size:1.1rem}
+
+/* Modal */
+.modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.95);z-index:9999;justify-content:center;align-items:center;padding:20px;cursor:zoom-out}
+.modal.open{display:flex}
+.modal-img{max-width:95vw;max-height:90vh;border-radius:14px;border:2px solid var(--accent);box-shadow:0 0 60px rgba(167,139,250,.3);cursor:default}
+.modal-x{position:fixed;top:20px;right:30px;color:var(--accent);font-size:2.5rem;cursor:pointer;z-index:10000;line-height:1;transition:.2s}
+.modal-x:hover{color:#fff;transform:scale(1.1)}
+</style>
+</head>
+<body>
+<div class="top-bar">
+    <a href="../index.html" class="back-btn">← All Leads</a>
+    <div class="top-title">
+        <h1>🔍 John Smith</h1>
+        <p>Location: TX &nbsp;·&nbsp; September 29, 2026 · 08:32 PM</p>
+    </div>
+</div>
+
+<div class="stats-row">
+    <div class="stat-pill highlight">
+        <div class="sp-val">10</div>
+        <div class="sp-lbl">Results Found</div>
+    </div>
+    <div class="stat-pill">
+        <div class="sp-val" style="color:var(--green)">
+            ✓ Found</div>
+        <div class="sp-lbl">Status</div>
+    </div>
+    <div class="stat-pill">
+        <div class="sp-val" style="font-size:1rem">TX</div>
+        <div class="sp-lbl">Location</div>
+    </div>
+</div>
+
+<div class="content">
+
+        <div class="rcard" id="result-1">
+            <div class="rcard-header">
+                <span class="rnum">#1</span>
+                <span class="rname">Johnnie Smith</span>
+                <a href="https://www.fastpeoplesearch.com/johnnie-smith_id_G8492928187410826719" target="_blank" class="profile-btn">🔗 View Profile</a>
+            </div>
+            <div class="rcard-body">
+                <div class="rinfo">
+                    <div class="field-row"><span class="fl">Full Name</span><span class="fv fname">Johnnie Smith</span></div>
+                    <div class="field-row"><span class="fl">Age</span><span class="fv">N/A</span></div>
+                    <div class="field-row"><span class="fl">City / State</span><span class="fv">N/A</span></div>
+                    <div class="field-row"><span class="fl">Address(es)</span>
+                        <div class="addrs"><div class="addr-item">📍 105 E Country Club Blvd, ELK CITY OK 73644</div><div class="addr-item">📍 928 E Spurgeon St, FORT WORTH TX 76115</div></div></div>
+                    <div class="field-row"><span class="fl">Phone</span><span class="fv">N/A</span></div>
+                    <div class="field-row"><span class="fl">Profile URL</span>
+                        <a href="https://www.fastpeoplesearch.com/johnnie-smith_id_G8492928187410826719" target="_blank" class="url-link">https://www.fastpeoplesearch.com/johnnie-smith_id_G8492928187410826719</a></div>
+                </div>
+                <div class="ss-wrap">
+                <img src="result_1.png" class="ss-thumb" onclick="openModal('result_1.png')" title="Click to view full screenshot">
+                <div class="ss-label">📸 Click to view full screenshot</div>
+            </div>
+            </div>
+        </div>
+        <div class="rcard" id="result-2">
+            <div class="rcard-header">
+                <span class="rnum">#2</span>
+                <span class="rname">Jonathon Smith</span>
+                <a href="https://www.fastpeoplesearch.com/jonathon-smith_id_G6948258124540141502" target="_blank" class="profile-btn">🔗 View Profile</a>
+            </div>
+            <div class="rcard-body">
+                <div class="rinfo">
+                    <div class="field-row"><span class="fl">Full Name</span><span class="fv fname">Jonathon Smith</span></div>
+                    <div class="field-row"><span class="fl">Age</span><span class="fv">N/A</span></div>
+                    <div class="field-row"><span class="fl">City / State</span><span class="fv">N/A</span></div>
+                    <div class="field-row"><span class="fl">Address(es)</span>
+                        <div class="addrs"><div class="addr-item">📍 177 Cynthia Dr, BASTROP TX 78602</div><div class="addr-item">📍 1071 E Centerville Rd Unit 2212, GARLAND TX 75041</div><div class="addr-item">📍 173 Lba Dr, BASTROP TX 78602</div><div class="addr-item">📍 166 Deadwood Rd, CEDAR CREEK TX 78612</div></div></div>
+                    <div class="field-row"><span class="fl">Phone</span><span class="fv">N/A</span></div>
+                    <div class="field-row"><span class="fl">Profile URL</span>
+                        <a href="https://www.fastpeoplesearch.com/jonathon-smith_id_G6948258124540141502" target="_blank" class="url-link">https://www.fastpeoplesearch.com/jonathon-smith_id_G6948258124540141502</a></div>
+                </div>
+                <div class="ss-wrap">
+                <img src="result_2.png" class="ss-thumb" onclick="openModal('result_2.png')" title="Click to view full screenshot">
+                <div class="ss-label">📸 Click to view full screenshot</div>
+            </div>
+            </div>
+        </div>
+        <div class="rcard" id="result-3">
+            <div class="rcard-header">
+                <span class="rnum">#3</span>
+                <span class="rname">Jamie Smith</span>
+                <a href="https://www.fastpeoplesearch.com/jamie-smith_id_G-6133958293969572193" target="_blank" class="profile-btn">🔗 View Profile</a>
+            </div>
+            <div class="rcard-body">
+                <div class="rinfo">
+                    <div class="field-row"><span class="fl">Full Name</span><span class="fv fname">Jamie Smith</span></div>
+                    <div class="field-row"><span class="fl">Age</span><span class="fv">N/A</span></div>
+                    <div class="field-row"><span class="fl">City / State</span><span class="fv">N/A</span></div>
+                    <div class="field-row"><span class="fl">Address(es)</span>
+                        <div class="addrs"><div class="addr-item">📍 10710 Buffalo Bend Dr, HOUSTON TX 77064</div><div class="addr-item">📍 11418 Galbreath Dr, HOUSTON TX 77066</div><div class="addr-item">📍 19131 Sears Dr, HUMBLE TX 77338</div><div class="addr-item">📍 1100 Langwick Dr Unit 1802, HOUSTON TX 77060</div></div></div>
+                    <div class="field-row"><span class="fl">Phone</span><span class="fv">N/A</span></div>
+                    <div class="field-row"><span class="fl">Profile URL</span>
+                        <a href="https://www.fastpeoplesearch.com/jamie-smith_id_G-6133958293969572193" target="_blank" class="url-link">https://www.fastpeoplesearch.com/jamie-smith_id_G-6133958293969572193</a></div>
+                </div>
+                <div class="ss-wrap">
+                <img src="result_3.png" class="ss-thumb" onclick="openModal('result_3.png')" title="Click to view full screenshot">
+                <div class="ss-label">📸 Click to view full screenshot</div>
+            </div>
+            </div>
+        </div>
+        <div class="rcard" id="result-4">
+            <div class="rcard-header">
+                <span class="rnum">#4</span>
+                <span class="rname">John Homeowner</span>
+                <a href="https://www.fastpeoplesearch.com/john-homeowner_id_G1816830716717649985" target="_blank" class="profile-btn">🔗 View Profile</a>
+            </div>
+            <div class="rcard-body">
+                <div class="rinfo">
+                    <div class="field-row"><span class="fl">Full Name</span><span class="fv fname">John Homeowner</span></div>
+                    <div class="field-row"><span class="fl">Age</span><span class="fv">N/A</span></div>
+                    <div class="field-row"><span class="fl">City / State</span><span class="fv">N/A</span></div>
+                    <div class="field-row"><span class="fl">Address(es)</span>
+                        <div class="addrs"><div class="addr-item">📍 3900 Wisconsin Ave Nw, WASHINGTON DC 20016</div><div class="addr-item">📍 4420 E Douglas Ave, GILBERT AZ 85234</div><div class="addr-item">📍 2505 S Essex, MESA AZ 85209</div><div class="addr-item">📍 75 13Th St Ne, WASHINGTON DC 20002</div></div></div>
+                    <div class="field-row"><span class="fl">Phone</span><span class="fv">N/A</span></div>
+                    <div class="field-row"><span class="fl">Profile URL</span>
+                        <a href="https://www.fastpeoplesearch.com/john-homeowner_id_G1816830716717649985" target="_blank" class="url-link">https://www.fastpeoplesearch.com/john-homeowner_id_G1816830716717649985</a></div>
+                </div>
+                <div class="ss-wrap">
+                <img src="result_4.png" class="ss-thumb" onclick="openModal('result_4.png')" title="Click to view full screenshot">
+                <div class="ss-label">📸 Click to view full screenshot</div>
+            </div>
+            </div>
+        </div>
+        <div class="rcard" id="result-5">
+            <div class="rcard-header">
+                <span class="rnum">#5</span>
+                <span class="rname">Johnny Bledsoe</span>
+                <a href="https://www.fastpeoplesearch.com/johnny-bledsoe_id_G177328144366989125" target="_blank" class="profile-btn">🔗 View Profile</a>
+            </div>
+            <div class="rcard-body">
+                <div class="rinfo">
+                    <div class="field-row"><span class="fl">Full Name</span><span class="fv fname">Johnny Bledsoe</span></div>
+                    <div class="field-row"><span class="fl">Age</span><span class="fv">N/A</span></div>
+                    <div class="field-row"><span class="fl">City / State</span><span class="fv">N/A</span></div>
+                    <div class="field-row"><span class="fl">Address(es)</span>
+                        <div class="addrs"><div class="addr-item">📍 2375 Chauvin Dr Unit C, LEXINGTON KY 40517</div><div class="addr-item">📍 650 Nw Irving St, PORTLAND OR 97209</div><div class="addr-item">📍 612 N Upper St, LEXINGTON KY 40508</div><div class="addr-item">📍 1512 Las Vegas Blvd N, LAS VEGAS NV 89101</div></div></div>
+                    <div class="field-row"><span class="fl">Phone</span><span class="fv">N/A</span></div>
+                    <div class="field-row"><span class="fl">Profile URL</span>
+                        <a href="https://www.fastpeoplesearch.com/johnny-bledsoe_id_G177328144366989125" target="_blank" class="url-link">https://www.fastpeoplesearch.com/johnny-bledsoe_id_G177328144366989125</a></div>
+                </div>
+                <div class="ss-wrap">
+                <img src="result_5.png" class="ss-thumb" onclick="openModal('result_5.png')" title="Click to view full screenshot">
+                <div class="ss-label">📸 Click to view full screenshot</div>
+            </div>
+            </div>
+        </div>
+        <div class="rcard" id="result-6">
+            <div class="rcard-header">
+                <span class="rnum">#6</span>
+                <span class="rname">Flavio Stroher</span>
+                <a href="https://www.fastpeoplesearch.com/flavio-stroher_id_G6554676802853469192" target="_blank" class="profile-btn">🔗 View Profile</a>
+            </div>
+            <div class="rcard-body">
+                <div class="rinfo">
+                    <div class="field-row"><span class="fl">Full Name</span><span class="fv fname">Flavio Stroher</span></div>
+                    <div class="field-row"><span class="fl">Age</span><span class="fv">N/A</span></div>
+                    <div class="field-row"><span class="fl">City / State</span><span class="fv">N/A</span></div>
+                    <div class="field-row"><span class="fl">Address(es)</span>
+                        <div class="addrs"><div class="addr-item">📍 4021 Phillip Ln, HUDSON NC 28638</div><div class="addr-item">📍 122 Sunset St Nw Unit A2, LENOIR NC 28645</div><div class="addr-item">📍 3205 Allerton Cir Unit M, GREENSBORO NC 27409</div><div class="addr-item">📍 412 Cannon St, ROCKWELL NC 28138</div></div></div>
+                    <div class="field-row"><span class="fl">Phone</span><span class="fv">N/A</span></div>
+                    <div class="field-row"><span class="fl">Profile URL</span>
+                        <a href="https://www.fastpeoplesearch.com/flavio-stroher_id_G6554676802853469192" target="_blank" class="url-link">https://www.fastpeoplesearch.com/flavio-stroher_id_G6554676802853469192</a></div>
+                </div>
+                <div class="ss-wrap">
+                <img src="result_6.png" class="ss-thumb" onclick="openModal('result_6.png')" title="Click to view full screenshot">
+                <div class="ss-label">📸 Click to view full screenshot</div>
+            </div>
+            </div>
+        </div>
+        <div class="rcard" id="result-7">
+            <div class="rcard-header">
+                <span class="rnum">#7</span>
+                <span class="rname">Juan Patino</span>
+                <a href="https://www.fastpeoplesearch.com/juan-patino_id_G-5393435059355670189" target="_blank" class="profile-btn">🔗 View Profile</a>
+            </div>
+            <div class="rcard-body">
+                <div class="rinfo">
+                    <div class="field-row"><span class="fl">Full Name</span><span class="fv fname">Juan Patino</span></div>
+                    <div class="field-row"><span class="fl">Age</span><span class="fv">N/A</span></div>
+                    <div class="field-row"><span class="fl">City / State</span><span class="fv">N/A</span></div>
+                    <div class="field-row"><span class="fl">Address(es)</span>
+                        <div class="addrs"><div class="addr-item">📍 5600 Chimney Rock Rd Unit 227, HOUSTON TX 77081</div><div class="addr-item">📍 5600 Chimney Rock Rd Unit 560, HOUSTON TX 77081</div><div class="addr-item">📍 5600 Chimney Rock Rd Unit 364, HOUSTON TX 77081</div></div></div>
+                    <div class="field-row"><span class="fl">Phone</span><span class="fv">N/A</span></div>
+                    <div class="field-row"><span class="fl">Profile URL</span>
+                        <a href="https://www.fastpeoplesearch.com/juan-patino_id_G-5393435059355670189" target="_blank" class="url-link">https://www.fastpeoplesearch.com/juan-patino_id_G-5393435059355670189</a></div>
+                </div>
+                <div class="ss-wrap">
+                <img src="result_7.png" class="ss-thumb" onclick="openModal('result_7.png')" title="Click to view full screenshot">
+                <div class="ss-label">📸 Click to view full screenshot</div>
+            </div>
+            </div>
+        </div>
+        <div class="rcard" id="result-8">
+            <div class="rcard-header">
+                <span class="rnum">#8</span>
+                <span class="rname">Juan Beas</span>
+                <a href="https://www.fastpeoplesearch.com/juan-beas_id_G-9132365107530137015" target="_blank" class="profile-btn">🔗 View Profile</a>
+            </div>
+            <div class="rcard-body">
+                <div class="rinfo">
+                    <div class="field-row"><span class="fl">Full Name</span><span class="fv fname">Juan Beas</span></div>
+                    <div class="field-row"><span class="fl">Age</span><span class="fv">N/A</span></div>
+                    <div class="field-row"><span class="fl">City / State</span><span class="fv">N/A</span></div>
+                    <div class="field-row"><span class="fl">Address(es)</span>
+                        <div class="addrs"><div class="addr-item">📍 3700 Seminole Way, MERCEDES TX 78570</div><div class="addr-item">📍 3658 Seminole Way, MERCEDES TX 78570</div><div class="addr-item">📍 Po Box 192, FAIRMOUNT ND 58030</div></div></div>
+                    <div class="field-row"><span class="fl">Phone</span><span class="fv">N/A</span></div>
+                    <div class="field-row"><span class="fl">Profile URL</span>
+                        <a href="https://www.fastpeoplesearch.com/juan-beas_id_G-9132365107530137015" target="_blank" class="url-link">https://www.fastpeoplesearch.com/juan-beas_id_G-9132365107530137015</a></div>
+                </div>
+                <div class="ss-wrap">
+                <img src="result_8.png" class="ss-thumb" onclick="openModal('result_8.png')" title="Click to view full screenshot">
+                <div class="ss-label">📸 Click to view full screenshot</div>
+            </div>
+            </div>
+        </div>
+        <div class="rcard" id="result-9">
+            <div class="rcard-header">
+                <span class="rnum">#9</span>
+                <span class="rname">Terrance Jones</span>
+                <a href="https://www.fastpeoplesearch.com/terrance-jones_id_G8615026969215852331" target="_blank" class="profile-btn">🔗 View Profile</a>
+            </div>
+            <div class="rcard-body">
+                <div class="rinfo">
+                    <div class="field-row"><span class="fl">Full Name</span><span class="fv fname">Terrance Jones</span></div>
+                    <div class="field-row"><span class="fl">Age</span><span class="fv">N/A</span></div>
+                    <div class="field-row"><span class="fl">City / State</span><span class="fv">N/A</span></div>
+                    <div class="field-row"><span class="fl">Address(es)</span>
+                        <div class="addrs"><div class="addr-item">📍 3039 S Bronson Ave, LOS ANGELES CA 90018</div><div class="addr-item">📍 7336 Santa Monica Blvd, WEST HOLLYWOOD CA 90046</div><div class="addr-item">📍 Po Box 563, COLUMBIA LA 71418</div><div class="addr-item">📍 731 E Tujunga Ave, BURBANK CA 91501</div></div></div>
+                    <div class="field-row"><span class="fl">Phone</span><span class="fv">N/A</span></div>
+                    <div class="field-row"><span class="fl">Profile URL</span>
+                        <a href="https://www.fastpeoplesearch.com/terrance-jones_id_G8615026969215852331" target="_blank" class="url-link">https://www.fastpeoplesearch.com/terrance-jones_id_G8615026969215852331</a></div>
+                </div>
+                <div class="ss-wrap">
+                <img src="result_9.png" class="ss-thumb" onclick="openModal('result_9.png')" title="Click to view full screenshot">
+                <div class="ss-label">📸 Click to view full screenshot</div>
+            </div>
+            </div>
+        </div>
+        <div class="rcard" id="result-10">
+            <div class="rcard-header">
+                <span class="rnum">#10</span>
+                <span class="rname">Matthew Ford</span>
+                <a href="https://www.fastpeoplesearch.com/matthew-ford_id_G56801726235850014" target="_blank" class="profile-btn">🔗 View Profile</a>
+            </div>
+            <div class="rcard-body">
+                <div class="rinfo">
+                    <div class="field-row"><span class="fl">Full Name</span><span class="fv fname">Matthew Ford</span></div>
+                    <div class="field-row"><span class="fl">Age</span><span class="fv">N/A</span></div>
+                    <div class="field-row"><span class="fl">City / State</span><span class="fv">N/A</span></div>
+                    <div class="field-row"><span class="fl">Address(es)</span>
+                        <div class="addrs"><div class="addr-item">📍 1982 N Main St, SEARCY AR 72143</div><div class="addr-item">📍 126 Capitol St, COTTER AR 72626</div><div class="addr-item">📍 975 Coley Dr, MOUNTAIN HOME AR 72653</div><div class="addr-item">📍 49 Tafel Ln, MIDWAY AR 72651</div></div></div>
+                    <div class="field-row"><span class="fl">Phone</span><span class="fv">N/A</span></div>
+                    <div class="field-row"><span class="fl">Profile URL</span>
+                        <a href="https://www.fastpeoplesearch.com/matthew-ford_id_G56801726235850014" target="_blank" class="url-link">https://www.fastpeoplesearch.com/matthew-ford_id_G56801726235850014</a></div>
+                </div>
+                <div class="ss-wrap">
+                <img src="result_10.png" class="ss-thumb" onclick="openModal('result_10.png')" title="Click to view full screenshot">
+                <div class="ss-label">📸 Click to view full screenshot</div>
+            </div>
+            </div>
+        </div>
+</div>
+
+<div class="modal" id="modal" onclick="closeModal(event)">
+    <span class="modal-x" onclick="document.getElementById('modal').classList.remove('open')">✕</span>
+    <img id="modal-img" src="" class="modal-img" onclick="event.stopPropagation()">
+</div>
+
+<script>
+function openModal(src){
+    document.getElementById('modal-img').src = src;
+    document.getElementById('modal').classList.add('open');
+}
+function closeModal(e){
+    if(e.target===document.getElementById('modal'))
+        document.getElementById('modal').classList.remove('open');
+}
+document.addEventListener('keydown', e => {
+    if(e.key==='Escape') document.getElementById('modal').classList.remove('open');
+});
+</script>
+</body>
+</html>

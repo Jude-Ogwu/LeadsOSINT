@@ -1,0 +1,764 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>David Anderson — LeadsOSINT</title>
+<style>
+:root{--bg:#0d0f1a;--s:#1a1d3a;--s2:#22264a;--bd:#3a3f7a;--ac:#a78bfa;--ac2:#6d28d9;
+      --tx:#e0e6ff;--mt:#8b95c4;--gn:#34d399;--rd:#f87171;--bl:#60a5fa;--yw:#fbbf24}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:"Segoe UI",system-ui,sans-serif;background:var(--bg);color:var(--tx);min-height:100vh}
+.topbar{background:linear-gradient(135deg,#1a1d3a,#0d0f1a);border-bottom:1px solid var(--bd);
+         padding:18px 40px;display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.back{background:var(--s2);border:1px solid var(--bd);color:var(--ac);padding:9px 18px;
+       border-radius:9px;font-size:.85rem;text-decoration:none;transition:.2s}
+.back:hover{border-color:var(--ac);background:var(--ac2);color:#fff}
+.ttl h1{font-size:1.5rem;color:#fff;font-weight:700}
+.ttl p{color:var(--mt);font-size:.8rem;margin-top:3px}
+.social-top-btn{background:linear-gradient(135deg,#2563eb,#60a5fa);color:#fff;padding:8px 16px;border-radius:9px;font-size:.82rem;font-weight:700;text-decoration:none;transition:.2s;box-shadow:0 4px 14px rgba(37,99,235,.3)}
+.social-top-btn:hover{transform:translateY(-1px);color:#fff;box-shadow:0 6px 20px rgba(96,165,250,.4)}
+.stats{display:flex;gap:14px;padding:20px 40px;background:var(--s);border-bottom:1px solid var(--bd);flex-wrap:wrap}
+.sp{background:var(--bg);border:1px solid var(--bd);border-radius:10px;
+     padding:12px 20px;text-align:center}
+.sp.hi{border-color:var(--ac);background:rgba(167,139,250,.07)}
+.sv{font-size:1.4rem;font-weight:800;color:var(--ac)}
+.sl{font-size:.7rem;color:var(--mt);text-transform:uppercase;letter-spacing:.5px;margin-top:2px}
+.content{padding:28px 40px;max-width:1400px;margin:0 auto}
+.rcard{background:var(--s);border:1px solid var(--bd);border-radius:16px;
+        margin-bottom:24px;overflow:hidden;transition:.4s all}
+.rcard:hover{border-color:var(--ac);transform:translateY(-2px);
+              box-shadow:0 10px 36px rgba(109,40,217,.2)}
+.rcard.removing{opacity:0;transform:translateY(-12px) scale(.97);pointer-events:none}
+.archived-card{opacity:.55;border-style:dashed;filter:grayscale(.3)}
+.rcard-hdr{background:linear-gradient(135deg,var(--s2),var(--s));padding:16px 24px;
+            display:flex;align-items:center;gap:14px;border-bottom:1px solid var(--bd);flex-wrap:wrap;cursor:pointer;list-style:none}
+.rcard-hdr::-webkit-details-marker{display:none}
+.rnum{background:linear-gradient(135deg,var(--ac2),var(--ac));color:#fff;
+       font-size:.78rem;font-weight:700;padding:4px 12px;border-radius:16px;flex-shrink:0}
+.rname{font-size:1.15rem;font-weight:700;color:#fff;flex:1}
+.badge-group{display:flex;gap:6px;align-items:center}
+.badge-tag{background:rgba(167,139,250,.15);border:1px solid rgba(167,139,250,.3);color:var(--ac);font-size:.75rem;padding:3px 8px;border-radius:6px;font-weight:600}
+.expand-indicator{color:var(--ac);font-size:.8rem;font-weight:700;margin-left:8px}
+.arch-tag{background:rgba(251,191,36,.15);border:1px solid rgba(251,191,36,.3);
+           color:var(--yw);font-size:.72rem;padding:3px 10px;border-radius:10px;flex-shrink:0}
+.profile-btn{background:linear-gradient(135deg,#4c3d8f,var(--ac2));color:#fff;
+              padding:8px 16px;border-radius:9px;font-size:.8rem;
+              font-weight:600;text-decoration:none;transition:.2s;flex-shrink:0}
+.profile-btn:hover{background:linear-gradient(135deg,var(--ac2),var(--ac));
+                    transform:translateY(-1px);color:#fff}
+.copy-all-btn{background:linear-gradient(135deg,var(--ac2),var(--ac3));color:#fff;border:none;padding:5px 12px;border-radius:6px;font-size:.75rem;font-weight:600;cursor:pointer;margin-bottom:6px;display:inline-block}
+.copy-all-btn:hover{background:var(--ac2)}
+.copy-item-btn{background:transparent;border:none;color:var(--mt);cursor:pointer;font-size:.8rem;padding:0 4px;margin-left:auto}
+.copy-item-btn:hover{color:var(--ac)}
+.addr-row{color:#c4caf0;font-size:.88rem;padding:6px 12px;
+           background:rgba(255,255,255,.03);border-radius:7px;border:1px solid var(--bd);display:flex;align-items:center;gap:8px}
+.url-link{color:var(--bl);font-size:.82rem;word-break:break-all;text-decoration:underline}
+.url-link:hover{color:var(--ac)}
+.rcard-body{padding:24px 28px;display:flex;gap:24px;align-items:flex-start;flex-wrap:wrap}
+.rinfo{flex:1;min-width:320px;display:flex;flex-direction:column;gap:14px}
+.frow{display:grid;grid-template-columns:140px 1fr;gap:12px;align-items:start;font-size:.92rem}
+.fl{font-weight:700;color:var(--mt);font-size:.85rem;letter-spacing:.3px;padding-top:4px}
+.fv{color:#fff;font-weight:600;line-height:1.5}
+.fname{font-size:1.15rem;color:var(--ac);font-weight:700}
+.ss-wrap{flex:0 0 320px;display:flex;flex-direction:column;align-items:center}
+.ss-thumb{width:100%;border-radius:10px;border:2px solid var(--bd);cursor:pointer;
+           transition:.2s;display:block}
+.ss-thumb:hover{border-color:var(--ac);transform:scale(1.02);
+                 box-shadow:0 6px 24px rgba(167,139,250,.3)}
+.ss-lbl{color:var(--mt);font-size:.78rem;margin-top:8px;text-align:center}
+.ss-missing{color:var(--mt);font-size:.82rem;padding:20px;text-align:center;
+             background:var(--s2);border-radius:10px;border:1px dashed var(--bd)}
+.res-actions{padding:14px 24px;border-top:1px solid var(--bd);
+              display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.res-actions.arch-mode{background:rgba(251,191,36,.04)}
+.res-btn{padding:8px 16px;border-radius:8px;font-size:.8rem;font-weight:600;
+          cursor:pointer;transition:.2s;border:1px solid;background:transparent}
+.arch-btn{border-color:rgba(251,191,36,.5);color:var(--yw);}
+.arch-btn:hover{background:rgba(251,191,36,.1)}
+.del-btn{border-color:rgba(248,113,113,.5);color:var(--rd);}
+.del-btn:hover{background:rgba(248,113,113,.1)}
+.unarch-btn{border-color:rgba(96,165,250,.5);color:var(--bl);}
+.unarch-btn:hover{background:rgba(96,165,250,.1)}
+.arch-label{font-size:.8rem;color:var(--yw);flex:1}
+.arch-section{margin-top:10px;border-radius:14px;border:1px dashed var(--bd);overflow:hidden}
+.arch-section summary{padding:14px 20px;cursor:pointer;color:var(--mt);font-size:.9rem;
+                       font-weight:600;list-style:none;background:var(--s2);
+                       display:flex;align-items:center;gap:8px}
+.arch-section summary:hover{color:var(--tx)}
+.arch-section summary span{font-size:.75rem;font-weight:400;margin-left:auto;color:var(--mt)}
+.arch-inner{padding:16px}
+.empty{background:var(--s);border:2px dashed var(--bd);border-radius:14px;
+        padding:50px;text-align:center;color:var(--mt);font-size:1rem}
+.search-ss-card{background:var(--s);border:1px solid var(--bd);border-radius:16px;margin-bottom:28px;overflow:hidden;box-shadow:0 4px 20px rgba(0,0,0,0.3)}
+.search-ss-hdr{background:linear-gradient(135deg,var(--s2),var(--s));padding:16px 24px;border-bottom:1px solid var(--bd);display:flex;justify-content:space-between;align-items:center}
+.search-ss-title{font-weight:700;color:#fff;font-size:1.05rem}
+.search-ss-sub{font-size:.78rem;color:var(--mt);margin-top:2px}
+.search-ss-body{position:relative;cursor:pointer;max-height:380px;overflow:hidden;background:#0d0f1a}
+.search-ss-img{width:100%;display:block;opacity:.88;transition:.3s all}
+.search-ss-body:hover .search-ss-img{opacity:1;transform:scale(1.005)}
+.search-ss-overlay{position:absolute;bottom:16px;left:50%;transform:translateX(-50%);background:rgba(13,15,26,.88);border:1px solid var(--ac);color:var(--ac);padding:8px 20px;border-radius:20px;font-size:.8rem;font-weight:700;backdrop-filter:blur(6px);pointer-events:none;box-shadow:0 4px 14px rgba(109,40,217,.3)}
+.toast{position:fixed;bottom:24px;right:24px;background:var(--s);
+        border:1px solid var(--bd);border-radius:12px;padding:12px 20px;
+        font-size:.85rem;z-index:999;transform:translateY(60px);opacity:0;
+        transition:.3s;max-width:280px}
+.toast.show{transform:translateY(0);opacity:1}
+.toast.ok{border-color:rgba(52,211,153,.4);color:var(--gn)}
+.toast.err{border-color:rgba(248,113,113,.4);color:var(--rd)}
+.modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.96);z-index:9999;
+        justify-content:center;align-items:center;padding:20px}
+.modal.open{display:flex}
+.modal-img{max-width:95vw;max-height:90vh;border-radius:12px;border:2px solid var(--ac)}
+.modal-x{position:fixed;top:18px;right:28px;color:var(--ac);font-size:2.2rem;
+          cursor:pointer;z-index:10000;transition:.2s}
+.modal-x:hover{color:#fff;transform:scale(1.1)}
+.confirm-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.8);
+                  z-index:8888;justify-content:center;align-items:center}
+.confirm-overlay.open{display:flex}
+.confirm-box{background:var(--s);border:1px solid var(--rd);border-radius:18px;
+              padding:32px 36px;max-width:380px;text-align:center}
+.confirm-box h3{color:#fff;margin-bottom:10px;font-size:1.1rem}
+.confirm-box p{color:var(--mt);font-size:.88rem;margin-bottom:24px;line-height:1.6}
+.confirm-btns{display:flex;gap:12px;justify-content:center}
+.cb-cancel{padding:10px 24px;border-radius:9px;border:1px solid var(--bd);
+            background:var(--s2);color:var(--tx);cursor:pointer;font-size:.9rem}
+.cb-delete{padding:10px 24px;border-radius:9px;border:none;
+            background:linear-gradient(135deg,#b91c1c,var(--rd));color:#fff;
+            cursor:pointer;font-size:.9rem;font-weight:700}
+.collapse-toolbar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:18px;flex-wrap:wrap;background:var(--s);padding:12px 20px;border-radius:12px;border:1px solid var(--bd)}
+.tool-btn{background:var(--s2);border:1px solid var(--bd);color:var(--ac);padding:7px 15px;border-radius:8px;font-size:.82rem;font-weight:700;cursor:pointer;transition:.2s}
+.tool-btn:hover{background:var(--ac2);color:#fff;border-color:var(--ac)}
+.view-pref{display:flex;align-items:center;gap:12px;font-size:.82rem;color:var(--mt)}
+.view-pref label{display:inline-flex;align-items:center;gap:6px;cursor:pointer;color:var(--tx);font-weight:600}
+.view-pref input[type="radio"]{accent-color:var(--ac);cursor:pointer}
+</style></head><body>
+<div class="topbar">
+  <a href="/results/179A87BE" class="back" onclick="if(window.location.protocol==='file:'){this.href='../index.html'}">← Back to Job</a>
+  <div class="ttl"><h1>🔍 David Anderson</h1>
+    <p>Location: Phoenix AZ · October 10, 2026 · 07:40 AM</p></div>
+  <div style="display:flex;gap:8px;margin-left:auto;flex-wrap:wrap">
+    <button class="social-top-btn" style="background:linear-gradient(135deg,#6d28d9,#a78bfa);color:#fff;cursor:pointer;border:none" onclick="redoReportLead('179A87BE', 0)" title="Re-run search for this lead">🔄 Re-do Search</button>
+    
+    
+    
+  </div>
+</div>
+<div class="stats">
+  <div class="sp hi"><div class="sv" id="active-count">10</div><div class="sl">Active Results</div></div>
+  <div class="sp"><div class="sv" style="color:var(--gn)">
+    ✓ Found</div><div class="sl">Status</div></div>
+  <div class="sp"><div class="sv" style="font-size:.9rem">Phoenix AZ</div>
+    <div class="sl">Location</div></div>
+  <div class="sp"><div class="sv" style="font-size:.85rem"><span style="color:var(--mt)">N/A</span></div>
+    <div class="sl">Social Link</div></div>
+  <div class="sp"><div class="sv" style="font-size:.85rem"><span style="color:var(--mt)">N/A</span></div>
+    <div class="sl">Input Email</div></div>
+  <div class="sp"><div class="sv" style="font-size:.85rem"><span style="color:var(--mt)">N/A</span></div>
+    <div class="sl">Input Phone</div></div>
+</div>
+<div class="content">
+
+<div class="search-ss-card">
+  <div class="search-ss-hdr">
+    <div>
+      <div class="search-ss-title">🌐 FastPeopleSearch — Full Search Page Overview</div>
+      <div class="search-ss-sub">Live search results overview for "David Anderson" (Phoenix AZ)</div>
+    </div>
+  </div>
+  <div class="search-ss-body" onclick="openModal('David_Anderson_Phoenix_AZ_search_page.png')">
+    <img src="David_Anderson_Phoenix_AZ_search_page.png" class="search-ss-img" title="Click to view full search page screenshot">
+    <div class="search-ss-overlay">🔍 Click to View Full Search Page Screenshot</div>
+  </div>
+</div>
+<div class="collapse-toolbar">
+  <div style="display:flex;align-items:center;gap:10px">
+    <button class="tool-btn" onclick="setAllCards(false)">▸ Collapse All</button>
+    <button class="tool-btn" onclick="setAllCards(true)">▾ Expand All</button>
+  </div>
+  <div class="view-pref">
+    <span>Default View:</span>
+    <label><input type="radio" name="default_view_pref" value="collapsed" id="pref-collapsed" onchange="setDefaultPref('collapsed')"> Collapsed</label>
+    <label><input type="radio" name="default_view_pref" value="expanded" id="pref-expanded" onchange="setDefaultPref('expanded')"> Expanded</label>
+  </div>
+</div>
+
+<details class="rcard " id="rcard-0">
+  <summary class="rcard-hdr">
+    <span class="rnum">#1</span>
+    <span class="rname">David Anderson · Age 52 · Celina, TX</span>
+    <span class="badge-group">
+      <span class="badge-tag">📞 8</span>
+      <span class="badge-tag">✉️ 10</span>
+    </span>
+    
+    <a href="https://www.fastpeoplesearch.com/david-anderson_id_G-5469014303083812125" target="_blank" class="profile-btn" onclick="event.stopPropagation()">🔗 View Profile</a>
+    <span class="expand-indicator">▼ Expand</span>
+  </summary>
+  <div class="rcard-body">
+    <div class="rinfo">
+      <div class="frow"><span class="fl">Full Name:</span><span class="fv fname">David Anderson</span></div>
+      <div class="frow"><span class="fl">Age:</span><span class="fv">52</span></div>
+      <div class="frow"><span class="fl">City / State:</span><span class="fv">Celina, TX</span></div>
+      <div class="frow"><span class="fl">Phone(s):</span><div class="addrs"><button class="copy-all-btn" onclick="copyList([&quot;(918) 805-4385&quot;, &quot;(805) 748-5432&quot;, &quot;(469) 535-3407&quot;, &quot;(972) 985-6183&quot;, &quot;(571) 214-2198&quot;, &quot;(605) 427-8099&quot;, &quot;(312) 944-4218&quot;, &quot;(469) 813-2097&quot;], 'Phones'); event.stopPropagation();">📋 Copy All Phones (8)</button><div class="addr-row">📞 <span>(918) 805-4385</span> <button class="copy-item-btn" onclick="copySingle('(918) 805-4385', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(805) 748-5432</span> <button class="copy-item-btn" onclick="copySingle('(805) 748-5432', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(469) 535-3407</span> <button class="copy-item-btn" onclick="copySingle('(469) 535-3407', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(972) 985-6183</span> <button class="copy-item-btn" onclick="copySingle('(972) 985-6183', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(571) 214-2198</span> <button class="copy-item-btn" onclick="copySingle('(571) 214-2198', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(605) 427-8099</span> <button class="copy-item-btn" onclick="copySingle('(605) 427-8099', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(312) 944-4218</span> <button class="copy-item-btn" onclick="copySingle('(312) 944-4218', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(469) 813-2097</span> <button class="copy-item-btn" onclick="copySingle('(469) 813-2097', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div></div></div>
+      <div class="frow"><span class="fl">Email(s):</span><div class="addrs"><button class="copy-all-btn" onclick="copyList([&quot;dsu33@yahoo.com&quot;, &quot;dsu33@hotmail.com&quot;, &quot;dsu33@tampabay.rr.com&quot;, &quot;dsu33@snet.net&quot;, &quot;dsu1@yahoo.com&quot;, &quot;dsu@tampabay.rr.com&quot;, &quot;dsu33@ameritech.net&quot;, &quot;dsu33@aol.com&quot;, &quot;dsu33@excite.com&quot;, &quot;dsu@snet.net&quot;], 'Emails'); event.stopPropagation();">📋 Copy All Emails (10)</button><div class="addr-row">✉️ <span>dsu33@yahoo.com</span> <button class="copy-item-btn" onclick="copySingle('dsu33@yahoo.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>dsu33@hotmail.com</span> <button class="copy-item-btn" onclick="copySingle('dsu33@hotmail.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>dsu33@tampabay.rr.com</span> <button class="copy-item-btn" onclick="copySingle('dsu33@tampabay.rr.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>dsu33@snet.net</span> <button class="copy-item-btn" onclick="copySingle('dsu33@snet.net', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>dsu1@yahoo.com</span> <button class="copy-item-btn" onclick="copySingle('dsu1@yahoo.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>dsu@tampabay.rr.com</span> <button class="copy-item-btn" onclick="copySingle('dsu@tampabay.rr.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>dsu33@ameritech.net</span> <button class="copy-item-btn" onclick="copySingle('dsu33@ameritech.net', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>dsu33@aol.com</span> <button class="copy-item-btn" onclick="copySingle('dsu33@aol.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>dsu33@excite.com</span> <button class="copy-item-btn" onclick="copySingle('dsu33@excite.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>dsu@snet.net</span> <button class="copy-item-btn" onclick="copySingle('dsu@snet.net', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div></div></div>
+      <div class="frow"><span class="fl">Address(es):</span><div class="addrs"><div class="addr-row">📍 2728 Evergreen Trl · Celina, TX</div><div class="addr-row">📍 15221C Berry Trl Unit 303C · Dallas, TX</div><div class="addr-row">📍 5405 Baton Rouge Blvd · Frisco, TX</div><div class="addr-row">📍 10633 E 450 Rd · Claremore, OK</div><div class="addr-row">📍 1904 Cornerstone Ln Unit A · Claremore, OK</div><div class="addr-row">📍 110 N Jefferson Ave · Madison, SD</div><div class="addr-row">📍 15510 Quorum Dr Unit 2609 · Addison, TX</div><div class="addr-row">📍 703 Ne 3Rd St · Madison, SD</div><div class="addr-row">📍 15221 Berry Trl Unit 303 · Dallas, TX</div><div class="addr-row">📍 3700 Trilogy Dr · Plano, TX</div></div></div>
+      <div class="frow"><span class="fl">Relatives:</span><span class="fv">Molly Anderson, Anna Franceschelli, Daniel Anderson, David Anderson, Erin Liston</span></div>
+      <div class="frow"><span class="fl">AKA / Aliases:</span><span class="fv">David G Anderson, Dave Anderson, Michael Anderson, D Anderson</span></div>
+      <div class="frow"><span class="fl">Profile URL:</span>
+        <a href="https://www.fastpeoplesearch.com/david-anderson_id_G-5469014303083812125" target="_blank" class="url-link">https://www.fastpeoplesearch.com/david-anderson_id_G-5469014303083812125</a></div>
+    </div>
+    <div class="ss-wrap">
+                <img src="David_Anderson_Phoenix_AZ_result_1.png" class="ss-thumb"
+                     onclick="openModal('David_Anderson_Phoenix_AZ_result_1.png')"
+                     title="Click to view profile detail screenshot">
+                <div class="ss-lbl">📸 Profile Detail Screenshot — click to zoom</div>
+            </div>
+  </div>
+  
+  <div class="res-actions">
+    <button class="res-btn arch-btn" onclick="archiveResult(0)">🗃 Not This Person</button>
+    <button class="res-btn del-btn"  onclick="confirmDelete(0)">🗑 Delete Result</button>
+  </div>
+</details>
+<details class="rcard " id="rcard-1">
+  <summary class="rcard-hdr">
+    <span class="rnum">#2</span>
+    <span class="rname">David Anderson · Age 76 · Brandon, FL</span>
+    <span class="badge-group">
+      <span class="badge-tag">📞 12</span>
+      <span class="badge-tag">✉️ 6</span>
+    </span>
+    
+    <a href="https://www.fastpeoplesearch.com/david-anderson_id_G5961113806835149487" target="_blank" class="profile-btn" onclick="event.stopPropagation()">🔗 View Profile</a>
+    <span class="expand-indicator">▼ Expand</span>
+  </summary>
+  <div class="rcard-body">
+    <div class="rinfo">
+      <div class="frow"><span class="fl">Full Name:</span><span class="fv fname">David Anderson</span></div>
+      <div class="frow"><span class="fl">Age:</span><span class="fv">76</span></div>
+      <div class="frow"><span class="fl">City / State:</span><span class="fv">Brandon, FL</span></div>
+      <div class="frow"><span class="fl">Phone(s):</span><div class="addrs"><button class="copy-all-btn" onclick="copyList([&quot;(318) 771-2977&quot;, &quot;(813) 830-8290&quot;, &quot;(813) 831-9846&quot;, &quot;(813) 643-9148&quot;, &quot;(318) 459-6703&quot;, &quot;(229) 244-2510&quot;, &quot;(703) 860-5531&quot;, &quot;(978) 302-0894&quot;, &quot;(786) 208-7994&quot;, &quot;(813) 689-0371&quot;, &quot;(813) 643-0000&quot;, &quot;(229) 244-4264&quot;], 'Phones'); event.stopPropagation();">📋 Copy All Phones (12)</button><div class="addr-row">📞 <span>(318) 771-2977</span> <button class="copy-item-btn" onclick="copySingle('(318) 771-2977', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(813) 830-8290</span> <button class="copy-item-btn" onclick="copySingle('(813) 830-8290', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(813) 831-9846</span> <button class="copy-item-btn" onclick="copySingle('(813) 831-9846', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(813) 643-9148</span> <button class="copy-item-btn" onclick="copySingle('(813) 643-9148', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(318) 459-6703</span> <button class="copy-item-btn" onclick="copySingle('(318) 459-6703', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(229) 244-2510</span> <button class="copy-item-btn" onclick="copySingle('(229) 244-2510', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(703) 860-5531</span> <button class="copy-item-btn" onclick="copySingle('(703) 860-5531', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(978) 302-0894</span> <button class="copy-item-btn" onclick="copySingle('(978) 302-0894', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(786) 208-7994</span> <button class="copy-item-btn" onclick="copySingle('(786) 208-7994', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(813) 689-0371</span> <button class="copy-item-btn" onclick="copySingle('(813) 689-0371', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(813) 643-0000</span> <button class="copy-item-btn" onclick="copySingle('(813) 643-0000', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(229) 244-4264</span> <button class="copy-item-btn" onclick="copySingle('(229) 244-4264', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div></div></div>
+      <div class="frow"><span class="fl">Email(s):</span><div class="addrs"><button class="copy-all-btn" onclick="copyList([&quot;david_andersonjr@yahoo.com&quot;, &quot;davida1966@aol.com&quot;, &quot;dave_kay_3060@msn.com&quot;, &quot;kinamarie69@msn.com&quot;, &quot;jackphay@yahoo.com&quot;, &quot;mlande0410@aol.com&quot;], 'Emails'); event.stopPropagation();">📋 Copy All Emails (6)</button><div class="addr-row">✉️ <span>david_andersonjr@yahoo.com</span> <button class="copy-item-btn" onclick="copySingle('david_andersonjr@yahoo.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>davida1966@aol.com</span> <button class="copy-item-btn" onclick="copySingle('davida1966@aol.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>dave_kay_3060@msn.com</span> <button class="copy-item-btn" onclick="copySingle('dave_kay_3060@msn.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>kinamarie69@msn.com</span> <button class="copy-item-btn" onclick="copySingle('kinamarie69@msn.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>jackphay@yahoo.com</span> <button class="copy-item-btn" onclick="copySingle('jackphay@yahoo.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>mlande0410@aol.com</span> <button class="copy-item-btn" onclick="copySingle('mlande0410@aol.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div></div></div>
+      <div class="frow"><span class="fl">Address(es):</span><div class="addrs"><div class="addr-row">📍 2018 Highview Fall Pl · Brandon, FL</div><div class="addr-row">📍 4800 S West Shore Blvd Unit 1016 · Tampa, FL</div><div class="addr-row">📍 2876 Somerset Park Dr Unit 101 · Tampa, FL</div><div class="addr-row">📍 6720 S Florida Ave Unit 4211 · Lakeland, FL</div><div class="addr-row">📍 4850 Heron Pointe Dr Unit 403 · Tampa, FL</div><div class="addr-row">📍 4433 W Bay Villa Ave · Tampa, FL</div><div class="addr-row">📍 3412 Grand Bayou Dr · Bossier City, LA</div><div class="addr-row">📍 6083 Psc 2 · Apo, AE</div><div class="addr-row">📍 3814 Sage Meadows Dr · Valdosta, GA</div><div class="addr-row">📍 4439 W Bay Villa Ave · Tampa, FL</div></div></div>
+      <div class="frow"><span class="fl">Relatives:</span><span class="fv">Anderson Ok, Alinda Anderson, Anthony Anderson, Danielle Jimenez, David Adeerson</span></div>
+      <div class="frow"><span class="fl">AKA / Aliases:</span><span class="fv">David R 2 Anderson, David R Anderson Jr, David Anderson Jr, David Ronald Anderson</span></div>
+      <div class="frow"><span class="fl">Profile URL:</span>
+        <a href="https://www.fastpeoplesearch.com/david-anderson_id_G5961113806835149487" target="_blank" class="url-link">https://www.fastpeoplesearch.com/david-anderson_id_G5961113806835149487</a></div>
+    </div>
+    <div class="ss-wrap">
+                <img src="David_Anderson_Phoenix_AZ_result_2.png" class="ss-thumb"
+                     onclick="openModal('David_Anderson_Phoenix_AZ_result_2.png')"
+                     title="Click to view profile detail screenshot">
+                <div class="ss-lbl">📸 Profile Detail Screenshot — click to zoom</div>
+            </div>
+  </div>
+  
+  <div class="res-actions">
+    <button class="res-btn arch-btn" onclick="archiveResult(1)">🗃 Not This Person</button>
+    <button class="res-btn del-btn"  onclick="confirmDelete(1)">🗑 Delete Result</button>
+  </div>
+</details>
+<details class="rcard " id="rcard-2">
+  <summary class="rcard-hdr">
+    <span class="rnum">#3</span>
+    <span class="rname">David Anderson · Age 60 · Raymore, MO</span>
+    <span class="badge-group">
+      <span class="badge-tag">📞 12</span>
+      <span class="badge-tag">✉️ 9</span>
+    </span>
+    
+    <a href="https://www.fastpeoplesearch.com/david-anderson_id_G7761490354501491038" target="_blank" class="profile-btn" onclick="event.stopPropagation()">🔗 View Profile</a>
+    <span class="expand-indicator">▼ Expand</span>
+  </summary>
+  <div class="rcard-body">
+    <div class="rinfo">
+      <div class="frow"><span class="fl">Full Name:</span><span class="fv fname">David Anderson</span></div>
+      <div class="frow"><span class="fl">Age:</span><span class="fv">60</span></div>
+      <div class="frow"><span class="fl">City / State:</span><span class="fv">Raymore, MO</span></div>
+      <div class="frow"><span class="fl">Phone(s):</span><div class="addrs"><button class="copy-all-btn" onclick="copyList([&quot;(913) 787-1437&quot;, &quot;(480) 318-9722&quot;, &quot;(641) 648-5274&quot;, &quot;(760) 367-9119&quot;, &quot;(816) 507-3788&quot;, &quot;(361) 883-9553&quot;, &quot;(641) 640-1029&quot;, &quot;(760) 830-6659&quot;, &quot;(816) 331-1244&quot;, &quot;(816) 265-0673&quot;, &quot;(816) 265-6506&quot;, &quot;(816) 522-6159&quot;], 'Phones'); event.stopPropagation();">📋 Copy All Phones (12)</button><div class="addr-row">📞 <span>(913) 787-1437</span> <button class="copy-item-btn" onclick="copySingle('(913) 787-1437', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(480) 318-9722</span> <button class="copy-item-btn" onclick="copySingle('(480) 318-9722', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(641) 648-5274</span> <button class="copy-item-btn" onclick="copySingle('(641) 648-5274', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(760) 367-9119</span> <button class="copy-item-btn" onclick="copySingle('(760) 367-9119', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(816) 507-3788</span> <button class="copy-item-btn" onclick="copySingle('(816) 507-3788', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(361) 883-9553</span> <button class="copy-item-btn" onclick="copySingle('(361) 883-9553', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(641) 640-1029</span> <button class="copy-item-btn" onclick="copySingle('(641) 640-1029', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(760) 830-6659</span> <button class="copy-item-btn" onclick="copySingle('(760) 830-6659', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(816) 331-1244</span> <button class="copy-item-btn" onclick="copySingle('(816) 331-1244', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(816) 265-0673</span> <button class="copy-item-btn" onclick="copySingle('(816) 265-0673', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(816) 265-6506</span> <button class="copy-item-btn" onclick="copySingle('(816) 265-6506', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(816) 522-6159</span> <button class="copy-item-btn" onclick="copySingle('(816) 522-6159', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div></div></div>
+      <div class="frow"><span class="fl">Email(s):</span><div class="addrs"><button class="copy-all-btn" onclick="copyList([&quot;davidtunes@gmail.com&quot;, &quot;davidtunes@comcast.net&quot;, &quot;andersonvaca@sbcglobal.net&quot;, &quot;jsthavnfun2day@cs.com&quot;, &quot;andersonvaca@netscape.com&quot;, &quot;jsthavnfun2day@aol.com&quot;, &quot;jsthavnfunday@aol.com&quot;, &quot;usmcband@aol.com&quot;, &quot;davetunes@earthlink.net&quot;], 'Emails'); event.stopPropagation();">📋 Copy All Emails (9)</button><div class="addr-row">✉️ <span>davidtunes@gmail.com</span> <button class="copy-item-btn" onclick="copySingle('davidtunes@gmail.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>davidtunes@comcast.net</span> <button class="copy-item-btn" onclick="copySingle('davidtunes@comcast.net', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>andersonvaca@sbcglobal.net</span> <button class="copy-item-btn" onclick="copySingle('andersonvaca@sbcglobal.net', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>jsthavnfun2day@cs.com</span> <button class="copy-item-btn" onclick="copySingle('jsthavnfun2day@cs.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>andersonvaca@netscape.com</span> <button class="copy-item-btn" onclick="copySingle('andersonvaca@netscape.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>jsthavnfun2day@aol.com</span> <button class="copy-item-btn" onclick="copySingle('jsthavnfun2day@aol.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>jsthavnfunday@aol.com</span> <button class="copy-item-btn" onclick="copySingle('jsthavnfunday@aol.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>usmcband@aol.com</span> <button class="copy-item-btn" onclick="copySingle('usmcband@aol.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>davetunes@earthlink.net</span> <button class="copy-item-btn" onclick="copySingle('davetunes@earthlink.net', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div></div></div>
+      <div class="frow"><span class="fl">Address(es):</span><div class="addrs"><div class="addr-row">📍 610 W Maple St · Raymore, MO</div><div class="addr-row">📍 16713 Bradley Ave · Belton, MO</div><div class="addr-row">📍 4816 E Western Star Blvd · Phoenix, AZ</div><div class="addr-row">📍 1339 E Dava Dr · Tempe, AZ</div><div class="addr-row">📍 1311 W Baseline Rd Unit 2044 · Tempe, AZ</div><div class="addr-row">📍 1201 Logan Ave · Corpus Christi, TX</div><div class="addr-row">📍 400 Jason Ave · Iowa Falls, IA</div><div class="addr-row">📍 7028 Indian Cove Rd · Twentynine Palms, CA</div><div class="addr-row">📍 629 Dale Dr · Iowa Falls, IA</div><div class="addr-row">📍 119 E Calico Dr · Raymore, MO</div></div></div>
+      <div class="frow"><span class="fl">Relatives:</span><span class="fv">Kari Anderson, Abigail Anderson, Andrew Anderson, Christopher Andersen, David Anderson</span></div>
+      <div class="frow"><span class="fl">AKA / Aliases:</span><span class="fv">David W Anderson Jr, David William Anderson, David W Anderson Sr, David Anderson Jr</span></div>
+      <div class="frow"><span class="fl">Profile URL:</span>
+        <a href="https://www.fastpeoplesearch.com/david-anderson_id_G7761490354501491038" target="_blank" class="url-link">https://www.fastpeoplesearch.com/david-anderson_id_G7761490354501491038</a></div>
+    </div>
+    <div class="ss-wrap">
+                <img src="David_Anderson_Phoenix_AZ_result_3.png" class="ss-thumb"
+                     onclick="openModal('David_Anderson_Phoenix_AZ_result_3.png')"
+                     title="Click to view profile detail screenshot">
+                <div class="ss-lbl">📸 Profile Detail Screenshot — click to zoom</div>
+            </div>
+  </div>
+  
+  <div class="res-actions">
+    <button class="res-btn arch-btn" onclick="archiveResult(2)">🗃 Not This Person</button>
+    <button class="res-btn del-btn"  onclick="confirmDelete(2)">🗑 Delete Result</button>
+  </div>
+</details>
+<details class="rcard " id="rcard-3">
+  <summary class="rcard-hdr">
+    <span class="rnum">#4</span>
+    <span class="rname">David Anderson · Age 83 · Corpus Christi, TX</span>
+    <span class="badge-group">
+      <span class="badge-tag">📞 8</span>
+      <span class="badge-tag">✉️ 9</span>
+    </span>
+    
+    <a href="https://www.fastpeoplesearch.com/david-anderson_id_G6134950268777958575" target="_blank" class="profile-btn" onclick="event.stopPropagation()">🔗 View Profile</a>
+    <span class="expand-indicator">▼ Expand</span>
+  </summary>
+  <div class="rcard-body">
+    <div class="rinfo">
+      <div class="frow"><span class="fl">Full Name:</span><span class="fv fname">David Anderson</span></div>
+      <div class="frow"><span class="fl">Age:</span><span class="fv">83</span></div>
+      <div class="frow"><span class="fl">City / State:</span><span class="fv">Corpus Christi, TX</span></div>
+      <div class="frow"><span class="fl">Phone(s):</span><div class="addrs"><button class="copy-all-btn" onclick="copyList([&quot;(361) 883-9553&quot;, &quot;(361) 455-4289&quot;, &quot;(816) 331-1244&quot;, &quot;(641) 648-5274&quot;, &quot;(760) 367-9119&quot;, &quot;(760) 830-6659&quot;, &quot;(512) 883-8959&quot;, &quot;(512) 883-9553&quot;], 'Phones'); event.stopPropagation();">📋 Copy All Phones (8)</button><div class="addr-row">📞 <span>(361) 883-9553</span> <button class="copy-item-btn" onclick="copySingle('(361) 883-9553', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(361) 455-4289</span> <button class="copy-item-btn" onclick="copySingle('(361) 455-4289', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(816) 331-1244</span> <button class="copy-item-btn" onclick="copySingle('(816) 331-1244', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(641) 648-5274</span> <button class="copy-item-btn" onclick="copySingle('(641) 648-5274', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(760) 367-9119</span> <button class="copy-item-btn" onclick="copySingle('(760) 367-9119', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(760) 830-6659</span> <button class="copy-item-btn" onclick="copySingle('(760) 830-6659', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(512) 883-8959</span> <button class="copy-item-btn" onclick="copySingle('(512) 883-8959', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(512) 883-9553</span> <button class="copy-item-btn" onclick="copySingle('(512) 883-9553', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div></div></div>
+      <div class="frow"><span class="fl">Email(s):</span><div class="addrs"><button class="copy-all-btn" onclick="copyList([&quot;sotosigns@aol.com&quot;, &quot;andersonvaca@sbcglobal.net&quot;, &quot;davidtunes@comcast.net&quot;, &quot;davetunes@earthlink.net&quot;, &quot;jsthavnfun2day@aol.com&quot;, &quot;andersonvaca@netscape.com&quot;, &quot;jsthavnfunday@aol.com&quot;, &quot;usmcband@aol.com&quot;, &quot;andersonvaca923@yahoo.com&quot;], 'Emails'); event.stopPropagation();">📋 Copy All Emails (9)</button><div class="addr-row">✉️ <span>sotosigns@aol.com</span> <button class="copy-item-btn" onclick="copySingle('sotosigns@aol.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>andersonvaca@sbcglobal.net</span> <button class="copy-item-btn" onclick="copySingle('andersonvaca@sbcglobal.net', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>davidtunes@comcast.net</span> <button class="copy-item-btn" onclick="copySingle('davidtunes@comcast.net', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>davetunes@earthlink.net</span> <button class="copy-item-btn" onclick="copySingle('davetunes@earthlink.net', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>jsthavnfun2day@aol.com</span> <button class="copy-item-btn" onclick="copySingle('jsthavnfun2day@aol.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>andersonvaca@netscape.com</span> <button class="copy-item-btn" onclick="copySingle('andersonvaca@netscape.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>jsthavnfunday@aol.com</span> <button class="copy-item-btn" onclick="copySingle('jsthavnfunday@aol.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>usmcband@aol.com</span> <button class="copy-item-btn" onclick="copySingle('usmcband@aol.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>andersonvaca923@yahoo.com</span> <button class="copy-item-btn" onclick="copySingle('andersonvaca923@yahoo.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div></div></div>
+      <div class="frow"><span class="fl">Address(es):</span><div class="addrs"><div class="addr-row">📍 1201 Logan Ave · Corpus Christi, TX</div><div class="addr-row">📍 1339 E Dava Dr · Tempe, AZ</div><div class="addr-row">📍 1201 Logan Ave · Corp Christi, TX</div><div class="addr-row">📍 400 Jason Ave · Iowa Falls, IA</div><div class="addr-row">📍 629 Dale Dr · Iowa Falls, IA</div><div class="addr-row">📍 119 E Calico Dr · Raymore, MO</div><div class="addr-row">📍 72337 El Paseo Dr · Twentynine Palms, CA</div><div class="addr-row">📍 7028 Indian Cove Rd · Twentynine Palms, CA</div><div class="addr-row">📍 11112 Norby Rd · Kansas City, MO</div><div class="addr-row">📍 1010 Ridgecrest Ln · Jacksonville, NC</div></div></div>
+      <div class="frow"><span class="fl">Relatives:</span><span class="fv">Victoria Anderson, Abigail Anderson, Andrew Anderson, Christopher Andersen, David Anderson</span></div>
+      <div class="frow"><span class="fl">AKA / Aliases:</span><span class="fv">David W Anderson Sr, David William Anderson, David Anderson Sr, David W Anderson</span></div>
+      <div class="frow"><span class="fl">Profile URL:</span>
+        <a href="https://www.fastpeoplesearch.com/david-anderson_id_G6134950268777958575" target="_blank" class="url-link">https://www.fastpeoplesearch.com/david-anderson_id_G6134950268777958575</a></div>
+    </div>
+    <div class="ss-wrap">
+                <img src="David_Anderson_Phoenix_AZ_result_4.png" class="ss-thumb"
+                     onclick="openModal('David_Anderson_Phoenix_AZ_result_4.png')"
+                     title="Click to view profile detail screenshot">
+                <div class="ss-lbl">📸 Profile Detail Screenshot — click to zoom</div>
+            </div>
+  </div>
+  
+  <div class="res-actions">
+    <button class="res-btn arch-btn" onclick="archiveResult(3)">🗃 Not This Person</button>
+    <button class="res-btn del-btn"  onclick="confirmDelete(3)">🗑 Delete Result</button>
+  </div>
+</details>
+<details class="rcard " id="rcard-4">
+  <summary class="rcard-hdr">
+    <span class="rnum">#5</span>
+    <span class="rname">Donald Patterson · Age 72 · The Colony, TX</span>
+    <span class="badge-group">
+      <span class="badge-tag">📞 6</span>
+      <span class="badge-tag">✉️ 6</span>
+    </span>
+    
+    <a href="https://www.fastpeoplesearch.com/donald-patterson_id_G-4147970163297888664" target="_blank" class="profile-btn" onclick="event.stopPropagation()">🔗 View Profile</a>
+    <span class="expand-indicator">▼ Expand</span>
+  </summary>
+  <div class="rcard-body">
+    <div class="rinfo">
+      <div class="frow"><span class="fl">Full Name:</span><span class="fv fname">Donald Patterson</span></div>
+      <div class="frow"><span class="fl">Age:</span><span class="fv">72</span></div>
+      <div class="frow"><span class="fl">City / State:</span><span class="fv">The Colony, TX</span></div>
+      <div class="frow"><span class="fl">Phone(s):</span><div class="addrs"><button class="copy-all-btn" onclick="copyList([&quot;(626) 524-4307&quot;, &quot;(626) 840-4371&quot;, &quot;(323) 257-6817&quot;, &quot;(626) 403-6817&quot;, &quot;(323) 657-6817&quot;, &quot;(602) 257-9277&quot;], 'Phones'); event.stopPropagation();">📋 Copy All Phones (6)</button><div class="addr-row">📞 <span>(626) 524-4307</span> <button class="copy-item-btn" onclick="copySingle('(626) 524-4307', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(626) 840-4371</span> <button class="copy-item-btn" onclick="copySingle('(626) 840-4371', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(323) 257-6817</span> <button class="copy-item-btn" onclick="copySingle('(323) 257-6817', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(626) 403-6817</span> <button class="copy-item-btn" onclick="copySingle('(626) 403-6817', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(323) 657-6817</span> <button class="copy-item-btn" onclick="copySingle('(323) 657-6817', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(602) 257-9277</span> <button class="copy-item-btn" onclick="copySingle('(602) 257-9277', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div></div></div>
+      <div class="frow"><span class="fl">Email(s):</span><div class="addrs"><button class="copy-all-btn" onclick="copyList([&quot;dugpatt@pacbell.net&quot;, &quot;reda.patterson@gmail.com&quot;, &quot;dugpatt@pacbell.com&quot;, &quot;dugpatt@san.rr.com&quot;, &quot;p.donald@globalmusicalternative.com&quot;, &quot;johnnydixon1980@gmail.com&quot;], 'Emails'); event.stopPropagation();">📋 Copy All Emails (6)</button><div class="addr-row">✉️ <span>dugpatt@pacbell.net</span> <button class="copy-item-btn" onclick="copySingle('dugpatt@pacbell.net', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>reda.patterson@gmail.com</span> <button class="copy-item-btn" onclick="copySingle('reda.patterson@gmail.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>dugpatt@pacbell.com</span> <button class="copy-item-btn" onclick="copySingle('dugpatt@pacbell.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>dugpatt@san.rr.com</span> <button class="copy-item-btn" onclick="copySingle('dugpatt@san.rr.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>p.donald@globalmusicalternative.com</span> <button class="copy-item-btn" onclick="copySingle('p.donald@globalmusicalternative.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>johnnydixon1980@gmail.com</span> <button class="copy-item-btn" onclick="copySingle('johnnydixon1980@gmail.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div></div></div>
+      <div class="frow"><span class="fl">Address(es):</span><div class="addrs"><div class="addr-row">📍 8324 Western · The Colony, TX</div><div class="addr-row">📍 2311 S Ocean Blvd Unit 1221 · Myrtle Beach, SC</div><div class="addr-row">📍 3004 Comal Dr · Little Elm, TX</div><div class="addr-row">📍 3004 Comal Dr · Oak Point, TX</div><div class="addr-row">📍 6080 Water St Unit 1501 · Plano, TX</div><div class="addr-row">📍 8320 Western · The Colony, TX</div><div class="addr-row">📍 1214 E Waco Ave · Dallas, TX</div><div class="addr-row">📍 161 Columbia St · Pasadena, CA</div><div class="addr-row">📍 6357 Rosswood Ter · Los Angeles, CA</div><div class="addr-row">📍 7615 San Benito Dr · Houston, TX</div></div></div>
+      <div class="frow"><span class="fl">Relatives:</span><span class="fv">Barbara Patterson, Beatrice Patterson, Benjamin Patterson, Betty Patterson, Buffy Peterson</span></div>
+      <div class="frow"><span class="fl">AKA / Aliases:</span><span class="fv">Donald R Patterson, Donald R Dugaspatterson, Donald R Pattterson, Dorothy Patterson</span></div>
+      <div class="frow"><span class="fl">Profile URL:</span>
+        <a href="https://www.fastpeoplesearch.com/donald-patterson_id_G-4147970163297888664" target="_blank" class="url-link">https://www.fastpeoplesearch.com/donald-patterson_id_G-4147970163297888664</a></div>
+    </div>
+    <div class="ss-wrap">
+                <img src="David_Anderson_Phoenix_AZ_result_5.png" class="ss-thumb"
+                     onclick="openModal('David_Anderson_Phoenix_AZ_result_5.png')"
+                     title="Click to view profile detail screenshot">
+                <div class="ss-lbl">📸 Profile Detail Screenshot — click to zoom</div>
+            </div>
+  </div>
+  
+  <div class="res-actions">
+    <button class="res-btn arch-btn" onclick="archiveResult(4)">🗃 Not This Person</button>
+    <button class="res-btn del-btn"  onclick="confirmDelete(4)">🗑 Delete Result</button>
+  </div>
+</details>
+<details class="rcard " id="rcard-5">
+  <summary class="rcard-hdr">
+    <span class="rnum">#6</span>
+    <span class="rname">Rick Anderson · Age 61 · Medford, OR</span>
+    <span class="badge-group">
+      <span class="badge-tag">📞 8</span>
+      <span class="badge-tag">✉️ 8</span>
+    </span>
+    
+    <a href="https://www.fastpeoplesearch.com/rick-anderson_id_G-3425447893988956476" target="_blank" class="profile-btn" onclick="event.stopPropagation()">🔗 View Profile</a>
+    <span class="expand-indicator">▼ Expand</span>
+  </summary>
+  <div class="rcard-body">
+    <div class="rinfo">
+      <div class="frow"><span class="fl">Full Name:</span><span class="fv fname">Rick Anderson</span></div>
+      <div class="frow"><span class="fl">Age:</span><span class="fv">61</span></div>
+      <div class="frow"><span class="fl">City / State:</span><span class="fv">Medford, OR</span></div>
+      <div class="frow"><span class="fl">Phone(s):</span><div class="addrs"><button class="copy-all-btn" onclick="copyList([&quot;(503) 629-8070&quot;, &quot;(503) 970-3055&quot;, &quot;(503) 659-8390&quot;, &quot;(675) 765-8767&quot;, &quot;(503) 353-6725&quot;, &quot;(503) 524-6307&quot;, &quot;(541) 738-6702&quot;, &quot;(602) 493-9676&quot;], 'Phones'); event.stopPropagation();">📋 Copy All Phones (8)</button><div class="addr-row">📞 <span>(503) 629-8070</span> <button class="copy-item-btn" onclick="copySingle('(503) 629-8070', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(503) 970-3055</span> <button class="copy-item-btn" onclick="copySingle('(503) 970-3055', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(503) 659-8390</span> <button class="copy-item-btn" onclick="copySingle('(503) 659-8390', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(675) 765-8767</span> <button class="copy-item-btn" onclick="copySingle('(675) 765-8767', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(503) 353-6725</span> <button class="copy-item-btn" onclick="copySingle('(503) 353-6725', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(503) 524-6307</span> <button class="copy-item-btn" onclick="copySingle('(503) 524-6307', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(541) 738-6702</span> <button class="copy-item-btn" onclick="copySingle('(541) 738-6702', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(602) 493-9676</span> <button class="copy-item-btn" onclick="copySingle('(602) 493-9676', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div></div></div>
+      <div class="frow"><span class="fl">Email(s):</span><div class="addrs"><button class="copy-all-btn" onclick="copyList([&quot;rick.david.anderson@gmail.com&quot;, &quot;rlanderson2376@gmail.com&quot;, &quot;sierra_anderson@sbcglobal.net&quot;, &quot;sierra_anderson@yahoo.com&quot;, &quot;sierraanderson@yahoo.com&quot;, &quot;rick.d.anderson@tek.com&quot;, &quot;huangbingjun@hotmail.com&quot;, &quot;richard.anderson@tds.net&quot;], 'Emails'); event.stopPropagation();">📋 Copy All Emails (8)</button><div class="addr-row">✉️ <span>rick.david.anderson@gmail.com</span> <button class="copy-item-btn" onclick="copySingle('rick.david.anderson@gmail.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>rlanderson2376@gmail.com</span> <button class="copy-item-btn" onclick="copySingle('rlanderson2376@gmail.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>sierra_anderson@sbcglobal.net</span> <button class="copy-item-btn" onclick="copySingle('sierra_anderson@sbcglobal.net', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>sierra_anderson@yahoo.com</span> <button class="copy-item-btn" onclick="copySingle('sierra_anderson@yahoo.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>sierraanderson@yahoo.com</span> <button class="copy-item-btn" onclick="copySingle('sierraanderson@yahoo.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>rick.d.anderson@tek.com</span> <button class="copy-item-btn" onclick="copySingle('rick.d.anderson@tek.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>huangbingjun@hotmail.com</span> <button class="copy-item-btn" onclick="copySingle('huangbingjun@hotmail.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>richard.anderson@tds.net</span> <button class="copy-item-btn" onclick="copySingle('richard.anderson@tds.net', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div></div></div>
+      <div class="frow"><span class="fl">Address(es):</span><div class="addrs"><div class="addr-row">📍 5755 Hughes Rd · Medford, OR</div><div class="addr-row">📍 12049 Sw Wilton Ave · Portland, OR</div><div class="addr-row">📍 5761 Hughes Rd · Medford, OR</div><div class="addr-row">📍 17627 Se Crystal Ln · Portland, OR</div><div class="addr-row">📍 57570 Whistler Ln · Bend, OR</div><div class="addr-row">📍 12049 Sw Wilton Ave · Tigard, OR</div><div class="addr-row">📍 17627 Se Crystal Ln · Milwaukie, OR</div><div class="addr-row">📍 8905 Sw Nimbus Ave Unit 255 · Beaverton, OR</div><div class="addr-row">📍 1810 Ne Noble Ave · Corvallis, OR</div><div class="addr-row">📍 10229 N 8Th St Unit B · Phoenix, AZ</div></div></div>
+      <div class="frow"><span class="fl">Relatives:</span><span class="fv">Carol Anderson, David Anderson, Jordan Anderson, Judy Anderson, Judy Anderson</span></div>
+      <div class="frow"><span class="fl">AKA / Aliases:</span><span class="fv">Rick D Anderson, Richard David Anderson, Richard D Anderson, Richard L Anderson</span></div>
+      <div class="frow"><span class="fl">Profile URL:</span>
+        <a href="https://www.fastpeoplesearch.com/rick-anderson_id_G-3425447893988956476" target="_blank" class="url-link">https://www.fastpeoplesearch.com/rick-anderson_id_G-3425447893988956476</a></div>
+    </div>
+    <div class="ss-wrap">
+                <img src="David_Anderson_Phoenix_AZ_result_6.png" class="ss-thumb"
+                     onclick="openModal('David_Anderson_Phoenix_AZ_result_6.png')"
+                     title="Click to view profile detail screenshot">
+                <div class="ss-lbl">📸 Profile Detail Screenshot — click to zoom</div>
+            </div>
+  </div>
+  
+  <div class="res-actions">
+    <button class="res-btn arch-btn" onclick="archiveResult(5)">🗃 Not This Person</button>
+    <button class="res-btn del-btn"  onclick="confirmDelete(5)">🗑 Delete Result</button>
+  </div>
+</details>
+<details class="rcard " id="rcard-6">
+  <summary class="rcard-hdr">
+    <span class="rnum">#7</span>
+    <span class="rname">William Anderson · Age N/A · Mesa, AZ</span>
+    <span class="badge-group">
+      <span class="badge-tag">📞 12</span>
+      <span class="badge-tag">✉️ 8</span>
+    </span>
+    
+    <a href="https://www.fastpeoplesearch.com/william-anderson_id_G-1127222250837120116" target="_blank" class="profile-btn" onclick="event.stopPropagation()">🔗 View Profile</a>
+    <span class="expand-indicator">▼ Expand</span>
+  </summary>
+  <div class="rcard-body">
+    <div class="rinfo">
+      <div class="frow"><span class="fl">Full Name:</span><span class="fv fname">William Anderson</span></div>
+      <div class="frow"><span class="fl">Age:</span><span class="fv">N/A</span></div>
+      <div class="frow"><span class="fl">City / State:</span><span class="fv">Mesa, AZ</span></div>
+      <div class="frow"><span class="fl">Phone(s):</span><div class="addrs"><button class="copy-all-btn" onclick="copyList([&quot;(623) 217-9981&quot;, &quot;(602) 957-3013&quot;, &quot;(831) 920-1823&quot;, &quot;(541) 505-7306&quot;, &quot;(520) 509-1201&quot;, &quot;(602) 778-0461&quot;, &quot;(480) 802-1962&quot;, &quot;(208) 552-9305&quot;, &quot;(208) 524-0767&quot;, &quot;(480) 777-1950&quot;, &quot;(602) 291-8750&quot;, &quot;(215) 260-5495&quot;], 'Phones'); event.stopPropagation();">📋 Copy All Phones (12)</button><div class="addr-row">📞 <span>(623) 217-9981</span> <button class="copy-item-btn" onclick="copySingle('(623) 217-9981', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(602) 957-3013</span> <button class="copy-item-btn" onclick="copySingle('(602) 957-3013', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(831) 920-1823</span> <button class="copy-item-btn" onclick="copySingle('(831) 920-1823', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(541) 505-7306</span> <button class="copy-item-btn" onclick="copySingle('(541) 505-7306', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(520) 509-1201</span> <button class="copy-item-btn" onclick="copySingle('(520) 509-1201', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(602) 778-0461</span> <button class="copy-item-btn" onclick="copySingle('(602) 778-0461', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(480) 802-1962</span> <button class="copy-item-btn" onclick="copySingle('(480) 802-1962', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(208) 552-9305</span> <button class="copy-item-btn" onclick="copySingle('(208) 552-9305', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(208) 524-0767</span> <button class="copy-item-btn" onclick="copySingle('(208) 524-0767', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(480) 777-1950</span> <button class="copy-item-btn" onclick="copySingle('(480) 777-1950', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(602) 291-8750</span> <button class="copy-item-btn" onclick="copySingle('(602) 291-8750', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(215) 260-5495</span> <button class="copy-item-btn" onclick="copySingle('(215) 260-5495', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div></div></div>
+      <div class="frow"><span class="fl">Email(s):</span><div class="addrs"><button class="copy-all-btn" onclick="copyList([&quot;wildason@att.net&quot;, &quot;gamertom@att.net&quot;, &quot;williamanderso1970@sbcglobal.net&quot;, &quot;granpappy.wda@gmail.com&quot;, &quot;rick.eilene.horne@gmail.com&quot;, &quot;sharlyn.stevens@yahoo.com&quot;, &quot;w.horne@aol.com&quot;, &quot;w.horne@gmail.com&quot;], 'Emails'); event.stopPropagation();">📋 Copy All Emails (8)</button><div class="addr-row">✉️ <span>wildason@att.net</span> <button class="copy-item-btn" onclick="copySingle('wildason@att.net', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>gamertom@att.net</span> <button class="copy-item-btn" onclick="copySingle('gamertom@att.net', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>williamanderso1970@sbcglobal.net</span> <button class="copy-item-btn" onclick="copySingle('williamanderso1970@sbcglobal.net', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>granpappy.wda@gmail.com</span> <button class="copy-item-btn" onclick="copySingle('granpappy.wda@gmail.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>rick.eilene.horne@gmail.com</span> <button class="copy-item-btn" onclick="copySingle('rick.eilene.horne@gmail.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>sharlyn.stevens@yahoo.com</span> <button class="copy-item-btn" onclick="copySingle('sharlyn.stevens@yahoo.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>w.horne@aol.com</span> <button class="copy-item-btn" onclick="copySingle('w.horne@aol.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>w.horne@gmail.com</span> <button class="copy-item-btn" onclick="copySingle('w.horne@gmail.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div></div></div>
+      <div class="frow"><span class="fl">Address(es):</span><div class="addrs"><div class="addr-row">📍 11457 E Neville Ave · Mesa, AZ</div><div class="addr-row">📍 133 E Woodhaven Ln · Idaho Falls, ID</div><div class="addr-row">📍 3010 E County Down Dr · Chandler, AZ</div><div class="addr-row">📍 14741 Kit Carson Dr · Marina, CA</div><div class="addr-row">📍 14741 Kit Carson Dr · East Garrison, CA</div><div class="addr-row">📍 1026 Pacific Grove Ln Unit 7 · Pacific Grove, CA</div><div class="addr-row">📍 57 Soledad Dr Unit 107 · Monterey, CA</div><div class="addr-row">📍 456 E Merrill Ave · Gilbert, AZ</div><div class="addr-row">📍 4959 Talbot Ln Unit 268 · Reno, NV</div><div class="addr-row">📍 2215 Sequoia St · Kemah, TX</div></div></div>
+      <div class="frow"><span class="fl">Relatives:</span><span class="fv">Orbelina Anderson, Alexis Schuh, Allison Howard, Brian Anderson, Bruce Anderson</span></div>
+      <div class="frow"><span class="fl">AKA / Aliases:</span><span class="fv">William David Anderson Sr, William David Anderson, William D Anderson, William D Anderson Jr</span></div>
+      <div class="frow"><span class="fl">Profile URL:</span>
+        <a href="https://www.fastpeoplesearch.com/william-anderson_id_G-1127222250837120116" target="_blank" class="url-link">https://www.fastpeoplesearch.com/william-anderson_id_G-1127222250837120116</a></div>
+    </div>
+    <div class="ss-wrap">
+                <img src="David_Anderson_Phoenix_AZ_result_7.png" class="ss-thumb"
+                     onclick="openModal('David_Anderson_Phoenix_AZ_result_7.png')"
+                     title="Click to view profile detail screenshot">
+                <div class="ss-lbl">📸 Profile Detail Screenshot — click to zoom</div>
+            </div>
+  </div>
+  
+  <div class="res-actions">
+    <button class="res-btn arch-btn" onclick="archiveResult(6)">🗃 Not This Person</button>
+    <button class="res-btn del-btn"  onclick="confirmDelete(6)">🗑 Delete Result</button>
+  </div>
+</details>
+<details class="rcard " id="rcard-7">
+  <summary class="rcard-hdr">
+    <span class="rnum">#8</span>
+    <span class="rname">Jon Anderson · Age 91 · Santa Rosa, CA</span>
+    <span class="badge-group">
+      <span class="badge-tag">📞 12</span>
+      <span class="badge-tag">✉️ 10</span>
+    </span>
+    
+    <a href="https://www.fastpeoplesearch.com/jon-anderson_id_G-1373538970073989279" target="_blank" class="profile-btn" onclick="event.stopPropagation()">🔗 View Profile</a>
+    <span class="expand-indicator">▼ Expand</span>
+  </summary>
+  <div class="rcard-body">
+    <div class="rinfo">
+      <div class="frow"><span class="fl">Full Name:</span><span class="fv fname">Jon Anderson</span></div>
+      <div class="frow"><span class="fl">Age:</span><span class="fv">91</span></div>
+      <div class="frow"><span class="fl">City / State:</span><span class="fv">Santa Rosa, CA</span></div>
+      <div class="frow"><span class="fl">Phone(s):</span><div class="addrs"><button class="copy-all-btn" onclick="copyList([&quot;(707) 501-7135&quot;, &quot;(707) 528-0400&quot;, &quot;(760) 773-1115&quot;, &quot;(210) 618-6696&quot;, &quot;(928) 231-0148&quot;, &quot;(210) 342-2031&quot;, &quot;(210) 543-1572&quot;, &quot;(928) 567-3710&quot;, &quot;(707) 258-8291&quot;, &quot;(707) 290-4199&quot;, &quot;(707) 486-0750&quot;, &quot;(707) 544-7904&quot;], 'Phones'); event.stopPropagation();">📋 Copy All Phones (12)</button><div class="addr-row">📞 <span>(707) 501-7135</span> <button class="copy-item-btn" onclick="copySingle('(707) 501-7135', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(707) 528-0400</span> <button class="copy-item-btn" onclick="copySingle('(707) 528-0400', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(760) 773-1115</span> <button class="copy-item-btn" onclick="copySingle('(760) 773-1115', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(210) 618-6696</span> <button class="copy-item-btn" onclick="copySingle('(210) 618-6696', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(928) 231-0148</span> <button class="copy-item-btn" onclick="copySingle('(928) 231-0148', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(210) 342-2031</span> <button class="copy-item-btn" onclick="copySingle('(210) 342-2031', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(210) 543-1572</span> <button class="copy-item-btn" onclick="copySingle('(210) 543-1572', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(928) 567-3710</span> <button class="copy-item-btn" onclick="copySingle('(928) 567-3710', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(707) 258-8291</span> <button class="copy-item-btn" onclick="copySingle('(707) 258-8291', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(707) 290-4199</span> <button class="copy-item-btn" onclick="copySingle('(707) 290-4199', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(707) 486-0750</span> <button class="copy-item-btn" onclick="copySingle('(707) 486-0750', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(707) 544-7904</span> <button class="copy-item-btn" onclick="copySingle('(707) 544-7904', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div></div></div>
+      <div class="frow"><span class="fl">Email(s):</span><div class="addrs"><button class="copy-all-btn" onclick="copyList([&quot;jda33@comcast.net&quot;, &quot;jcahma@comcast.net&quot;, &quot;leadmeetswinter@msn.com&quot;, &quot;janderson2541@yahoo.com&quot;, &quot;leadmeetswinter@cs.com&quot;, &quot;nancy.mcneil@att.net&quot;, &quot;jandersonia@peoplepc.com&quot;, &quot;jandersonia@msn.com&quot;, &quot;8jon.anderson@att.net&quot;, &quot;leadmeetswinter@yahoo.com&quot;], 'Emails'); event.stopPropagation();">📋 Copy All Emails (10)</button><div class="addr-row">✉️ <span>jda33@comcast.net</span> <button class="copy-item-btn" onclick="copySingle('jda33@comcast.net', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>jcahma@comcast.net</span> <button class="copy-item-btn" onclick="copySingle('jcahma@comcast.net', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>leadmeetswinter@msn.com</span> <button class="copy-item-btn" onclick="copySingle('leadmeetswinter@msn.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>janderson2541@yahoo.com</span> <button class="copy-item-btn" onclick="copySingle('janderson2541@yahoo.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>leadmeetswinter@cs.com</span> <button class="copy-item-btn" onclick="copySingle('leadmeetswinter@cs.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>nancy.mcneil@att.net</span> <button class="copy-item-btn" onclick="copySingle('nancy.mcneil@att.net', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>jandersonia@peoplepc.com</span> <button class="copy-item-btn" onclick="copySingle('jandersonia@peoplepc.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>jandersonia@msn.com</span> <button class="copy-item-btn" onclick="copySingle('jandersonia@msn.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>8jon.anderson@att.net</span> <button class="copy-item-btn" onclick="copySingle('8jon.anderson@att.net', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>leadmeetswinter@yahoo.com</span> <button class="copy-item-btn" onclick="copySingle('leadmeetswinter@yahoo.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div></div></div>
+      <div class="frow"><span class="fl">Address(es):</span><div class="addrs"><div class="addr-row">📍 4303 Sonoma Mountain Rd · Santa Rosa, CA</div><div class="addr-row">📍 461 Falling Star Ct · Santa Rosa, CA</div><div class="addr-row">📍 2515 W Madison Ave · Boise, ID</div><div class="addr-row">📍 72350 Rim Dr · Palm Desert, CA</div><div class="addr-row">📍 4306 Elizabeth St · Rockville, MD</div><div class="addr-row">📍 802 E Port Au Prince Ln · Phoenix, AZ</div><div class="addr-row">📍 3675 Bannock · Flagstaff, AZ</div><div class="addr-row">📍 908 N Humphreys St · Flagstaff, AZ</div><div class="addr-row">📍 20 W Pine Ave · Flagstaff, AZ</div><div class="addr-row">📍 4303 Sonoma Hwy · Santa Rosa, CA</div></div></div>
+      <div class="frow"><span class="fl">Relatives:</span><span class="fv">Helen Anderson, Carl Anderson, Carl Anderson, Cherie Avila, Chrissie Keeney</span></div>
+      <div class="frow"><span class="fl">AKA / Aliases:</span><span class="fv">Jon David Anderson, Jon D Anderson, John D Anderson, David D Anderson</span></div>
+      <div class="frow"><span class="fl">Profile URL:</span>
+        <a href="https://www.fastpeoplesearch.com/jon-anderson_id_G-1373538970073989279" target="_blank" class="url-link">https://www.fastpeoplesearch.com/jon-anderson_id_G-1373538970073989279</a></div>
+    </div>
+    <div class="ss-wrap">
+                <img src="David_Anderson_Phoenix_AZ_result_8.png" class="ss-thumb"
+                     onclick="openModal('David_Anderson_Phoenix_AZ_result_8.png')"
+                     title="Click to view profile detail screenshot">
+                <div class="ss-lbl">📸 Profile Detail Screenshot — click to zoom</div>
+            </div>
+  </div>
+  
+  <div class="res-actions">
+    <button class="res-btn arch-btn" onclick="archiveResult(7)">🗃 Not This Person</button>
+    <button class="res-btn del-btn"  onclick="confirmDelete(7)">🗑 Delete Result</button>
+  </div>
+</details>
+<details class="rcard " id="rcard-8">
+  <summary class="rcard-hdr">
+    <span class="rnum">#9</span>
+    <span class="rname">David Collins · Age 60 · Apopka, FL</span>
+    <span class="badge-group">
+      <span class="badge-tag">📞 11</span>
+      <span class="badge-tag">✉️ 10</span>
+    </span>
+    
+    <a href="https://www.fastpeoplesearch.com/david-collins_id_G-4135169002632754774" target="_blank" class="profile-btn" onclick="event.stopPropagation()">🔗 View Profile</a>
+    <span class="expand-indicator">▼ Expand</span>
+  </summary>
+  <div class="rcard-body">
+    <div class="rinfo">
+      <div class="frow"><span class="fl">Full Name:</span><span class="fv fname">David Collins</span></div>
+      <div class="frow"><span class="fl">Age:</span><span class="fv">60</span></div>
+      <div class="frow"><span class="fl">City / State:</span><span class="fv">Apopka, FL</span></div>
+      <div class="frow"><span class="fl">Phone(s):</span><div class="addrs"><button class="copy-all-btn" onclick="copyList([&quot;(407) 703-7054&quot;, &quot;(334) 763-0387&quot;, &quot;(334) 348-9260&quot;, &quot;(480) 325-7729&quot;, &quot;(480) 326-6162&quot;, &quot;(305) 606-9879&quot;, &quot;(314) 498-6152&quot;, &quot;(636) 391-5852&quot;, &quot;(602) 373-8500&quot;, &quot;(480) 844-9576&quot;, &quot;(602) 844-9576&quot;], 'Phones'); event.stopPropagation();">📋 Copy All Phones (11)</button><div class="addr-row">📞 <span>(407) 703-7054</span> <button class="copy-item-btn" onclick="copySingle('(407) 703-7054', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(334) 763-0387</span> <button class="copy-item-btn" onclick="copySingle('(334) 763-0387', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(334) 348-9260</span> <button class="copy-item-btn" onclick="copySingle('(334) 348-9260', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(480) 325-7729</span> <button class="copy-item-btn" onclick="copySingle('(480) 325-7729', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(480) 326-6162</span> <button class="copy-item-btn" onclick="copySingle('(480) 326-6162', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(305) 606-9879</span> <button class="copy-item-btn" onclick="copySingle('(305) 606-9879', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(314) 498-6152</span> <button class="copy-item-btn" onclick="copySingle('(314) 498-6152', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(636) 391-5852</span> <button class="copy-item-btn" onclick="copySingle('(636) 391-5852', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(602) 373-8500</span> <button class="copy-item-btn" onclick="copySingle('(602) 373-8500', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(480) 844-9576</span> <button class="copy-item-btn" onclick="copySingle('(480) 844-9576', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(602) 844-9576</span> <button class="copy-item-btn" onclick="copySingle('(602) 844-9576', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div></div></div>
+      <div class="frow"><span class="fl">Email(s):</span><div class="addrs"><button class="copy-all-btn" onclick="copyList([&quot;carjugara@gmail.com&quot;, &quot;apachemech724@aol.com&quot;, &quot;david.collins@collegeclub.com&quot;, &quot;davecoll_85213@yahoo.com&quot;, &quot;davecoll@yahoo.com&quot;, &quot;davecoll1@yahoo.com&quot;, &quot;davecoll_85213@earthlink.net&quot;, &quot;david.collins@peoplepc.com&quot;, &quot;davecoll85213@yahoo.com&quot;, &quot;davecoll_85213@rochester.rr.com&quot;], 'Emails'); event.stopPropagation();">📋 Copy All Emails (10)</button><div class="addr-row">✉️ <span>carjugara@gmail.com</span> <button class="copy-item-btn" onclick="copySingle('carjugara@gmail.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>apachemech724@aol.com</span> <button class="copy-item-btn" onclick="copySingle('apachemech724@aol.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>david.collins@collegeclub.com</span> <button class="copy-item-btn" onclick="copySingle('david.collins@collegeclub.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>davecoll_85213@yahoo.com</span> <button class="copy-item-btn" onclick="copySingle('davecoll_85213@yahoo.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>davecoll@yahoo.com</span> <button class="copy-item-btn" onclick="copySingle('davecoll@yahoo.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>davecoll1@yahoo.com</span> <button class="copy-item-btn" onclick="copySingle('davecoll1@yahoo.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>davecoll_85213@earthlink.net</span> <button class="copy-item-btn" onclick="copySingle('davecoll_85213@earthlink.net', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>david.collins@peoplepc.com</span> <button class="copy-item-btn" onclick="copySingle('david.collins@peoplepc.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>davecoll85213@yahoo.com</span> <button class="copy-item-btn" onclick="copySingle('davecoll85213@yahoo.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>davecoll_85213@rochester.rr.com</span> <button class="copy-item-btn" onclick="copySingle('davecoll_85213@rochester.rr.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div></div></div>
+      <div class="frow"><span class="fl">Address(es):</span><div class="addrs"><div class="addr-row">📍 1746 Stefan Cole Ln · Apopka, FL</div><div class="addr-row">📍 1138 N Weld Cir · Mesa, AZ</div><div class="addr-row">📍 107 Britt Dr · Enterprise, AL</div><div class="addr-row">📍 244 County Road 683 · Enterprise, AL</div><div class="addr-row">📍 5332 E Baseline Rd Unit 2008 · Mesa, AZ</div><div class="addr-row">📍 2816 E Grandview Cir · Mesa, AZ</div><div class="addr-row">📍 8832 W Hazelwood St · Phoenix, AZ</div><div class="addr-row">📍 3443 E University Dr Unit 134 · Mesa, AZ</div><div class="addr-row">📍 3443 E University Dr Unit 209 · Mesa, AZ</div><div class="addr-row">📍 244 Coronada St Unit 683 · Enterprise, AL</div></div></div>
+      <div class="frow"><span class="fl">Relatives:</span><span class="fv">Michelle Collins, David Anderson, David Collins, Debra Lamar, Douglas Collins</span></div>
+      <div class="frow"><span class="fl">AKA / Aliases:</span><span class="fv">David C Collins, David C Collins Jr, David Collins Jr, Dave C Collins</span></div>
+      <div class="frow"><span class="fl">Profile URL:</span>
+        <a href="https://www.fastpeoplesearch.com/david-collins_id_G-4135169002632754774" target="_blank" class="url-link">https://www.fastpeoplesearch.com/david-collins_id_G-4135169002632754774</a></div>
+    </div>
+    <div class="ss-wrap">
+                <img src="David_Anderson_Phoenix_AZ_result_9.png" class="ss-thumb"
+                     onclick="openModal('David_Anderson_Phoenix_AZ_result_9.png')"
+                     title="Click to view profile detail screenshot">
+                <div class="ss-lbl">📸 Profile Detail Screenshot — click to zoom</div>
+            </div>
+  </div>
+  
+  <div class="res-actions">
+    <button class="res-btn arch-btn" onclick="archiveResult(8)">🗃 Not This Person</button>
+    <button class="res-btn del-btn"  onclick="confirmDelete(8)">🗑 Delete Result</button>
+  </div>
+</details>
+<details class="rcard " id="rcard-9">
+  <summary class="rcard-hdr">
+    <span class="rnum">#10</span>
+    <span class="rname">Artemio Sarrol · Age 74 · Phoenix, AZ</span>
+    <span class="badge-group">
+      <span class="badge-tag">📞 12</span>
+      <span class="badge-tag">✉️ 5</span>
+    </span>
+    
+    <a href="https://www.fastpeoplesearch.com/artemio-sarrol_id_G1638938088147539068" target="_blank" class="profile-btn" onclick="event.stopPropagation()">🔗 View Profile</a>
+    <span class="expand-indicator">▼ Expand</span>
+  </summary>
+  <div class="rcard-body">
+    <div class="rinfo">
+      <div class="frow"><span class="fl">Full Name:</span><span class="fv fname">Artemio Sarrol</span></div>
+      <div class="frow"><span class="fl">Age:</span><span class="fv">74</span></div>
+      <div class="frow"><span class="fl">City / State:</span><span class="fv">Phoenix, AZ</span></div>
+      <div class="frow"><span class="fl">Phone(s):</span><div class="addrs"><button class="copy-all-btn" onclick="copyList([&quot;(847) 219-0332&quot;, &quot;(847) 219-0333&quot;, &quot;(331) 551-1172&quot;, &quot;(630) 272-8150&quot;, &quot;(331) 262-2138&quot;, &quot;(781) 575-0604&quot;, &quot;(630) 868-3055&quot;, &quot;(913) 912-7112&quot;, &quot;(224) 653-8885&quot;, &quot;(630) 510-9027&quot;, &quot;(805) 985-7345&quot;, &quot;(847) 740-5440&quot;], 'Phones'); event.stopPropagation();">📋 Copy All Phones (12)</button><div class="addr-row">📞 <span>(847) 219-0332</span> <button class="copy-item-btn" onclick="copySingle('(847) 219-0332', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(847) 219-0333</span> <button class="copy-item-btn" onclick="copySingle('(847) 219-0333', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(331) 551-1172</span> <button class="copy-item-btn" onclick="copySingle('(331) 551-1172', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(630) 272-8150</span> <button class="copy-item-btn" onclick="copySingle('(630) 272-8150', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(331) 262-2138</span> <button class="copy-item-btn" onclick="copySingle('(331) 262-2138', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(781) 575-0604</span> <button class="copy-item-btn" onclick="copySingle('(781) 575-0604', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(630) 868-3055</span> <button class="copy-item-btn" onclick="copySingle('(630) 868-3055', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(913) 912-7112</span> <button class="copy-item-btn" onclick="copySingle('(913) 912-7112', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(224) 653-8885</span> <button class="copy-item-btn" onclick="copySingle('(224) 653-8885', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(630) 510-9027</span> <button class="copy-item-btn" onclick="copySingle('(630) 510-9027', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(805) 985-7345</span> <button class="copy-item-btn" onclick="copySingle('(805) 985-7345', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(847) 740-5440</span> <button class="copy-item-btn" onclick="copySingle('(847) 740-5440', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div></div></div>
+      <div class="frow"><span class="fl">Email(s):</span><div class="addrs"><button class="copy-all-btn" onclick="copyList([&quot;avsarrol@cox-internet.com&quot;, &quot;artemio.sarrol@yahoo.com&quot;, &quot;avsarrol@megsinet.com&quot;, &quot;avsarrol@megsinet.net&quot;, &quot;avsarrol@yahoo.com&quot;], 'Emails'); event.stopPropagation();">📋 Copy All Emails (5)</button><div class="addr-row">✉️ <span>avsarrol@cox-internet.com</span> <button class="copy-item-btn" onclick="copySingle('avsarrol@cox-internet.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>artemio.sarrol@yahoo.com</span> <button class="copy-item-btn" onclick="copySingle('artemio.sarrol@yahoo.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>avsarrol@megsinet.com</span> <button class="copy-item-btn" onclick="copySingle('avsarrol@megsinet.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>avsarrol@megsinet.net</span> <button class="copy-item-btn" onclick="copySingle('avsarrol@megsinet.net', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>avsarrol@yahoo.com</span> <button class="copy-item-btn" onclick="copySingle('avsarrol@yahoo.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div></div></div>
+      <div class="frow"><span class="fl">Address(es):</span><div class="addrs"><div class="addr-row">📍 4007 E Agave Rd · Phoenix, AZ</div><div class="addr-row">📍 1713 Sw Fairlawn Rd · Topeka, KS</div><div class="addr-row">📍 7517 W 102Nd St · Overland Park, KS</div><div class="addr-row">📍 535 Canterbury Dr · Carol Stream, IL</div><div class="addr-row">📍 90 Windsor Ln · Glendale Heights, IL</div><div class="addr-row">📍 317 Vinings Dr · Bloomingdale, IL</div><div class="addr-row">📍 225 E Fullerton Ave · Glendale Heights, IL</div><div class="addr-row">📍 3685 S New Town Ave Unit 3 · Saint Charles, MO</div><div class="addr-row">📍 466 Havenwood Dr · Round Lake, IL</div><div class="addr-row">📍 7517 W 102Nd St · Shawnee Mission, KS</div></div></div>
+      <div class="frow"><span class="fl">Relatives:</span><span class="fv">Tember Sarrol, Andreas Sarrol, Artelee Sarrol, Artemio Sarrol, Artemio Sarrol</span></div>
+      <div class="frow"><span class="fl">AKA / Aliases:</span><span class="fv">Artemio Sarrol Jr, Artunuit Valle Sarrol Jr, Artemio V Sarrol Jr, Artemio V Sarrol</span></div>
+      <div class="frow"><span class="fl">Profile URL:</span>
+        <a href="https://www.fastpeoplesearch.com/artemio-sarrol_id_G1638938088147539068" target="_blank" class="url-link">https://www.fastpeoplesearch.com/artemio-sarrol_id_G1638938088147539068</a></div>
+    </div>
+    <div class="ss-wrap">
+                <img src="David_Anderson_Phoenix_AZ_result_10.png" class="ss-thumb"
+                     onclick="openModal('David_Anderson_Phoenix_AZ_result_10.png')"
+                     title="Click to view profile detail screenshot">
+                <div class="ss-lbl">📸 Profile Detail Screenshot — click to zoom</div>
+            </div>
+  </div>
+  
+  <div class="res-actions">
+    <button class="res-btn arch-btn" onclick="archiveResult(9)">🗃 Not This Person</button>
+    <button class="res-btn del-btn"  onclick="confirmDelete(9)">🗑 Delete Result</button>
+  </div>
+</details>
+</div>
+<div class="toast" id="toast"></div>
+<div class="modal" id="modal" onclick="if(event.target===this)this.classList.remove('open')">
+  <span class="modal-x" onclick="document.getElementById('modal').classList.remove('open')">✕</span>
+  <img id="modal-img" src="" class="modal-img" onclick="event.stopPropagation()">
+</div>
+<div class="confirm-overlay" id="confirm-overlay">
+  <div class="confirm-box">
+    <h3>🗑 Delete This Result?</h3>
+    <p>This will permanently remove the result and its screenshot.<br>This <strong>cannot be undone</strong>.</p>
+    <div class="confirm-btns">
+      <button class="cb-cancel" onclick="closeConfirm()">Cancel</button>
+      <button class="cb-delete" id="cb-confirm-btn" onclick="doDelete()">Delete Permanently</button>
+    </div>
+  </div>
+</div>
+<script>
+const JOB_ID   = '179A87BE';
+const LEAD_IDX = 0;
+const API      = (window.location.protocol.startsWith('http') ? window.location.origin : 'http://localhost:5050');
+let _pendingDeleteIdx = null;
+
+function copySingle(val, label) {
+  navigator.clipboard.writeText(val).then(() => {
+    showToast(label + ' copied to clipboard!', 'ok');
+  }).catch(() => {
+    const ta = document.createElement('textarea');
+    ta.value = val;
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    showToast(label + ' copied!', 'ok');
+  });
+}
+
+function copyList(arr, label) {
+  if (!arr || !arr.length) return;
+  const text = arr.join('\\n');
+  navigator.clipboard.writeText(text).then(() => {
+    showToast(arr.length + ' ' + label + ' copied to clipboard!', 'ok');
+  }).catch(() => {
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    showToast(arr.length + ' ' + label + ' copied!', 'ok');
+  });
+}
+
+function openModal(src){
+  document.getElementById('modal-img').src=src;
+  document.getElementById('modal').classList.add('open');
+}
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape'){
+    document.getElementById('modal').classList.remove('open');
+    closeConfirm();
+  }
+});
+
+function showToast(msg, type='ok'){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast ' + type + ' show';
+  setTimeout(()=>t.classList.remove('show'), 3500);
+}
+
+function confirmDelete(idx){
+  _pendingDeleteIdx = idx;
+  document.getElementById('confirm-overlay').classList.add('open');
+}
+function closeConfirm(){
+  document.getElementById('confirm-overlay').classList.remove('open');
+  _pendingDeleteIdx = null;
+}
+async function doDelete(){
+  const idx = _pendingDeleteIdx;
+  closeConfirm();
+  if (idx === null || !JOB_ID) return;
+  await deleteResult(idx);
+}
+async function deleteResult(idx){
+  if (!JOB_ID) { showToast('No job ID — open via dashboard', 'err'); return; }
+  const card = document.getElementById('rcard-' + idx);
+  if (card) card.classList.add('removing');
+  try {
+    const r = await fetch(`${API}/api/jobs/${JOB_ID}/leads/${LEAD_IDX}/results/${idx}/delete`,
+                          {method:'POST'});
+    const d = await r.json();
+    if (r.ok) {
+      setTimeout(()=>{ if(card) card.remove(); updateCount(-1); }, 250);
+      showToast('Result deleted permanently', 'ok');
+    } else {
+      if (card) card.classList.remove('removing');
+      showToast(d.error || 'Delete failed', 'err');
+    }
+  } catch(e) {
+    if (card) card.classList.remove('removing');
+    showToast('Network error: ' + (e.message || e), 'err');
+  }
+}
+async function archiveResult(idx){
+  if (!JOB_ID) { showToast('No job ID — open via dashboard', 'err'); return; }
+  const card = document.getElementById('rcard-' + idx);
+  if (card) {
+    card.style.transition = '0.25s all';
+    card.style.opacity = '0.3';
+    card.style.transform = 'scale(0.98)';
+  }
+  showToast('Updating status...', 'ok');
+  try {
+    const r = await fetch(`${API}/api/jobs/${JOB_ID}/leads/${LEAD_IDX}/results/${idx}/archive`,
+                          {method:'POST'});
+    const d = await r.json();
+    if (r.ok) {
+      showToast('Marked as Not This Person', 'ok');
+      setTimeout(()=>{
+        const u = new URL(window.location.href);
+        u.searchParams.set('_t', Date.now());
+        window.location.replace(u.href);
+      }, 300);
+    } else {
+      if (card) { card.style.opacity = '1'; card.style.transform = 'none'; }
+      showToast(d.error || 'Archive failed', 'err');
+    }
+  } catch(e) {
+    if (card) { card.style.opacity = '1'; card.style.transform = 'none'; }
+    showToast('Network error: ' + (e.message || e), 'err');
+  }
+}
+async function unarchiveResult(idx){
+  if (!JOB_ID) return;
+  const card = document.getElementById('rcard-' + idx);
+  if (card) {
+    card.style.transition = '0.25s all';
+    card.style.opacity = '0.3';
+  }
+  showToast('Restoring result...', 'ok');
+  try {
+    const r = await fetch(`${API}/api/jobs/${JOB_ID}/leads/${LEAD_IDX}/results/${idx}/unarchive`,
+                          {method:'POST'});
+    const d = await r.json();
+    if (r.ok) {
+      showToast('Result restored', 'ok');
+      setTimeout(()=>{
+        const u = new URL(window.location.href);
+        u.searchParams.set('_t', Date.now());
+        window.location.replace(u.href);
+      }, 300);
+    } else {
+      if (card) { card.style.opacity = '1'; card.style.transform = 'none'; }
+      showToast(d.error || 'Restore failed', 'err');
+    }
+  } catch(e) {
+    if (card) { card.style.opacity = '1'; card.style.transform = 'none'; }
+    showToast('Network error: ' + (e.message || e), 'err');
+  }
+}
+function setAllCards(expanded) {
+  document.querySelectorAll('details.rcard:not(.archived-card)').forEach(d => d.open = expanded);
+}
+function setDefaultPref(pref) {
+  localStorage.setItem('leadsosint_default_view', pref);
+  showToast('Default view saved: ' + (pref === 'expanded' ? 'Expanded' : 'Collapsed'), 'ok');
+  setAllCards(pref === 'expanded');
+}
+(function() {
+  const pref = localStorage.getItem('leadsosint_default_view') || 'collapsed';
+  if (pref === 'expanded') {
+    const el = document.getElementById('pref-expanded');
+    if (el) el.checked = true;
+    setAllCards(true);
+  } else {
+    const el = document.getElementById('pref-collapsed');
+    if (el) el.checked = true;
+    setAllCards(false);
+  }
+})();
+function updateCount(delta){
+  const el = document.getElementById('active-count');
+  if (el) el.textContent = Math.max(0, parseInt(el.textContent||'0') + delta);
+}
+async function redoReportLead(jobId, idx){
+  if (!confirm('Re-run search for this lead now?')) return;
+  try {
+    const r = await fetch(`${API}/api/jobs/${jobId}/leads/${idx}/retry`, {method:'POST'});
+    if (r.ok) {
+      showToast('Re-starting search...', 'ok');
+      setTimeout(()=>location.reload(), 2000);
+    } else {
+      const d = await r.json().catch(()=>({}));
+      showToast(d.error || 'Retry error', 'err');
+    }
+  } catch(e) {
+    showToast('Network error: ' + (e.message || e), 'err');
+  }
+}
+</script>
+</body></html>

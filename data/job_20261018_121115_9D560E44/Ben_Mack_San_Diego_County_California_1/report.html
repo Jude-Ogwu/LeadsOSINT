@@ -1,0 +1,764 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Ben Mack — LeadsOSINT</title>
+<style>
+:root{--bg:#0d0f1a;--s:#1a1d3a;--s2:#22264a;--bd:#3a3f7a;--ac:#a78bfa;--ac2:#6d28d9;
+      --tx:#e0e6ff;--mt:#8b95c4;--gn:#34d399;--rd:#f87171;--bl:#60a5fa;--yw:#fbbf24}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:"Segoe UI",system-ui,sans-serif;background:var(--bg);color:var(--tx);min-height:100vh}
+.topbar{background:linear-gradient(135deg,#1a1d3a,#0d0f1a);border-bottom:1px solid var(--bd);
+         padding:18px 40px;display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.back{background:var(--s2);border:1px solid var(--bd);color:var(--ac);padding:9px 18px;
+       border-radius:9px;font-size:.85rem;text-decoration:none;transition:.2s}
+.back:hover{border-color:var(--ac);background:var(--ac2);color:#fff}
+.ttl h1{font-size:1.5rem;color:#fff;font-weight:700}
+.ttl p{color:var(--mt);font-size:.8rem;margin-top:3px}
+.social-top-btn{background:linear-gradient(135deg,#2563eb,#60a5fa);color:#fff;padding:8px 16px;border-radius:9px;font-size:.82rem;font-weight:700;text-decoration:none;transition:.2s;box-shadow:0 4px 14px rgba(37,99,235,.3)}
+.social-top-btn:hover{transform:translateY(-1px);color:#fff;box-shadow:0 6px 20px rgba(96,165,250,.4)}
+.stats{display:flex;gap:14px;padding:20px 40px;background:var(--s);border-bottom:1px solid var(--bd);flex-wrap:wrap}
+.sp{background:var(--bg);border:1px solid var(--bd);border-radius:10px;
+     padding:12px 20px;text-align:center}
+.sp.hi{border-color:var(--ac);background:rgba(167,139,250,.07)}
+.sv{font-size:1.4rem;font-weight:800;color:var(--ac)}
+.sl{font-size:.7rem;color:var(--mt);text-transform:uppercase;letter-spacing:.5px;margin-top:2px}
+.content{padding:28px 40px;max-width:1400px;margin:0 auto}
+.rcard{background:var(--s);border:1px solid var(--bd);border-radius:16px;
+        margin-bottom:24px;overflow:hidden;transition:.4s all}
+.rcard:hover{border-color:var(--ac);transform:translateY(-2px);
+              box-shadow:0 10px 36px rgba(109,40,217,.2)}
+.rcard.removing{opacity:0;transform:translateY(-12px) scale(.97);pointer-events:none}
+.archived-card{opacity:.55;border-style:dashed;filter:grayscale(.3)}
+.rcard-hdr{background:linear-gradient(135deg,var(--s2),var(--s));padding:16px 24px;
+            display:flex;align-items:center;gap:14px;border-bottom:1px solid var(--bd);flex-wrap:wrap;cursor:pointer;list-style:none}
+.rcard-hdr::-webkit-details-marker{display:none}
+.rnum{background:linear-gradient(135deg,var(--ac2),var(--ac));color:#fff;
+       font-size:.78rem;font-weight:700;padding:4px 12px;border-radius:16px;flex-shrink:0}
+.rname{font-size:1.15rem;font-weight:700;color:#fff;flex:1}
+.badge-group{display:flex;gap:6px;align-items:center}
+.badge-tag{background:rgba(167,139,250,.15);border:1px solid rgba(167,139,250,.3);color:var(--ac);font-size:.75rem;padding:3px 8px;border-radius:6px;font-weight:600}
+.expand-indicator{color:var(--ac);font-size:.8rem;font-weight:700;margin-left:8px}
+.arch-tag{background:rgba(251,191,36,.15);border:1px solid rgba(251,191,36,.3);
+           color:var(--yw);font-size:.72rem;padding:3px 10px;border-radius:10px;flex-shrink:0}
+.profile-btn{background:linear-gradient(135deg,#4c3d8f,var(--ac2));color:#fff;
+              padding:8px 16px;border-radius:9px;font-size:.8rem;
+              font-weight:600;text-decoration:none;transition:.2s;flex-shrink:0}
+.profile-btn:hover{background:linear-gradient(135deg,var(--ac2),var(--ac));
+                    transform:translateY(-1px);color:#fff}
+.copy-all-btn{background:linear-gradient(135deg,var(--ac2),var(--ac3));color:#fff;border:none;padding:5px 12px;border-radius:6px;font-size:.75rem;font-weight:600;cursor:pointer;margin-bottom:6px;display:inline-block}
+.copy-all-btn:hover{background:var(--ac2)}
+.copy-item-btn{background:transparent;border:none;color:var(--mt);cursor:pointer;font-size:.8rem;padding:0 4px;margin-left:auto}
+.copy-item-btn:hover{color:var(--ac)}
+.addr-row{color:#c4caf0;font-size:.88rem;padding:6px 12px;
+           background:rgba(255,255,255,.03);border-radius:7px;border:1px solid var(--bd);display:flex;align-items:center;gap:8px}
+.url-link{color:var(--bl);font-size:.82rem;word-break:break-all;text-decoration:underline}
+.url-link:hover{color:var(--ac)}
+.rcard-body{padding:24px 28px;display:flex;gap:24px;align-items:flex-start;flex-wrap:wrap}
+.rinfo{flex:1;min-width:320px;display:flex;flex-direction:column;gap:14px}
+.frow{display:grid;grid-template-columns:140px 1fr;gap:12px;align-items:start;font-size:.92rem}
+.fl{font-weight:700;color:var(--mt);font-size:.85rem;letter-spacing:.3px;padding-top:4px}
+.fv{color:#fff;font-weight:600;line-height:1.5}
+.fname{font-size:1.15rem;color:var(--ac);font-weight:700}
+.ss-wrap{flex:0 0 320px;display:flex;flex-direction:column;align-items:center}
+.ss-thumb{width:100%;border-radius:10px;border:2px solid var(--bd);cursor:pointer;
+           transition:.2s;display:block}
+.ss-thumb:hover{border-color:var(--ac);transform:scale(1.02);
+                 box-shadow:0 6px 24px rgba(167,139,250,.3)}
+.ss-lbl{color:var(--mt);font-size:.78rem;margin-top:8px;text-align:center}
+.ss-missing{color:var(--mt);font-size:.82rem;padding:20px;text-align:center;
+             background:var(--s2);border-radius:10px;border:1px dashed var(--bd)}
+.res-actions{padding:14px 24px;border-top:1px solid var(--bd);
+              display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.res-actions.arch-mode{background:rgba(251,191,36,.04)}
+.res-btn{padding:8px 16px;border-radius:8px;font-size:.8rem;font-weight:600;
+          cursor:pointer;transition:.2s;border:1px solid;background:transparent}
+.arch-btn{border-color:rgba(251,191,36,.5);color:var(--yw);}
+.arch-btn:hover{background:rgba(251,191,36,.1)}
+.del-btn{border-color:rgba(248,113,113,.5);color:var(--rd);}
+.del-btn:hover{background:rgba(248,113,113,.1)}
+.unarch-btn{border-color:rgba(96,165,250,.5);color:var(--bl);}
+.unarch-btn:hover{background:rgba(96,165,250,.1)}
+.arch-label{font-size:.8rem;color:var(--yw);flex:1}
+.arch-section{margin-top:10px;border-radius:14px;border:1px dashed var(--bd);overflow:hidden}
+.arch-section summary{padding:14px 20px;cursor:pointer;color:var(--mt);font-size:.9rem;
+                       font-weight:600;list-style:none;background:var(--s2);
+                       display:flex;align-items:center;gap:8px}
+.arch-section summary:hover{color:var(--tx)}
+.arch-section summary span{font-size:.75rem;font-weight:400;margin-left:auto;color:var(--mt)}
+.arch-inner{padding:16px}
+.empty{background:var(--s);border:2px dashed var(--bd);border-radius:14px;
+        padding:50px;text-align:center;color:var(--mt);font-size:1rem}
+.search-ss-card{background:var(--s);border:1px solid var(--bd);border-radius:16px;margin-bottom:28px;overflow:hidden;box-shadow:0 4px 20px rgba(0,0,0,0.3)}
+.search-ss-hdr{background:linear-gradient(135deg,var(--s2),var(--s));padding:16px 24px;border-bottom:1px solid var(--bd);display:flex;justify-content:space-between;align-items:center}
+.search-ss-title{font-weight:700;color:#fff;font-size:1.05rem}
+.search-ss-sub{font-size:.78rem;color:var(--mt);margin-top:2px}
+.search-ss-body{position:relative;cursor:pointer;max-height:380px;overflow:hidden;background:#0d0f1a}
+.search-ss-img{width:100%;display:block;opacity:.88;transition:.3s all}
+.search-ss-body:hover .search-ss-img{opacity:1;transform:scale(1.005)}
+.search-ss-overlay{position:absolute;bottom:16px;left:50%;transform:translateX(-50%);background:rgba(13,15,26,.88);border:1px solid var(--ac);color:var(--ac);padding:8px 20px;border-radius:20px;font-size:.8rem;font-weight:700;backdrop-filter:blur(6px);pointer-events:none;box-shadow:0 4px 14px rgba(109,40,217,.3)}
+.toast{position:fixed;bottom:24px;right:24px;background:var(--s);
+        border:1px solid var(--bd);border-radius:12px;padding:12px 20px;
+        font-size:.85rem;z-index:999;transform:translateY(60px);opacity:0;
+        transition:.3s;max-width:280px}
+.toast.show{transform:translateY(0);opacity:1}
+.toast.ok{border-color:rgba(52,211,153,.4);color:var(--gn)}
+.toast.err{border-color:rgba(248,113,113,.4);color:var(--rd)}
+.modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.96);z-index:9999;
+        justify-content:center;align-items:center;padding:20px}
+.modal.open{display:flex}
+.modal-img{max-width:95vw;max-height:90vh;border-radius:12px;border:2px solid var(--ac)}
+.modal-x{position:fixed;top:18px;right:28px;color:var(--ac);font-size:2.2rem;
+          cursor:pointer;z-index:10000;transition:.2s}
+.modal-x:hover{color:#fff;transform:scale(1.1)}
+.confirm-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.8);
+                  z-index:8888;justify-content:center;align-items:center}
+.confirm-overlay.open{display:flex}
+.confirm-box{background:var(--s);border:1px solid var(--rd);border-radius:18px;
+              padding:32px 36px;max-width:380px;text-align:center}
+.confirm-box h3{color:#fff;margin-bottom:10px;font-size:1.1rem}
+.confirm-box p{color:var(--mt);font-size:.88rem;margin-bottom:24px;line-height:1.6}
+.confirm-btns{display:flex;gap:12px;justify-content:center}
+.cb-cancel{padding:10px 24px;border-radius:9px;border:1px solid var(--bd);
+            background:var(--s2);color:var(--tx);cursor:pointer;font-size:.9rem}
+.cb-delete{padding:10px 24px;border-radius:9px;border:none;
+            background:linear-gradient(135deg,#b91c1c,var(--rd));color:#fff;
+            cursor:pointer;font-size:.9rem;font-weight:700}
+.collapse-toolbar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:18px;flex-wrap:wrap;background:var(--s);padding:12px 20px;border-radius:12px;border:1px solid var(--bd)}
+.tool-btn{background:var(--s2);border:1px solid var(--bd);color:var(--ac);padding:7px 15px;border-radius:8px;font-size:.82rem;font-weight:700;cursor:pointer;transition:.2s}
+.tool-btn:hover{background:var(--ac2);color:#fff;border-color:var(--ac)}
+.view-pref{display:flex;align-items:center;gap:12px;font-size:.82rem;color:var(--mt)}
+.view-pref label{display:inline-flex;align-items:center;gap:6px;cursor:pointer;color:var(--tx);font-weight:600}
+.view-pref input[type="radio"]{accent-color:var(--ac);cursor:pointer}
+</style></head><body>
+<div class="topbar">
+  <a href="/results/9D560E44" class="back" onclick="if(window.location.protocol==='file:'){this.href='../index.html'}">← Back to Job</a>
+  <div class="ttl"><h1>🔍 Ben Mack</h1>
+    <p>Location: San Diego County California · October 18, 2026 · 12:16 PM</p></div>
+  <div style="display:flex;gap:8px;margin-left:auto;flex-wrap:wrap">
+    <button class="social-top-btn" style="background:linear-gradient(135deg,#6d28d9,#a78bfa);color:#fff;cursor:pointer;border:none" onclick="redoReportLead('9D560E44', 0)" title="Re-run search for this lead">🔄 Re-do Search</button>
+    
+    
+    
+  </div>
+</div>
+<div class="stats">
+  <div class="sp hi"><div class="sv" id="active-count">10</div><div class="sl">Active Results</div></div>
+  <div class="sp"><div class="sv" style="color:var(--gn)">
+    ✓ Found</div><div class="sl">Status</div></div>
+  <div class="sp"><div class="sv" style="font-size:.9rem">San Diego County California</div>
+    <div class="sl">Location</div></div>
+  <div class="sp"><div class="sv" style="font-size:.85rem"><span style="color:var(--mt)">N/A</span></div>
+    <div class="sl">Social Link</div></div>
+  <div class="sp"><div class="sv" style="font-size:.85rem"><span style="color:var(--mt)">N/A</span></div>
+    <div class="sl">Input Email</div></div>
+  <div class="sp"><div class="sv" style="font-size:.85rem"><span style="color:var(--mt)">N/A</span></div>
+    <div class="sl">Input Phone</div></div>
+</div>
+<div class="content">
+
+<div class="search-ss-card">
+  <div class="search-ss-hdr">
+    <div>
+      <div class="search-ss-title">🌐 FastPeopleSearch — Full Search Page Overview</div>
+      <div class="search-ss-sub">Live search results overview for "Ben Mack" (San Diego County California)</div>
+    </div>
+  </div>
+  <div class="search-ss-body" onclick="openModal('Ben_Mack_San_Diego_County_California_1_search_page.png')">
+    <img src="Ben_Mack_San_Diego_County_California_1_search_page.png" class="search-ss-img" title="Click to view full search page screenshot">
+    <div class="search-ss-overlay">🔍 Click to View Full Search Page Screenshot</div>
+  </div>
+</div>
+<div class="collapse-toolbar">
+  <div style="display:flex;align-items:center;gap:10px">
+    <button class="tool-btn" onclick="setAllCards(false)">▸ Collapse All</button>
+    <button class="tool-btn" onclick="setAllCards(true)">▾ Expand All</button>
+  </div>
+  <div class="view-pref">
+    <span>Default View:</span>
+    <label><input type="radio" name="default_view_pref" value="collapsed" id="pref-collapsed" onchange="setDefaultPref('collapsed')"> Collapsed</label>
+    <label><input type="radio" name="default_view_pref" value="expanded" id="pref-expanded" onchange="setDefaultPref('expanded')"> Expanded</label>
+  </div>
+</div>
+
+<details class="rcard " id="rcard-0">
+  <summary class="rcard-hdr">
+    <span class="rnum">#1</span>
+    <span class="rname">Benjamin Mack · Age 55 · Chula Vista, CA</span>
+    <span class="badge-group">
+      <span class="badge-tag">📞 12</span>
+      <span class="badge-tag">✉️ 10</span>
+    </span>
+    
+    <a href="https://www.fastpeoplesearch.com/benjamin-mack_id_G-3806858033456186949" target="_blank" class="profile-btn" onclick="event.stopPropagation()">🔗 View Profile</a>
+    <span class="expand-indicator">▼ Expand</span>
+  </summary>
+  <div class="rcard-body">
+    <div class="rinfo">
+      <div class="frow"><span class="fl">Full Name:</span><span class="fv fname">Benjamin Mack</span></div>
+      <div class="frow"><span class="fl">Age:</span><span class="fv">55</span></div>
+      <div class="frow"><span class="fl">City / State:</span><span class="fv">Chula Vista, CA</span></div>
+      <div class="frow"><span class="fl">Phone(s):</span><div class="addrs"><button class="copy-all-btn" onclick="copyList([&quot;(619) 397-3423&quot;, &quot;(858) 530-0577&quot;, &quot;(650) 726-5474&quot;, &quot;(619) 530-0577&quot;, &quot;(619) 394-4511&quot;, &quot;(650) 224-7672&quot;, &quot;(619) 850-0916&quot;, &quot;(310) 453-4419&quot;, &quot;(314) 640-5294&quot;, &quot;(408) 839-7738&quot;, &quot;(408) 726-5474&quot;, &quot;(858) 259-0306&quot;], 'Phones'); event.stopPropagation();">📋 Copy All Phones (12)</button><div class="addr-row">📞 <span>(619) 397-3423</span> <button class="copy-item-btn" onclick="copySingle('(619) 397-3423', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(858) 530-0577</span> <button class="copy-item-btn" onclick="copySingle('(858) 530-0577', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(650) 726-5474</span> <button class="copy-item-btn" onclick="copySingle('(650) 726-5474', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(619) 530-0577</span> <button class="copy-item-btn" onclick="copySingle('(619) 530-0577', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(619) 394-4511</span> <button class="copy-item-btn" onclick="copySingle('(619) 394-4511', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(650) 224-7672</span> <button class="copy-item-btn" onclick="copySingle('(650) 224-7672', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(619) 850-0916</span> <button class="copy-item-btn" onclick="copySingle('(619) 850-0916', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(310) 453-4419</span> <button class="copy-item-btn" onclick="copySingle('(310) 453-4419', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(314) 640-5294</span> <button class="copy-item-btn" onclick="copySingle('(314) 640-5294', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(408) 839-7738</span> <button class="copy-item-btn" onclick="copySingle('(408) 839-7738', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(408) 726-5474</span> <button class="copy-item-btn" onclick="copySingle('(408) 726-5474', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(858) 259-0306</span> <button class="copy-item-btn" onclick="copySingle('(858) 259-0306', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div></div></div>
+      <div class="frow"><span class="fl">Email(s):</span><div class="addrs"><button class="copy-all-btn" onclick="copyList([&quot;anhu1@yahoo.com&quot;, &quot;francesmack@yahoo.com&quot;, &quot;an_hu@yahoo.com&quot;, &quot;anhu2@yahoo.com&quot;, &quot;an_hu@hotmail.com&quot;, &quot;an_hu@aol.com&quot;, &quot;anhu@yahoo.com&quot;, &quot;an_hu@mail.com&quot;, &quot;an-hu@yahoo.com&quot;, &quot;an-hu@ca.rr.com&quot;], 'Emails'); event.stopPropagation();">📋 Copy All Emails (10)</button><div class="addr-row">✉️ <span>anhu1@yahoo.com</span> <button class="copy-item-btn" onclick="copySingle('anhu1@yahoo.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>francesmack@yahoo.com</span> <button class="copy-item-btn" onclick="copySingle('francesmack@yahoo.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>an_hu@yahoo.com</span> <button class="copy-item-btn" onclick="copySingle('an_hu@yahoo.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>anhu2@yahoo.com</span> <button class="copy-item-btn" onclick="copySingle('anhu2@yahoo.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>an_hu@hotmail.com</span> <button class="copy-item-btn" onclick="copySingle('an_hu@hotmail.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>an_hu@aol.com</span> <button class="copy-item-btn" onclick="copySingle('an_hu@aol.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>anhu@yahoo.com</span> <button class="copy-item-btn" onclick="copySingle('anhu@yahoo.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>an_hu@mail.com</span> <button class="copy-item-btn" onclick="copySingle('an_hu@mail.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>an-hu@yahoo.com</span> <button class="copy-item-btn" onclick="copySingle('an-hu@yahoo.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>an-hu@ca.rr.com</span> <button class="copy-item-btn" onclick="copySingle('an-hu@ca.rr.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div></div></div>
+      <div class="frow"><span class="fl">Address(es):</span><div class="addrs"><div class="addr-row">📍 2046 Mccloud River Rd · Chula Vista, CA</div><div class="addr-row">📍 1541 Marion Ct · Chula Vista, CA</div><div class="addr-row">📍 2041 Mccloud River Rd · Chula Vista, CA</div><div class="addr-row">📍 11391 Bootes St · San Diego, CA</div><div class="addr-row">📍 10527 Caminito Glenellen · San Diego, CA</div><div class="addr-row">📍 10840 Worthing Ave · San Diego, CA</div><div class="addr-row">📍 2017 Bordeaux Ln · Half Moon Bay, CA</div><div class="addr-row">📍 10527 Caminito Obra · San Diego, CA</div><div class="addr-row">📍 411 Bay Meadows Way · Solana Beach, CA</div><div class="addr-row">📍 7771 Starling Dr · San Diego, CA</div></div></div>
+      <div class="frow"><span class="fl">Relatives:</span><span class="fv">Bee Rutchik, Daniel Mack, David Mack, Ella Mack, Frances Mack</span></div>
+      <div class="frow"><span class="fl">AKA / Aliases:</span><span class="fv">Benjamin A Mack, Beniman A Mack, Ben A Mack, Benjamina Mack</span></div>
+      <div class="frow"><span class="fl">Profile URL:</span>
+        <a href="https://www.fastpeoplesearch.com/benjamin-mack_id_G-3806858033456186949" target="_blank" class="url-link">https://www.fastpeoplesearch.com/benjamin-mack_id_G-3806858033456186949</a></div>
+    </div>
+    <div class="ss-wrap">
+                <img src="Ben_Mack_San_Diego_County_California_1_result_1.png" class="ss-thumb"
+                     onclick="openModal('Ben_Mack_San_Diego_County_California_1_result_1.png')"
+                     title="Click to view profile detail screenshot">
+                <div class="ss-lbl">📸 Profile Detail Screenshot — click to zoom</div>
+            </div>
+  </div>
+  
+  <div class="res-actions">
+    <button class="res-btn arch-btn" onclick="archiveResult(0)">🗃 Not This Person</button>
+    <button class="res-btn del-btn"  onclick="confirmDelete(0)">🗑 Delete Result</button>
+  </div>
+</details>
+<details class="rcard " id="rcard-1">
+  <summary class="rcard-hdr">
+    <span class="rnum">#2</span>
+    <span class="rname">Benjamin Mack · Age 46 · Centreville, VA</span>
+    <span class="badge-group">
+      <span class="badge-tag">📞 3</span>
+      <span class="badge-tag">✉️ 1</span>
+    </span>
+    
+    <a href="https://www.fastpeoplesearch.com/benjamin-mack_id_G-3262045707310031424" target="_blank" class="profile-btn" onclick="event.stopPropagation()">🔗 View Profile</a>
+    <span class="expand-indicator">▼ Expand</span>
+  </summary>
+  <div class="rcard-body">
+    <div class="rinfo">
+      <div class="frow"><span class="fl">Full Name:</span><span class="fv fname">Benjamin Mack</span></div>
+      <div class="frow"><span class="fl">Age:</span><span class="fv">46</span></div>
+      <div class="frow"><span class="fl">City / State:</span><span class="fv">Centreville, VA</span></div>
+      <div class="frow"><span class="fl">Phone(s):</span><div class="addrs"><button class="copy-all-btn" onclick="copyList([&quot;(323) 423-6385&quot;, &quot;(212) 581-8614&quot;, &quot;(646) 644-8614&quot;], 'Phones'); event.stopPropagation();">📋 Copy All Phones (3)</button><div class="addr-row">📞 <span>(323) 423-6385</span> <button class="copy-item-btn" onclick="copySingle('(323) 423-6385', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(212) 581-8614</span> <button class="copy-item-btn" onclick="copySingle('(212) 581-8614', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(646) 644-8614</span> <button class="copy-item-btn" onclick="copySingle('(646) 644-8614', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div></div></div>
+      <div class="frow"><span class="fl">Email(s):</span><div class="addrs"><button class="copy-all-btn" onclick="copyList([&quot;benjaminmack@mchsi.com&quot;], 'Emails'); event.stopPropagation();">📋 Copy All Emails (1)</button><div class="addr-row">✉️ <span>benjaminmack@mchsi.com</span> <button class="copy-item-btn" onclick="copySingle('benjaminmack@mchsi.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div></div></div>
+      <div class="frow"><span class="fl">Address(es):</span><div class="addrs"><div class="addr-row">📍 5516 Virgin Rock Rd · Centreville, VA</div><div class="addr-row">📍 30 Townsend Ave · Newburgh, NY</div><div class="addr-row">📍 4327 N Mallow Rd · Los Angeles, CA</div><div class="addr-row">📍 1640 N Adamson St · Los Angeles, CA</div><div class="addr-row">📍 8715 Burton Way Unit 402 · West Hollywood, CA</div><div class="addr-row">📍 340 W 55Th St Unit 6C · New York, NY</div><div class="addr-row">📍 8436 Blackburn Ave Unit 2 · Los Angeles, CA</div><div class="addr-row">📍 340 W 55Th St Unit 5E · New York, NY</div></div></div>
+      <div class="frow"><span class="fl">Relatives:</span><span class="fv">Katherine Ackerman, Lydia Mack, Matthew Mack, Susan Mack, Vernon Mack</span></div>
+      <div class="frow"><span class="fl">AKA / Aliases:</span><span class="fv">Benjamin C Mack, Benjamin Casmir Mack, Ben C Mack, Banjamin C Mack</span></div>
+      <div class="frow"><span class="fl">Profile URL:</span>
+        <a href="https://www.fastpeoplesearch.com/benjamin-mack_id_G-3262045707310031424" target="_blank" class="url-link">https://www.fastpeoplesearch.com/benjamin-mack_id_G-3262045707310031424</a></div>
+    </div>
+    <div class="ss-wrap">
+                <img src="Ben_Mack_San_Diego_County_California_1_result_2.png" class="ss-thumb"
+                     onclick="openModal('Ben_Mack_San_Diego_County_California_1_result_2.png')"
+                     title="Click to view profile detail screenshot">
+                <div class="ss-lbl">📸 Profile Detail Screenshot — click to zoom</div>
+            </div>
+  </div>
+  
+  <div class="res-actions">
+    <button class="res-btn arch-btn" onclick="archiveResult(1)">🗃 Not This Person</button>
+    <button class="res-btn del-btn"  onclick="confirmDelete(1)">🗑 Delete Result</button>
+  </div>
+</details>
+<details class="rcard " id="rcard-2">
+  <summary class="rcard-hdr">
+    <span class="rnum">#3</span>
+    <span class="rname">Benjamin Mack · Age 52 · Winston Salem, NC</span>
+    <span class="badge-group">
+      <span class="badge-tag">📞 8</span>
+      <span class="badge-tag">✉️ 1</span>
+    </span>
+    
+    <a href="https://www.fastpeoplesearch.com/benjamin-mack_id_G-2401042785491062727" target="_blank" class="profile-btn" onclick="event.stopPropagation()">🔗 View Profile</a>
+    <span class="expand-indicator">▼ Expand</span>
+  </summary>
+  <div class="rcard-body">
+    <div class="rinfo">
+      <div class="frow"><span class="fl">Full Name:</span><span class="fv fname">Benjamin Mack</span></div>
+      <div class="frow"><span class="fl">Age:</span><span class="fv">52</span></div>
+      <div class="frow"><span class="fl">City / State:</span><span class="fv">Winston Salem, NC</span></div>
+      <div class="frow"><span class="fl">Phone(s):</span><div class="addrs"><button class="copy-all-btn" onclick="copyList([&quot;(646) 584-4993&quot;, &quot;(571) 376-3351&quot;, &quot;(408) 390-8791&quot;, &quot;(703) 685-0880&quot;, &quot;(408) 251-0438&quot;, &quot;(703) 534-5680&quot;, &quot;(408) 406-4087&quot;, &quot;(408) 406-8062&quot;], 'Phones'); event.stopPropagation();">📋 Copy All Phones (8)</button><div class="addr-row">📞 <span>(646) 584-4993</span> <button class="copy-item-btn" onclick="copySingle('(646) 584-4993', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(571) 376-3351</span> <button class="copy-item-btn" onclick="copySingle('(571) 376-3351', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(408) 390-8791</span> <button class="copy-item-btn" onclick="copySingle('(408) 390-8791', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(703) 685-0880</span> <button class="copy-item-btn" onclick="copySingle('(703) 685-0880', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(408) 251-0438</span> <button class="copy-item-btn" onclick="copySingle('(408) 251-0438', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(703) 534-5680</span> <button class="copy-item-btn" onclick="copySingle('(703) 534-5680', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(408) 406-4087</span> <button class="copy-item-btn" onclick="copySingle('(408) 406-4087', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(408) 406-8062</span> <button class="copy-item-btn" onclick="copySingle('(408) 406-8062', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div></div></div>
+      <div class="frow"><span class="fl">Email(s):</span><div class="addrs"><button class="copy-all-btn" onclick="copyList([&quot;bm45@email.byu.edu&quot;], 'Emails'); event.stopPropagation();">📋 Copy All Emails (1)</button><div class="addr-row">✉️ <span>bm45@email.byu.edu</span> <button class="copy-item-btn" onclick="copySingle('bm45@email.byu.edu', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div></div></div>
+      <div class="frow"><span class="fl">Address(es):</span><div class="addrs"><div class="addr-row">📍 135 Rosedown Ct · Winston Salem, NC</div><div class="addr-row">📍 6662 Chestnut Ave · Falls Church, VA</div><div class="addr-row">📍 6802 Farragut Ave · Falls Church, VA</div><div class="addr-row">📍 921 22Nd St S · Arlington, VA</div><div class="addr-row">📍 1603 11Th St S · Arlington, VA</div><div class="addr-row">📍 2619 S Joyce St · Arlington, VA</div><div class="addr-row">📍 1953 Wave Pl · San Jose, CA</div><div class="addr-row">📍 621 21St St S Unit T · Arlington, VA</div><div class="addr-row">📍 8283 Greensboro Dr · Mc Lean, VA</div><div class="addr-row">📍 2619 S La Salle Ave Unit 3 · Los Angeles, CA</div></div></div>
+      <div class="frow"><span class="fl">Relatives:</span><span class="fv">Jamee Mack, Emily Walsh, James Mack, Julie Mack, Katie Bond</span></div>
+      <div class="frow"><span class="fl">AKA / Aliases:</span><span class="fv">Benjamin C Mack, Ben C Mack, Bejamin Mack, Ben Mack</span></div>
+      <div class="frow"><span class="fl">Profile URL:</span>
+        <a href="https://www.fastpeoplesearch.com/benjamin-mack_id_G-2401042785491062727" target="_blank" class="url-link">https://www.fastpeoplesearch.com/benjamin-mack_id_G-2401042785491062727</a></div>
+    </div>
+    <div class="ss-wrap">
+                <img src="Ben_Mack_San_Diego_County_California_1_result_3.png" class="ss-thumb"
+                     onclick="openModal('Ben_Mack_San_Diego_County_California_1_result_3.png')"
+                     title="Click to view profile detail screenshot">
+                <div class="ss-lbl">📸 Profile Detail Screenshot — click to zoom</div>
+            </div>
+  </div>
+  
+  <div class="res-actions">
+    <button class="res-btn arch-btn" onclick="archiveResult(2)">🗃 Not This Person</button>
+    <button class="res-btn del-btn"  onclick="confirmDelete(2)">🗑 Delete Result</button>
+  </div>
+</details>
+<details class="rcard " id="rcard-3">
+  <summary class="rcard-hdr">
+    <span class="rnum">#4</span>
+    <span class="rname">Benjamin Mack · Age 58 · Pahoa, HI</span>
+    <span class="badge-group">
+      <span class="badge-tag">📞 9</span>
+      <span class="badge-tag">✉️ 8</span>
+    </span>
+    
+    <a href="https://www.fastpeoplesearch.com/benjamin-mack_id_G-4945117155703150349" target="_blank" class="profile-btn" onclick="event.stopPropagation()">🔗 View Profile</a>
+    <span class="expand-indicator">▼ Expand</span>
+  </summary>
+  <div class="rcard-body">
+    <div class="rinfo">
+      <div class="frow"><span class="fl">Full Name:</span><span class="fv fname">Benjamin Mack</span></div>
+      <div class="frow"><span class="fl">Age:</span><span class="fv">58</span></div>
+      <div class="frow"><span class="fl">City / State:</span><span class="fv">Pahoa, HI</span></div>
+      <div class="frow"><span class="fl">Phone(s):</span><div class="addrs"><button class="copy-all-btn" onclick="copyList([&quot;(404) 725-2121&quot;, &quot;(404) 949-0040&quot;, &quot;(404) 285-3704&quot;, &quot;(828) 242-1781&quot;, &quot;(310) 399-6746&quot;, &quot;(310) 441-3425&quot;, &quot;(323) 646-8363&quot;, &quot;(323) 856-9347&quot;, &quot;(954) 646-8363&quot;], 'Phones'); event.stopPropagation();">📋 Copy All Phones (9)</button><div class="addr-row">📞 <span>(404) 725-2121</span> <button class="copy-item-btn" onclick="copySingle('(404) 725-2121', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(404) 949-0040</span> <button class="copy-item-btn" onclick="copySingle('(404) 949-0040', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(404) 285-3704</span> <button class="copy-item-btn" onclick="copySingle('(404) 285-3704', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(828) 242-1781</span> <button class="copy-item-btn" onclick="copySingle('(828) 242-1781', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(310) 399-6746</span> <button class="copy-item-btn" onclick="copySingle('(310) 399-6746', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(310) 441-3425</span> <button class="copy-item-btn" onclick="copySingle('(310) 441-3425', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(323) 646-8363</span> <button class="copy-item-btn" onclick="copySingle('(323) 646-8363', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(323) 856-9347</span> <button class="copy-item-btn" onclick="copySingle('(323) 856-9347', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(954) 646-8363</span> <button class="copy-item-btn" onclick="copySingle('(954) 646-8363', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div></div></div>
+      <div class="frow"><span class="fl">Email(s):</span><div class="addrs"><button class="copy-all-btn" onclick="copyList([&quot;bengsmack@hotmail.com&quot;, &quot;benamck23@yahoo.com&quot;, &quot;bmack@voyager.net&quot;, &quot;mack@pinkfloyd.com&quot;, &quot;benjamin.mack@cs.com&quot;, &quot;mackresearch@earthlink.net&quot;, &quot;mack@pinkfloyd.net&quot;, &quot;benmackresearch@gmail.com&quot;], 'Emails'); event.stopPropagation();">📋 Copy All Emails (8)</button><div class="addr-row">✉️ <span>bengsmack@hotmail.com</span> <button class="copy-item-btn" onclick="copySingle('bengsmack@hotmail.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>benamck23@yahoo.com</span> <button class="copy-item-btn" onclick="copySingle('benamck23@yahoo.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>bmack@voyager.net</span> <button class="copy-item-btn" onclick="copySingle('bmack@voyager.net', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>mack@pinkfloyd.com</span> <button class="copy-item-btn" onclick="copySingle('mack@pinkfloyd.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>benjamin.mack@cs.com</span> <button class="copy-item-btn" onclick="copySingle('benjamin.mack@cs.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>mackresearch@earthlink.net</span> <button class="copy-item-btn" onclick="copySingle('mackresearch@earthlink.net', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>mack@pinkfloyd.net</span> <button class="copy-item-btn" onclick="copySingle('mack@pinkfloyd.net', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>benmackresearch@gmail.com</span> <button class="copy-item-btn" onclick="copySingle('benmackresearch@gmail.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div></div></div>
+      <div class="frow"><span class="fl">Address(es):</span><div class="addrs"><div class="addr-row">📍 16~2164 Tangerine Dr · Pahoa, HI</div><div class="addr-row">📍 2415 Ala Wai Blvd Unit 1901 · Honolulu, HI</div><div class="addr-row">📍 76 Riverview Dr · Asheville, NC</div><div class="addr-row">📍 1215 E Columbus Dr · Tampa, FL</div><div class="addr-row">📍 2141 Virginia Pl Ne · Atlanta, GA</div><div class="addr-row">📍 41 Furman Ave Unit 5 · Asheville, NC</div><div class="addr-row">📍 43 Vermont Ct Unit E16 · Asheville, NC</div><div class="addr-row">📍 127 Riverview Dr Unit 6 · Asheville, NC</div><div class="addr-row">📍 64 Flint St · Asheville, NC</div><div class="addr-row">📍 50 W Willetta St · Phoenix, AZ</div></div></div>
+      <div class="frow"><span class="fl">Relatives:</span><span class="fv">Arthur Mack, Haley Mack, Lucy Bryant, Baird Bryant, Erin Edkins</span></div>
+      <div class="frow"><span class="fl">AKA / Aliases:</span><span class="fv">Benjamin G Mack, Benjamin Garth Siddharth Mack, Ben G Mack, Benjamin C Mack</span></div>
+      <div class="frow"><span class="fl">Profile URL:</span>
+        <a href="https://www.fastpeoplesearch.com/benjamin-mack_id_G-4945117155703150349" target="_blank" class="url-link">https://www.fastpeoplesearch.com/benjamin-mack_id_G-4945117155703150349</a></div>
+    </div>
+    <div class="ss-wrap">
+                <img src="Ben_Mack_San_Diego_County_California_1_result_4.png" class="ss-thumb"
+                     onclick="openModal('Ben_Mack_San_Diego_County_California_1_result_4.png')"
+                     title="Click to view profile detail screenshot">
+                <div class="ss-lbl">📸 Profile Detail Screenshot — click to zoom</div>
+            </div>
+  </div>
+  
+  <div class="res-actions">
+    <button class="res-btn arch-btn" onclick="archiveResult(3)">🗃 Not This Person</button>
+    <button class="res-btn del-btn"  onclick="confirmDelete(3)">🗑 Delete Result</button>
+  </div>
+</details>
+<details class="rcard " id="rcard-4">
+  <summary class="rcard-hdr">
+    <span class="rnum">#5</span>
+    <span class="rname">Benjamin Mack · Age 49 · Sausalito, CA</span>
+    <span class="badge-group">
+      <span class="badge-tag">📞 12</span>
+      <span class="badge-tag">✉️ 2</span>
+    </span>
+    
+    <a href="https://www.fastpeoplesearch.com/benjamin-mack_id_G-6400828894527873663" target="_blank" class="profile-btn" onclick="event.stopPropagation()">🔗 View Profile</a>
+    <span class="expand-indicator">▼ Expand</span>
+  </summary>
+  <div class="rcard-body">
+    <div class="rinfo">
+      <div class="frow"><span class="fl">Full Name:</span><span class="fv fname">Benjamin Mack</span></div>
+      <div class="frow"><span class="fl">Age:</span><span class="fv">49</span></div>
+      <div class="frow"><span class="fl">City / State:</span><span class="fv">Sausalito, CA</span></div>
+      <div class="frow"><span class="fl">Phone(s):</span><div class="addrs"><button class="copy-all-btn" onclick="copyList([&quot;(415) 505-7638&quot;, &quot;(415) 448-5673&quot;, &quot;(415) 677-8261&quot;, &quot;(515) 752-8015&quot;, &quot;(415) 305-3602&quot;, &quot;(641) 752-8015&quot;, &quot;(651) 698-4976&quot;, &quot;(415) 879-9846&quot;, &quot;(415) 498-7576&quot;, &quot;(415) 887-9846&quot;, &quot;(515) 292-6814&quot;, &quot;(641) 752-7500&quot;], 'Phones'); event.stopPropagation();">📋 Copy All Phones (12)</button><div class="addr-row">📞 <span>(415) 505-7638</span> <button class="copy-item-btn" onclick="copySingle('(415) 505-7638', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(415) 448-5673</span> <button class="copy-item-btn" onclick="copySingle('(415) 448-5673', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(415) 677-8261</span> <button class="copy-item-btn" onclick="copySingle('(415) 677-8261', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(515) 752-8015</span> <button class="copy-item-btn" onclick="copySingle('(515) 752-8015', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(415) 305-3602</span> <button class="copy-item-btn" onclick="copySingle('(415) 305-3602', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(641) 752-8015</span> <button class="copy-item-btn" onclick="copySingle('(641) 752-8015', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(651) 698-4976</span> <button class="copy-item-btn" onclick="copySingle('(651) 698-4976', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(415) 879-9846</span> <button class="copy-item-btn" onclick="copySingle('(415) 879-9846', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(415) 498-7576</span> <button class="copy-item-btn" onclick="copySingle('(415) 498-7576', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(415) 887-9846</span> <button class="copy-item-btn" onclick="copySingle('(415) 887-9846', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(515) 292-6814</span> <button class="copy-item-btn" onclick="copySingle('(515) 292-6814', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(641) 752-7500</span> <button class="copy-item-btn" onclick="copySingle('(641) 752-7500', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div></div></div>
+      <div class="frow"><span class="fl">Email(s):</span><div class="addrs"><button class="copy-all-btn" onclick="copyList([&quot;ben.t.mack@gmail.com&quot;, &quot;xgben.t.mack37@gmail.com&quot;], 'Emails'); event.stopPropagation();">📋 Copy All Emails (2)</button><div class="addr-row">✉️ <span>ben.t.mack@gmail.com</span> <button class="copy-item-btn" onclick="copySingle('ben.t.mack@gmail.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>xgben.t.mack37@gmail.com</span> <button class="copy-item-btn" onclick="copySingle('xgben.t.mack37@gmail.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div></div></div>
+      <div class="frow"><span class="fl">Address(es):</span><div class="addrs"><div class="addr-row">📍 32 E Pier · Sausalito, CA</div><div class="addr-row">📍 Po Box 50851 · Mendota, MN</div><div class="addr-row">📍 1366 D St · Mendota, MN</div><div class="addr-row">📍 5 Windy Ridge Pl · Mendota, MN</div><div class="addr-row">📍 720 S Plaza Way Unit P29 · Mendota Heights, MN</div><div class="addr-row">📍 720 S Plaza Way Unit P29 · Saint Paul, MN</div><div class="addr-row">📍 43 Shannon Ln · San Rafael, CA</div><div class="addr-row">📍 1969 Fulton St Unit 2 · San Francisco, CA</div><div class="addr-row">📍 128 Carl St Unit 6 · San Francisco, CA</div><div class="addr-row">📍 1908 Hennepin Ave Unit 5 · Minneapolis, MN</div></div></div>
+      <div class="frow"><span class="fl">Relatives:</span><span class="fv">Ann Mack, Abigail Jones, Della Mack, Lucinda Mack, Thomas Mack</span></div>
+      <div class="frow"><span class="fl">AKA / Aliases:</span><span class="fv">Benjamin T Mack, Benjamin M Mack, Ben T Mack, Ben Mack</span></div>
+      <div class="frow"><span class="fl">Profile URL:</span>
+        <a href="https://www.fastpeoplesearch.com/benjamin-mack_id_G-6400828894527873663" target="_blank" class="url-link">https://www.fastpeoplesearch.com/benjamin-mack_id_G-6400828894527873663</a></div>
+    </div>
+    <div class="ss-wrap">
+                <img src="Ben_Mack_San_Diego_County_California_1_result_5.png" class="ss-thumb"
+                     onclick="openModal('Ben_Mack_San_Diego_County_California_1_result_5.png')"
+                     title="Click to view profile detail screenshot">
+                <div class="ss-lbl">📸 Profile Detail Screenshot — click to zoom</div>
+            </div>
+  </div>
+  
+  <div class="res-actions">
+    <button class="res-btn arch-btn" onclick="archiveResult(4)">🗃 Not This Person</button>
+    <button class="res-btn del-btn"  onclick="confirmDelete(4)">🗑 Delete Result</button>
+  </div>
+</details>
+<details class="rcard " id="rcard-5">
+  <summary class="rcard-hdr">
+    <span class="rnum">#6</span>
+    <span class="rname">Benjamin Mak · Age 50 · Petaluma, CA</span>
+    <span class="badge-group">
+      <span class="badge-tag">📞 6</span>
+      <span class="badge-tag">✉️ 2</span>
+    </span>
+    
+    <a href="https://www.fastpeoplesearch.com/benjamin-mak_id_G-6868740478221908916" target="_blank" class="profile-btn" onclick="event.stopPropagation()">🔗 View Profile</a>
+    <span class="expand-indicator">▼ Expand</span>
+  </summary>
+  <div class="rcard-body">
+    <div class="rinfo">
+      <div class="frow"><span class="fl">Full Name:</span><span class="fv fname">Benjamin Mak</span></div>
+      <div class="frow"><span class="fl">Age:</span><span class="fv">50</span></div>
+      <div class="frow"><span class="fl">City / State:</span><span class="fv">Petaluma, CA</span></div>
+      <div class="frow"><span class="fl">Phone(s):</span><div class="addrs"><button class="copy-all-btn" onclick="copyList([&quot;(707) 793-9467&quot;, &quot;(415) 472-7783&quot;, &quot;(626) 321-7615&quot;, &quot;(415) 847-8437&quot;, &quot;(415) 453-9429&quot;, &quot;(415) 479-3112&quot;], 'Phones'); event.stopPropagation();">📋 Copy All Phones (6)</button><div class="addr-row">📞 <span>(707) 793-9467</span> <button class="copy-item-btn" onclick="copySingle('(707) 793-9467', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(415) 472-7783</span> <button class="copy-item-btn" onclick="copySingle('(415) 472-7783', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(626) 321-7615</span> <button class="copy-item-btn" onclick="copySingle('(626) 321-7615', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(415) 847-8437</span> <button class="copy-item-btn" onclick="copySingle('(415) 847-8437', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(415) 453-9429</span> <button class="copy-item-btn" onclick="copySingle('(415) 453-9429', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(415) 479-3112</span> <button class="copy-item-btn" onclick="copySingle('(415) 479-3112', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div></div></div>
+      <div class="frow"><span class="fl">Email(s):</span><div class="addrs"><button class="copy-all-btn" onclick="copyList([&quot;hk888@sbcglobal.net&quot;, &quot;kodawson@rtr.net&quot;], 'Emails'); event.stopPropagation();">📋 Copy All Emails (2)</button><div class="addr-row">✉️ <span>hk888@sbcglobal.net</span> <button class="copy-item-btn" onclick="copySingle('hk888@sbcglobal.net', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>kodawson@rtr.net</span> <button class="copy-item-btn" onclick="copySingle('kodawson@rtr.net', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div></div></div>
+      <div class="frow"><span class="fl">Address(es):</span><div class="addrs"><div class="addr-row">📍 832 Holly Ln · Petaluma, CA</div><div class="addr-row">📍 420 Greenbriar Cir Unit B · Petaluma, CA</div><div class="addr-row">📍 2005 Crinella Dr · Petaluma, CA</div><div class="addr-row">📍 1601 Corporate Cir Unit 7145 · Petaluma, CA</div><div class="addr-row">📍 Po Box 7145 · Petaluma, CA</div><div class="addr-row">📍 810 Wine Ct · Petaluma, CA</div><div class="addr-row">📍 8841 Gravenstein Way · Cotati, CA</div><div class="addr-row">📍 56 Dockside Cir · San Rafael, CA</div><div class="addr-row">📍 87 Bayo Vista Way Unit Wa · San Rafael, CA</div><div class="addr-row">📍 85 Bayo Vista Way Unit Wa · San Rafael, CA</div></div></div>
+      <div class="frow"><span class="fl">Relatives:</span><span class="fv">Naomi Johnson, Ella Mak, Joan Mak, Tom Mak, Allysia Mak</span></div>
+      <div class="frow"><span class="fl">AKA / Aliases:</span><span class="fv">Ben T Mak, Ben Mak, Mark T Benjamin, Ben T Mack</span></div>
+      <div class="frow"><span class="fl">Profile URL:</span>
+        <a href="https://www.fastpeoplesearch.com/benjamin-mak_id_G-6868740478221908916" target="_blank" class="url-link">https://www.fastpeoplesearch.com/benjamin-mak_id_G-6868740478221908916</a></div>
+    </div>
+    <div class="ss-wrap">
+                <img src="Ben_Mack_San_Diego_County_California_1_result_6.png" class="ss-thumb"
+                     onclick="openModal('Ben_Mack_San_Diego_County_California_1_result_6.png')"
+                     title="Click to view profile detail screenshot">
+                <div class="ss-lbl">📸 Profile Detail Screenshot — click to zoom</div>
+            </div>
+  </div>
+  
+  <div class="res-actions">
+    <button class="res-btn arch-btn" onclick="archiveResult(5)">🗃 Not This Person</button>
+    <button class="res-btn del-btn"  onclick="confirmDelete(5)">🗑 Delete Result</button>
+  </div>
+</details>
+<details class="rcard " id="rcard-6">
+  <summary class="rcard-hdr">
+    <span class="rnum">#7</span>
+    <span class="rname">Barbara Mack · Age 90 · Leonardtown, MD</span>
+    <span class="badge-group">
+      <span class="badge-tag">📞 9</span>
+      <span class="badge-tag">✉️ 1</span>
+    </span>
+    
+    <a href="https://www.fastpeoplesearch.com/barbara-mack_id_G-946040145832141022" target="_blank" class="profile-btn" onclick="event.stopPropagation()">🔗 View Profile</a>
+    <span class="expand-indicator">▼ Expand</span>
+  </summary>
+  <div class="rcard-body">
+    <div class="rinfo">
+      <div class="frow"><span class="fl">Full Name:</span><span class="fv fname">Barbara Mack</span></div>
+      <div class="frow"><span class="fl">Age:</span><span class="fv">90</span></div>
+      <div class="frow"><span class="fl">City / State:</span><span class="fv">Leonardtown, MD</span></div>
+      <div class="frow"><span class="fl">Phone(s):</span><div class="addrs"><button class="copy-all-btn" onclick="copyList([&quot;(619) 255-3646&quot;, &quot;(303) 651-0558&quot;, &quot;(619) 300-0305&quot;, &quot;(619) 469-9666&quot;, &quot;(858) 451-7862&quot;, &quot;(619) 807-7312&quot;, &quot;(619) 698-4943&quot;, &quot;(619) 469-6270&quot;, &quot;(310) 489-7469&quot;], 'Phones'); event.stopPropagation();">📋 Copy All Phones (9)</button><div class="addr-row">📞 <span>(619) 255-3646</span> <button class="copy-item-btn" onclick="copySingle('(619) 255-3646', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(303) 651-0558</span> <button class="copy-item-btn" onclick="copySingle('(303) 651-0558', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(619) 300-0305</span> <button class="copy-item-btn" onclick="copySingle('(619) 300-0305', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(619) 469-9666</span> <button class="copy-item-btn" onclick="copySingle('(619) 469-9666', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(858) 451-7862</span> <button class="copy-item-btn" onclick="copySingle('(858) 451-7862', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(619) 807-7312</span> <button class="copy-item-btn" onclick="copySingle('(619) 807-7312', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(619) 698-4943</span> <button class="copy-item-btn" onclick="copySingle('(619) 698-4943', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(619) 469-6270</span> <button class="copy-item-btn" onclick="copySingle('(619) 469-6270', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(310) 489-7469</span> <button class="copy-item-btn" onclick="copySingle('(310) 489-7469', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div></div></div>
+      <div class="frow"><span class="fl">Email(s):</span><div class="addrs"><button class="copy-all-btn" onclick="copyList([&quot;blm35@cox.net&quot;], 'Emails'); event.stopPropagation();">📋 Copy All Emails (1)</button><div class="addr-row">✉️ <span>blm35@cox.net</span> <button class="copy-item-btn" onclick="copySingle('blm35@cox.net', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div></div></div>
+      <div class="frow"><span class="fl">Address(es):</span><div class="addrs"><div class="addr-row">📍 42540 Wilderness Rd · Leonardtown, MD</div><div class="addr-row">📍 7734 Blue Lake Dr · San Diego, CA</div><div class="addr-row">📍 6583 Ute Hwy · Longmont, CO</div><div class="addr-row">📍 8084 Meadowdale Sq · Niwot, CO</div><div class="addr-row">📍 5740 Lake Murray Blvd · La Mesa, CA</div><div class="addr-row">📍 1775 Linden Ave · Boulder, CO</div><div class="addr-row">📍 4806 Sussex Dr · San Diego, CA</div><div class="addr-row">📍 5669 Amaya Dr Unit 364 · La Mesa, CA</div><div class="addr-row">📍 8600 Lemon Ave Unit 11 · La Mesa, CA</div><div class="addr-row">📍 2240 Pratt St Unit 123 · Longmont, CO</div></div></div>
+      <div class="frow"><span class="fl">Relatives:</span><span class="fv">Elizabeth Ferber, Heather Mack, Hunter Mack, Lorraine Dunn, Mack Benson</span></div>
+      <div class="frow"><span class="fl">AKA / Aliases:</span><span class="fv">Barbara L Mack, Barbara Goodwin Mack, Barbara G Mack, Barbara Goodwin Macks</span></div>
+      <div class="frow"><span class="fl">Profile URL:</span>
+        <a href="https://www.fastpeoplesearch.com/barbara-mack_id_G-946040145832141022" target="_blank" class="url-link">https://www.fastpeoplesearch.com/barbara-mack_id_G-946040145832141022</a></div>
+    </div>
+    <div class="ss-wrap">
+                <img src="Ben_Mack_San_Diego_County_California_1_result_7.png" class="ss-thumb"
+                     onclick="openModal('Ben_Mack_San_Diego_County_California_1_result_7.png')"
+                     title="Click to view profile detail screenshot">
+                <div class="ss-lbl">📸 Profile Detail Screenshot — click to zoom</div>
+            </div>
+  </div>
+  
+  <div class="res-actions">
+    <button class="res-btn arch-btn" onclick="archiveResult(6)">🗃 Not This Person</button>
+    <button class="res-btn del-btn"  onclick="confirmDelete(6)">🗑 Delete Result</button>
+  </div>
+</details>
+<details class="rcard " id="rcard-7">
+  <summary class="rcard-hdr">
+    <span class="rnum">#8</span>
+    <span class="rname">Cyndie Mack · Age 76 · Thousand Oaks, CA</span>
+    <span class="badge-group">
+      <span class="badge-tag">📞 9</span>
+      <span class="badge-tag">✉️ 8</span>
+    </span>
+    
+    <a href="https://www.fastpeoplesearch.com/cyndie-mack_id_G-2307604152858659878" target="_blank" class="profile-btn" onclick="event.stopPropagation()">🔗 View Profile</a>
+    <span class="expand-indicator">▼ Expand</span>
+  </summary>
+  <div class="rcard-body">
+    <div class="rinfo">
+      <div class="frow"><span class="fl">Full Name:</span><span class="fv fname">Cyndie Mack</span></div>
+      <div class="frow"><span class="fl">Age:</span><span class="fv">76</span></div>
+      <div class="frow"><span class="fl">City / State:</span><span class="fv">Thousand Oaks, CA</span></div>
+      <div class="frow"><span class="fl">Phone(s):</span><div class="addrs"><button class="copy-all-btn" onclick="copyList([&quot;(805) 338-1163&quot;, &quot;(805) 493-7723&quot;, &quot;(805) 496-3083&quot;, &quot;(702) 496-3083&quot;, &quot;(858) 391-8691&quot;, &quot;(858) 391-8694&quot;, &quot;(702) 645-6804&quot;, &quot;(805) 492-7723&quot;, &quot;(818) 707-3362&quot;], 'Phones'); event.stopPropagation();">📋 Copy All Phones (9)</button><div class="addr-row">📞 <span>(805) 338-1163</span> <button class="copy-item-btn" onclick="copySingle('(805) 338-1163', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(805) 493-7723</span> <button class="copy-item-btn" onclick="copySingle('(805) 493-7723', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(805) 496-3083</span> <button class="copy-item-btn" onclick="copySingle('(805) 496-3083', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(702) 496-3083</span> <button class="copy-item-btn" onclick="copySingle('(702) 496-3083', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(858) 391-8691</span> <button class="copy-item-btn" onclick="copySingle('(858) 391-8691', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(858) 391-8694</span> <button class="copy-item-btn" onclick="copySingle('(858) 391-8694', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(702) 645-6804</span> <button class="copy-item-btn" onclick="copySingle('(702) 645-6804', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(805) 492-7723</span> <button class="copy-item-btn" onclick="copySingle('(805) 492-7723', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(818) 707-3362</span> <button class="copy-item-btn" onclick="copySingle('(818) 707-3362', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div></div></div>
+      <div class="frow"><span class="fl">Email(s):</span><div class="addrs"><button class="copy-all-btn" onclick="copyList([&quot;eve_maksic@yahoo.com&quot;, &quot;mmack@epstrategies.net&quot;, &quot;mack@mbmesq.com&quot;, &quot;mbmackesq@cs.com&quot;, &quot;mbmack@eplaw.net&quot;, &quot;oneloyalmack@hotmail.com&quot;, &quot;mbm@epstrategies.net&quot;, &quot;m.matthew@mbmesq.com&quot;], 'Emails'); event.stopPropagation();">📋 Copy All Emails (8)</button><div class="addr-row">✉️ <span>eve_maksic@yahoo.com</span> <button class="copy-item-btn" onclick="copySingle('eve_maksic@yahoo.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>mmack@epstrategies.net</span> <button class="copy-item-btn" onclick="copySingle('mmack@epstrategies.net', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>mack@mbmesq.com</span> <button class="copy-item-btn" onclick="copySingle('mack@mbmesq.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>mbmackesq@cs.com</span> <button class="copy-item-btn" onclick="copySingle('mbmackesq@cs.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>mbmack@eplaw.net</span> <button class="copy-item-btn" onclick="copySingle('mbmack@eplaw.net', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>oneloyalmack@hotmail.com</span> <button class="copy-item-btn" onclick="copySingle('oneloyalmack@hotmail.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>mbm@epstrategies.net</span> <button class="copy-item-btn" onclick="copySingle('mbm@epstrategies.net', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>m.matthew@mbmesq.com</span> <button class="copy-item-btn" onclick="copySingle('m.matthew@mbmesq.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div></div></div>
+      <div class="frow"><span class="fl">Address(es):</span><div class="addrs"><div class="addr-row">📍 34 Del Ray Cir · Thousand Oaks, CA</div><div class="addr-row">📍 320 Higuera St · San Luis Obispo, CA</div><div class="addr-row">📍 34163 Yarrow Pl · Pioneer, CA</div><div class="addr-row">📍 31258 Endymion Way · Redlands, CA</div><div class="addr-row">📍 1913 Cabrillo Ave · Torrance, CA</div><div class="addr-row">📍 10236 California Ave · South Gate, CA</div><div class="addr-row">📍 1310 S Main St · Santa Ana, CA</div><div class="addr-row">📍 2101 San Marino St Unit 2131 · Oxnard, CA</div><div class="addr-row">📍 468 Pennsfield Pl Unit 201 · Thousand Oaks, CA</div><div class="addr-row">📍 1518 S 450 E · Orem, UT</div></div></div>
+      <div class="frow"><span class="fl">Relatives:</span><span class="fv">Cyndie Mack, Amanda Mack, Brittany Hoffman, Emily Purcell, Jessica Mack</span></div>
+      <div class="frow"><span class="fl">AKA / Aliases:</span><span class="fv">Matthew B Mack, Matthew Bmack, Matthew Blaine Mack, Matthew Mack</span></div>
+      <div class="frow"><span class="fl">Profile URL:</span>
+        <a href="https://www.fastpeoplesearch.com/cyndie-mack_id_G-2307604152858659878" target="_blank" class="url-link">https://www.fastpeoplesearch.com/cyndie-mack_id_G-2307604152858659878</a></div>
+    </div>
+    <div class="ss-wrap">
+                <img src="Ben_Mack_San_Diego_County_California_1_result_8.png" class="ss-thumb"
+                     onclick="openModal('Ben_Mack_San_Diego_County_California_1_result_8.png')"
+                     title="Click to view profile detail screenshot">
+                <div class="ss-lbl">📸 Profile Detail Screenshot — click to zoom</div>
+            </div>
+  </div>
+  
+  <div class="res-actions">
+    <button class="res-btn arch-btn" onclick="archiveResult(7)">🗃 Not This Person</button>
+    <button class="res-btn del-btn"  onclick="confirmDelete(7)">🗑 Delete Result</button>
+  </div>
+</details>
+<details class="rcard " id="rcard-8">
+  <summary class="rcard-hdr">
+    <span class="rnum">#9</span>
+    <span class="rname">Matthew Mack · Age 44 · Solana Beach, CA</span>
+    <span class="badge-group">
+      <span class="badge-tag">📞 4</span>
+      <span class="badge-tag">✉️ 4</span>
+    </span>
+    
+    <a href="https://www.fastpeoplesearch.com/matthew-mack_id_G6697563891052155917" target="_blank" class="profile-btn" onclick="event.stopPropagation()">🔗 View Profile</a>
+    <span class="expand-indicator">▼ Expand</span>
+  </summary>
+  <div class="rcard-body">
+    <div class="rinfo">
+      <div class="frow"><span class="fl">Full Name:</span><span class="fv fname">Matthew Mack</span></div>
+      <div class="frow"><span class="fl">Age:</span><span class="fv">44</span></div>
+      <div class="frow"><span class="fl">City / State:</span><span class="fv">Solana Beach, CA</span></div>
+      <div class="frow"><span class="fl">Phone(s):</span><div class="addrs"><button class="copy-all-btn" onclick="copyList([&quot;(858) 837-3404&quot;, &quot;(702) 769-6082&quot;, &quot;(858) 212-1092&quot;, &quot;(702) 545-0809&quot;], 'Phones'); event.stopPropagation();">📋 Copy All Phones (4)</button><div class="addr-row">📞 <span>(858) 837-3404</span> <button class="copy-item-btn" onclick="copySingle('(858) 837-3404', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(702) 769-6082</span> <button class="copy-item-btn" onclick="copySingle('(702) 769-6082', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(858) 212-1092</span> <button class="copy-item-btn" onclick="copySingle('(858) 212-1092', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(702) 545-0809</span> <button class="copy-item-btn" onclick="copySingle('(702) 545-0809', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div></div></div>
+      <div class="frow"><span class="fl">Email(s):</span><div class="addrs"><button class="copy-all-btn" onclick="copyList([&quot;mack@mbmesq.com&quot;, &quot;oneloyalmack@hotmail.com&quot;, &quot;mbmack@eplaw.net&quot;, &quot;mmack@epstrategies.net&quot;], 'Emails'); event.stopPropagation();">📋 Copy All Emails (4)</button><div class="addr-row">✉️ <span>mack@mbmesq.com</span> <button class="copy-item-btn" onclick="copySingle('mack@mbmesq.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>oneloyalmack@hotmail.com</span> <button class="copy-item-btn" onclick="copySingle('oneloyalmack@hotmail.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>mbmack@eplaw.net</span> <button class="copy-item-btn" onclick="copySingle('mbmack@eplaw.net', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>mmack@epstrategies.net</span> <button class="copy-item-btn" onclick="copySingle('mmack@epstrategies.net', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div></div></div>
+      <div class="frow"><span class="fl">Address(es):</span><div class="addrs"><div class="addr-row">📍 176 S Nardo Ave · Solana Beach, CA</div><div class="addr-row">📍 12248 Meadow Grass Ct · San Diego, CA</div><div class="addr-row">📍 11684 Springside Rd · San Diego, CA</div><div class="addr-row">📍 12030 Crest Rd · Poway, CA</div><div class="addr-row">📍 11895 Bridgewood Way · San Diego, CA</div><div class="addr-row">📍 8113 Eagle Clan Ct · Las Vegas, NV</div><div class="addr-row">📍 12328 Briardale Way · San Diego, CA</div><div class="addr-row">📍 2209 Mba Ct · Concord, NC</div><div class="addr-row">📍 8601 Butterchurn Ave · Las Vegas, NV</div><div class="addr-row">📍 10232 Cowboys Dream St · Las Vegas, NV</div></div></div>
+      <div class="frow"><span class="fl">Relatives:</span><span class="fv">Jessica Mack, Amanda Mack, Brittany Hoffman, Cyndie Mack, Cyndie Mack</span></div>
+      <div class="frow"><span class="fl">AKA / Aliases:</span><span class="fv">Matthew B Mack, Benjamin M Mack, Benjamin Mack, Ben Mack</span></div>
+      <div class="frow"><span class="fl">Profile URL:</span>
+        <a href="https://www.fastpeoplesearch.com/matthew-mack_id_G6697563891052155917" target="_blank" class="url-link">https://www.fastpeoplesearch.com/matthew-mack_id_G6697563891052155917</a></div>
+    </div>
+    <div class="ss-wrap">
+                <img src="Ben_Mack_San_Diego_County_California_1_result_9.png" class="ss-thumb"
+                     onclick="openModal('Ben_Mack_San_Diego_County_California_1_result_9.png')"
+                     title="Click to view profile detail screenshot">
+                <div class="ss-lbl">📸 Profile Detail Screenshot — click to zoom</div>
+            </div>
+  </div>
+  
+  <div class="res-actions">
+    <button class="res-btn arch-btn" onclick="archiveResult(8)">🗃 Not This Person</button>
+    <button class="res-btn del-btn"  onclick="confirmDelete(8)">🗑 Delete Result</button>
+  </div>
+</details>
+<details class="rcard " id="rcard-9">
+  <summary class="rcard-hdr">
+    <span class="rnum">#10</span>
+    <span class="rname">Benjamin Laplant · Age 74 · Seffner, FL</span>
+    <span class="badge-group">
+      <span class="badge-tag">📞 7</span>
+      <span class="badge-tag">✉️ 10</span>
+    </span>
+    
+    <a href="https://www.fastpeoplesearch.com/benjamin-laplant_id_G-4589302994447565705" target="_blank" class="profile-btn" onclick="event.stopPropagation()">🔗 View Profile</a>
+    <span class="expand-indicator">▼ Expand</span>
+  </summary>
+  <div class="rcard-body">
+    <div class="rinfo">
+      <div class="frow"><span class="fl">Full Name:</span><span class="fv fname">Benjamin Laplant</span></div>
+      <div class="frow"><span class="fl">Age:</span><span class="fv">74</span></div>
+      <div class="frow"><span class="fl">City / State:</span><span class="fv">Seffner, FL</span></div>
+      <div class="frow"><span class="fl">Phone(s):</span><div class="addrs"><button class="copy-all-btn" onclick="copyList([&quot;(407) 538-0094&quot;, &quot;(386) 795-5532&quot;, &quot;(386) 228-0124&quot;, &quot;(407) 668-7870&quot;, &quot;(813) 969-1395&quot;, &quot;(386) 956-8714&quot;, &quot;(813) 265-2198&quot;], 'Phones'); event.stopPropagation();">📋 Copy All Phones (7)</button><div class="addr-row">📞 <span>(407) 538-0094</span> <button class="copy-item-btn" onclick="copySingle('(407) 538-0094', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(386) 795-5532</span> <button class="copy-item-btn" onclick="copySingle('(386) 795-5532', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(386) 228-0124</span> <button class="copy-item-btn" onclick="copySingle('(386) 228-0124', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(407) 668-7870</span> <button class="copy-item-btn" onclick="copySingle('(407) 668-7870', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(813) 969-1395</span> <button class="copy-item-btn" onclick="copySingle('(813) 969-1395', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(386) 956-8714</span> <button class="copy-item-btn" onclick="copySingle('(386) 956-8714', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(813) 265-2198</span> <button class="copy-item-btn" onclick="copySingle('(813) 265-2198', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div></div></div>
+      <div class="frow"><span class="fl">Email(s):</span><div class="addrs"><button class="copy-all-btn" onclick="copyList([&quot;eggyno@hotmail.com&quot;, &quot;eggyno1@msn.com&quot;, &quot;bmacklaplant@worldnet.att.net&quot;, &quot;eggyno@bellsouth.net&quot;, &quot;eggyno1@excite.com&quot;, &quot;eggyno2@aol.com&quot;, &quot;eggyno@aol.com&quot;, &quot;eggyno@yahoo.com&quot;, &quot;eggyno@msn.com&quot;, &quot;eggyno@rediffmail.com&quot;], 'Emails'); event.stopPropagation();">📋 Copy All Emails (10)</button><div class="addr-row">✉️ <span>eggyno@hotmail.com</span> <button class="copy-item-btn" onclick="copySingle('eggyno@hotmail.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>eggyno1@msn.com</span> <button class="copy-item-btn" onclick="copySingle('eggyno1@msn.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>bmacklaplant@worldnet.att.net</span> <button class="copy-item-btn" onclick="copySingle('bmacklaplant@worldnet.att.net', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>eggyno@bellsouth.net</span> <button class="copy-item-btn" onclick="copySingle('eggyno@bellsouth.net', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>eggyno1@excite.com</span> <button class="copy-item-btn" onclick="copySingle('eggyno1@excite.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>eggyno2@aol.com</span> <button class="copy-item-btn" onclick="copySingle('eggyno2@aol.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>eggyno@aol.com</span> <button class="copy-item-btn" onclick="copySingle('eggyno@aol.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>eggyno@yahoo.com</span> <button class="copy-item-btn" onclick="copySingle('eggyno@yahoo.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>eggyno@msn.com</span> <button class="copy-item-btn" onclick="copySingle('eggyno@msn.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>eggyno@rediffmail.com</span> <button class="copy-item-btn" onclick="copySingle('eggyno@rediffmail.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div></div></div>
+      <div class="frow"><span class="fl">Address(es):</span><div class="addrs"><div class="addr-row">📍 2301 Bandy Dr · Seffner, FL</div><div class="addr-row">📍 6203 Savannah Breeze Ct Unit 201 · Tampa, FL</div><div class="addr-row">📍 4702 Bullock Ct · Tampa, FL</div><div class="addr-row">📍 13316 Tiger Lilly Ln · Tampa, FL</div><div class="addr-row">📍 433 Tangerine Ave · Lake Helen, FL</div><div class="addr-row">📍 6203 Savannah Breeze Ct Unit 103 · Tampa, FL</div><div class="addr-row">📍 3701 Carrollwood Place Cir Unit 103 · Tampa, FL</div><div class="addr-row">📍 4711 W Waters Ave Unit 109 · Tampa, FL</div></div></div>
+      <div class="frow"><span class="fl">Relatives:</span><span class="fv">Benjamin Plant, Bryan Mack, John Laplant, Nazarias Mack, Anthony Catalano</span></div>
+      <div class="frow"><span class="fl">AKA / Aliases:</span><span class="fv">Ben Mack Laplant, Benjamin R Mack Laplant, Benjamin Mack Laplant, Benjamin R Laplant</span></div>
+      <div class="frow"><span class="fl">Profile URL:</span>
+        <a href="https://www.fastpeoplesearch.com/benjamin-laplant_id_G-4589302994447565705" target="_blank" class="url-link">https://www.fastpeoplesearch.com/benjamin-laplant_id_G-4589302994447565705</a></div>
+    </div>
+    <div class="ss-wrap">
+                <img src="Ben_Mack_San_Diego_County_California_1_result_10.png" class="ss-thumb"
+                     onclick="openModal('Ben_Mack_San_Diego_County_California_1_result_10.png')"
+                     title="Click to view profile detail screenshot">
+                <div class="ss-lbl">📸 Profile Detail Screenshot — click to zoom</div>
+            </div>
+  </div>
+  
+  <div class="res-actions">
+    <button class="res-btn arch-btn" onclick="archiveResult(9)">🗃 Not This Person</button>
+    <button class="res-btn del-btn"  onclick="confirmDelete(9)">🗑 Delete Result</button>
+  </div>
+</details>
+</div>
+<div class="toast" id="toast"></div>
+<div class="modal" id="modal" onclick="if(event.target===this)this.classList.remove('open')">
+  <span class="modal-x" onclick="document.getElementById('modal').classList.remove('open')">✕</span>
+  <img id="modal-img" src="" class="modal-img" onclick="event.stopPropagation()">
+</div>
+<div class="confirm-overlay" id="confirm-overlay">
+  <div class="confirm-box">
+    <h3>🗑 Delete This Result?</h3>
+    <p>This will permanently remove the result and its screenshot.<br>This <strong>cannot be undone</strong>.</p>
+    <div class="confirm-btns">
+      <button class="cb-cancel" onclick="closeConfirm()">Cancel</button>
+      <button class="cb-delete" id="cb-confirm-btn" onclick="doDelete()">Delete Permanently</button>
+    </div>
+  </div>
+</div>
+<script>
+const JOB_ID   = '9D560E44';
+const LEAD_IDX = 0;
+const API      = (window.location.protocol.startsWith('http') ? window.location.origin : 'http://localhost:5050');
+let _pendingDeleteIdx = null;
+
+function copySingle(val, label) {
+  navigator.clipboard.writeText(val).then(() => {
+    showToast(label + ' copied to clipboard!', 'ok');
+  }).catch(() => {
+    const ta = document.createElement('textarea');
+    ta.value = val;
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    showToast(label + ' copied!', 'ok');
+  });
+}
+
+function copyList(arr, label) {
+  if (!arr || !arr.length) return;
+  const text = arr.join('\\n');
+  navigator.clipboard.writeText(text).then(() => {
+    showToast(arr.length + ' ' + label + ' copied to clipboard!', 'ok');
+  }).catch(() => {
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    showToast(arr.length + ' ' + label + ' copied!', 'ok');
+  });
+}
+
+function openModal(src){
+  document.getElementById('modal-img').src=src;
+  document.getElementById('modal').classList.add('open');
+}
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape'){
+    document.getElementById('modal').classList.remove('open');
+    closeConfirm();
+  }
+});
+
+function showToast(msg, type='ok'){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast ' + type + ' show';
+  setTimeout(()=>t.classList.remove('show'), 3500);
+}
+
+function confirmDelete(idx){
+  _pendingDeleteIdx = idx;
+  document.getElementById('confirm-overlay').classList.add('open');
+}
+function closeConfirm(){
+  document.getElementById('confirm-overlay').classList.remove('open');
+  _pendingDeleteIdx = null;
+}
+async function doDelete(){
+  const idx = _pendingDeleteIdx;
+  closeConfirm();
+  if (idx === null || !JOB_ID) return;
+  await deleteResult(idx);
+}
+async function deleteResult(idx){
+  if (!JOB_ID) { showToast('No job ID — open via dashboard', 'err'); return; }
+  const card = document.getElementById('rcard-' + idx);
+  if (card) card.classList.add('removing');
+  try {
+    const r = await fetch(`${API}/api/jobs/${JOB_ID}/leads/${LEAD_IDX}/results/${idx}/delete`,
+                          {method:'POST'});
+    const d = await r.json();
+    if (r.ok) {
+      setTimeout(()=>{ if(card) card.remove(); updateCount(-1); }, 250);
+      showToast('Result deleted permanently', 'ok');
+    } else {
+      if (card) card.classList.remove('removing');
+      showToast(d.error || 'Delete failed', 'err');
+    }
+  } catch(e) {
+    if (card) card.classList.remove('removing');
+    showToast('Network error: ' + (e.message || e), 'err');
+  }
+}
+async function archiveResult(idx){
+  if (!JOB_ID) { showToast('No job ID — open via dashboard', 'err'); return; }
+  const card = document.getElementById('rcard-' + idx);
+  if (card) {
+    card.style.transition = '0.25s all';
+    card.style.opacity = '0.3';
+    card.style.transform = 'scale(0.98)';
+  }
+  showToast('Updating status...', 'ok');
+  try {
+    const r = await fetch(`${API}/api/jobs/${JOB_ID}/leads/${LEAD_IDX}/results/${idx}/archive`,
+                          {method:'POST'});
+    const d = await r.json();
+    if (r.ok) {
+      showToast('Marked as Not This Person', 'ok');
+      setTimeout(()=>{
+        const u = new URL(window.location.href);
+        u.searchParams.set('_t', Date.now());
+        window.location.replace(u.href);
+      }, 300);
+    } else {
+      if (card) { card.style.opacity = '1'; card.style.transform = 'none'; }
+      showToast(d.error || 'Archive failed', 'err');
+    }
+  } catch(e) {
+    if (card) { card.style.opacity = '1'; card.style.transform = 'none'; }
+    showToast('Network error: ' + (e.message || e), 'err');
+  }
+}
+async function unarchiveResult(idx){
+  if (!JOB_ID) return;
+  const card = document.getElementById('rcard-' + idx);
+  if (card) {
+    card.style.transition = '0.25s all';
+    card.style.opacity = '0.3';
+  }
+  showToast('Restoring result...', 'ok');
+  try {
+    const r = await fetch(`${API}/api/jobs/${JOB_ID}/leads/${LEAD_IDX}/results/${idx}/unarchive`,
+                          {method:'POST'});
+    const d = await r.json();
+    if (r.ok) {
+      showToast('Result restored', 'ok');
+      setTimeout(()=>{
+        const u = new URL(window.location.href);
+        u.searchParams.set('_t', Date.now());
+        window.location.replace(u.href);
+      }, 300);
+    } else {
+      if (card) { card.style.opacity = '1'; card.style.transform = 'none'; }
+      showToast(d.error || 'Restore failed', 'err');
+    }
+  } catch(e) {
+    if (card) { card.style.opacity = '1'; card.style.transform = 'none'; }
+    showToast('Network error: ' + (e.message || e), 'err');
+  }
+}
+function setAllCards(expanded) {
+  document.querySelectorAll('details.rcard:not(.archived-card)').forEach(d => d.open = expanded);
+}
+function setDefaultPref(pref) {
+  localStorage.setItem('leadsosint_default_view', pref);
+  showToast('Default view saved: ' + (pref === 'expanded' ? 'Expanded' : 'Collapsed'), 'ok');
+  setAllCards(pref === 'expanded');
+}
+(function() {
+  const pref = localStorage.getItem('leadsosint_default_view') || 'collapsed';
+  if (pref === 'expanded') {
+    const el = document.getElementById('pref-expanded');
+    if (el) el.checked = true;
+    setAllCards(true);
+  } else {
+    const el = document.getElementById('pref-collapsed');
+    if (el) el.checked = true;
+    setAllCards(false);
+  }
+})();
+function updateCount(delta){
+  const el = document.getElementById('active-count');
+  if (el) el.textContent = Math.max(0, parseInt(el.textContent||'0') + delta);
+}
+async function redoReportLead(jobId, idx){
+  if (!confirm('Re-run search for this lead now?')) return;
+  try {
+    const r = await fetch(`${API}/api/jobs/${jobId}/leads/${idx}/retry`, {method:'POST'});
+    if (r.ok) {
+      showToast('Re-starting search...', 'ok');
+      setTimeout(()=>location.reload(), 2000);
+    } else {
+      const d = await r.json().catch(()=>({}));
+      showToast(d.error || 'Retry error', 'err');
+    }
+  } catch(e) {
+    showToast('Network error: ' + (e.message || e), 'err');
+  }
+}
+</script>
+</body></html>

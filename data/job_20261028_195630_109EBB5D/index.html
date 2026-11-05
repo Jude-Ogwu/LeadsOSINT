@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>CSV Test Semicolon — LeadsOSINT</title>
+<style>
+:root{--bg:#0d0f1a;--s:#1a1d3a;--s2:#22264a;--bd:#3a3f7a;--ac:#a78bfa;
+      --ac2:#6d28d9;--tx:#e0e6ff;--mt:#8b95c4;--gn:#34d399}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:"Segoe UI",system-ui,sans-serif;background:var(--bg);color:var(--tx);min-height:100vh}
+.hero{background:linear-gradient(135deg,#1a1d3a,#0d0f1a);border-bottom:1px solid var(--bd);
+       padding:40px 50px}
+.htop{display:flex;align-items:center;gap:16px;margin-bottom:24px}
+.logo{font-size:2rem}
+h1{font-size:2rem;font-weight:800;background:linear-gradient(135deg,var(--ac),#60a5fa);
+    -webkit-background-clip:text;-webkit-text-fill-color:transparent}
+p{color:var(--mt);font-size:.85rem;margin-top:5px}
+.back{background:var(--s2);border:1px solid var(--bd);color:var(--ac);padding:9px 18px;
+       border-radius:9px;font-size:.85rem;text-decoration:none;margin-left:auto}
+.back:hover{border-color:var(--ac);background:var(--ac2);color:#fff}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:14px;max-width:700px}
+.st{background:rgba(255,255,255,.04);border:1px solid var(--bd);border-radius:12px;
+     padding:18px 22px;text-align:center;transition:.2s}
+.st:hover{border-color:var(--ac)}
+.sv{font-size:1.8rem;font-weight:800;color:var(--ac)}
+.sl{font-size:.72rem;color:var(--mt);text-transform:uppercase;letter-spacing:.5px;margin-top:5px}
+.grid{padding:36px 50px;display:grid;grid-template-columns:repeat(auto-fill,minmax(400px,1fr));gap:14px}
+.lcard{background:var(--s);border:1px solid var(--bd);border-radius:14px;padding:16px 20px;
+        display:flex;align-items:center;gap:14px;color:inherit;transition:.25s;position:relative}
+.lcard:hover{transform:translateY(-3px);box-shadow:0 12px 40px rgba(109,40,217,.2);background:var(--s2)}
+.lcard.found{border-left:4px solid var(--ac)}
+.lcard.none{border-left:4px solid var(--bd);opacity:.75}
+.lcard.running{border-left:4px solid var(--gn);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(52,211,153,.2)}
+                  50%{box-shadow:0 0 0 6px rgba(52,211,153,.0)}}
+.lc-icon{font-size:1.7rem;flex-shrink:0}
+.lc-info{flex:1;min-width:0}
+.lc-name{font-size:1rem;font-weight:700;color:#fff;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.lc-loc{font-size:.78rem;color:var(--mt);margin-top:4px}
+.lc-count{text-align:center;flex-shrink:0;margin-right:8px}
+.lc-num{font-size:1.6rem;font-weight:800;color:var(--ac)}
+.lc-lbl{font-size:.68rem;color:var(--mt);text-transform:uppercase;letter-spacing:.5px}
+.redo-lead-btn{background:var(--s2);border:1px solid var(--bd);color:var(--ac);padding:6px 12px;
+                border-radius:8px;font-size:.78rem;font-weight:700;cursor:pointer;transition:.2s;flex-shrink:0}
+.redo-lead-btn:hover{background:var(--ac2);color:#fff;border-color:var(--ac)}
+.footer{text-align:center;padding:36px;color:var(--mt);font-size:.82rem;border-top:1px solid var(--bd)}
+</style></head><body>
+<div class="hero">
+  <div class="htop">
+    <div class="logo">🔍</div>
+    <div><h1>CSV Test Semicolon</h1><p>Job ID: 109EBB5D · Generated: October 28, 2026 · 07:56 PM</p></div>
+    <a href="/" class="back">← Dashboard</a>
+  </div>
+  <div class="stats">
+    <div class="st"><div class="sv">2</div><div class="sl">Total Leads</div></div>
+    <div class="st"><div class="sv">0</div><div class="sl">Found</div></div>
+    <div class="st"><div class="sv">0</div><div class="sl">Failed</div></div>
+    <div class="st"><div class="sv">0</div><div class="sl">Total Results</div></div>
+  </div>
+</div>
+<div class="grid">
+<div class="lcard none">
+  <a href="#" style="display:flex;align-items:center;gap:16px;flex:1;text-decoration:none;color:inherit;min-width:0" onclick="return false">
+    <div class="lc-icon">⏳</div>
+    <div class="lc-info">
+      <div class="lc-name">David Beckham</div>
+      <div class="lc-loc">Miami FL</div>
+      
+    </div>
+    <div class="lc-count">
+      <div class="lc-num">0</div>
+      <div class="lc-lbl">results</div>
+    </div>
+  </a>
+  <button class="redo-lead-btn" onclick="redoLead('109EBB5D', 0)" title="Re-run search for this lead">🔄 Re-do</button>
+</div>
+<div class="lcard none">
+  <a href="#" style="display:flex;align-items:center;gap:16px;flex:1;text-decoration:none;color:inherit;min-width:0" onclick="return false">
+    <div class="lc-icon">⏳</div>
+    <div class="lc-info">
+      <div class="lc-name">Lionel Messi</div>
+      <div class="lc-loc">Fort Lauderdale FL</div>
+      
+    </div>
+    <div class="lc-count">
+      <div class="lc-num">0</div>
+      <div class="lc-lbl">results</div>
+    </div>
+  </a>
+  <button class="redo-lead-btn" onclick="redoLead('109EBB5D', 1)" title="Re-run search for this lead">🔄 Re-do</button>
+</div></div>
+<div class="footer">LeadsOSINT · Public Records Intelligence Engine</div>
+<script>
+async function redoLead(jobId, idx) {
+  if (!confirm('Re-run search for this single lead now?')) return;
+  const api = (window.location.protocol.startsWith('http') ? window.location.origin : 'http://localhost:5050');
+  try {
+    const r = await fetch(api + '/api/jobs/' + jobId + '/leads/' + idx + '/retry', {method: 'POST'});
+    if (r.ok) {
+      alert('Re-starting search for lead... Page will refresh.');
+      setTimeout(() => location.reload(), 1500);
+    } else {
+      const d = await r.json().catch(()=>({}));
+      alert(d.error || 'Error triggering retry');
+    }
+  } catch(e) {
+    alert('Network error triggering retry');
+  }
+}
+</script>
+</body></html>

@@ -1,0 +1,764 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Ami Simmons — LeadsOSINT</title>
+<style>
+:root{--bg:#0d0f1a;--s:#1a1d3a;--s2:#22264a;--bd:#3a3f7a;--ac:#a78bfa;--ac2:#6d28d9;
+      --tx:#e0e6ff;--mt:#8b95c4;--gn:#34d399;--rd:#f87171;--bl:#60a5fa;--yw:#fbbf24}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:"Segoe UI",system-ui,sans-serif;background:var(--bg);color:var(--tx);min-height:100vh}
+.topbar{background:linear-gradient(135deg,#1a1d3a,#0d0f1a);border-bottom:1px solid var(--bd);
+         padding:18px 40px;display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.back{background:var(--s2);border:1px solid var(--bd);color:var(--ac);padding:9px 18px;
+       border-radius:9px;font-size:.85rem;text-decoration:none;transition:.2s}
+.back:hover{border-color:var(--ac);background:var(--ac2);color:#fff}
+.ttl h1{font-size:1.5rem;color:#fff;font-weight:700}
+.ttl p{color:var(--mt);font-size:.8rem;margin-top:3px}
+.social-top-btn{background:linear-gradient(135deg,#2563eb,#60a5fa);color:#fff;padding:8px 16px;border-radius:9px;font-size:.82rem;font-weight:700;text-decoration:none;transition:.2s;box-shadow:0 4px 14px rgba(37,99,235,.3)}
+.social-top-btn:hover{transform:translateY(-1px);color:#fff;box-shadow:0 6px 20px rgba(96,165,250,.4)}
+.stats{display:flex;gap:14px;padding:20px 40px;background:var(--s);border-bottom:1px solid var(--bd);flex-wrap:wrap}
+.sp{background:var(--bg);border:1px solid var(--bd);border-radius:10px;
+     padding:12px 20px;text-align:center}
+.sp.hi{border-color:var(--ac);background:rgba(167,139,250,.07)}
+.sv{font-size:1.4rem;font-weight:800;color:var(--ac)}
+.sl{font-size:.7rem;color:var(--mt);text-transform:uppercase;letter-spacing:.5px;margin-top:2px}
+.content{padding:28px 40px;max-width:1400px;margin:0 auto}
+.rcard{background:var(--s);border:1px solid var(--bd);border-radius:16px;
+        margin-bottom:24px;overflow:hidden;transition:.4s all}
+.rcard:hover{border-color:var(--ac);transform:translateY(-2px);
+              box-shadow:0 10px 36px rgba(109,40,217,.2)}
+.rcard.removing{opacity:0;transform:translateY(-12px) scale(.97);pointer-events:none}
+.archived-card{opacity:.55;border-style:dashed;filter:grayscale(.3)}
+.rcard-hdr{background:linear-gradient(135deg,var(--s2),var(--s));padding:16px 24px;
+            display:flex;align-items:center;gap:14px;border-bottom:1px solid var(--bd);flex-wrap:wrap;cursor:pointer;list-style:none}
+.rcard-hdr::-webkit-details-marker{display:none}
+.rnum{background:linear-gradient(135deg,var(--ac2),var(--ac));color:#fff;
+       font-size:.78rem;font-weight:700;padding:4px 12px;border-radius:16px;flex-shrink:0}
+.rname{font-size:1.15rem;font-weight:700;color:#fff;flex:1}
+.badge-group{display:flex;gap:6px;align-items:center}
+.badge-tag{background:rgba(167,139,250,.15);border:1px solid rgba(167,139,250,.3);color:var(--ac);font-size:.75rem;padding:3px 8px;border-radius:6px;font-weight:600}
+.expand-indicator{color:var(--ac);font-size:.8rem;font-weight:700;margin-left:8px}
+.arch-tag{background:rgba(251,191,36,.15);border:1px solid rgba(251,191,36,.3);
+           color:var(--yw);font-size:.72rem;padding:3px 10px;border-radius:10px;flex-shrink:0}
+.profile-btn{background:linear-gradient(135deg,#4c3d8f,var(--ac2));color:#fff;
+              padding:8px 16px;border-radius:9px;font-size:.8rem;
+              font-weight:600;text-decoration:none;transition:.2s;flex-shrink:0}
+.profile-btn:hover{background:linear-gradient(135deg,var(--ac2),var(--ac));
+                    transform:translateY(-1px);color:#fff}
+.copy-all-btn{background:linear-gradient(135deg,var(--ac2),var(--ac3));color:#fff;border:none;padding:5px 12px;border-radius:6px;font-size:.75rem;font-weight:600;cursor:pointer;margin-bottom:6px;display:inline-block}
+.copy-all-btn:hover{background:var(--ac2)}
+.copy-item-btn{background:transparent;border:none;color:var(--mt);cursor:pointer;font-size:.8rem;padding:0 4px;margin-left:auto}
+.copy-item-btn:hover{color:var(--ac)}
+.addr-row{color:#c4caf0;font-size:.88rem;padding:6px 12px;
+           background:rgba(255,255,255,.03);border-radius:7px;border:1px solid var(--bd);display:flex;align-items:center;gap:8px}
+.url-link{color:var(--bl);font-size:.82rem;word-break:break-all;text-decoration:underline}
+.url-link:hover{color:var(--ac)}
+.rcard-body{padding:24px 28px;display:flex;gap:24px;align-items:flex-start;flex-wrap:wrap}
+.rinfo{flex:1;min-width:320px;display:flex;flex-direction:column;gap:14px}
+.frow{display:grid;grid-template-columns:140px 1fr;gap:12px;align-items:start;font-size:.92rem}
+.fl{font-weight:700;color:var(--mt);font-size:.85rem;letter-spacing:.3px;padding-top:4px}
+.fv{color:#fff;font-weight:600;line-height:1.5}
+.fname{font-size:1.15rem;color:var(--ac);font-weight:700}
+.ss-wrap{flex:0 0 320px;display:flex;flex-direction:column;align-items:center}
+.ss-thumb{width:100%;border-radius:10px;border:2px solid var(--bd);cursor:pointer;
+           transition:.2s;display:block}
+.ss-thumb:hover{border-color:var(--ac);transform:scale(1.02);
+                 box-shadow:0 6px 24px rgba(167,139,250,.3)}
+.ss-lbl{color:var(--mt);font-size:.78rem;margin-top:8px;text-align:center}
+.ss-missing{color:var(--mt);font-size:.82rem;padding:20px;text-align:center;
+             background:var(--s2);border-radius:10px;border:1px dashed var(--bd)}
+.res-actions{padding:14px 24px;border-top:1px solid var(--bd);
+              display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.res-actions.arch-mode{background:rgba(251,191,36,.04)}
+.res-btn{padding:8px 16px;border-radius:8px;font-size:.8rem;font-weight:600;
+          cursor:pointer;transition:.2s;border:1px solid;background:transparent}
+.arch-btn{border-color:rgba(251,191,36,.5);color:var(--yw);}
+.arch-btn:hover{background:rgba(251,191,36,.1)}
+.del-btn{border-color:rgba(248,113,113,.5);color:var(--rd);}
+.del-btn:hover{background:rgba(248,113,113,.1)}
+.unarch-btn{border-color:rgba(96,165,250,.5);color:var(--bl);}
+.unarch-btn:hover{background:rgba(96,165,250,.1)}
+.arch-label{font-size:.8rem;color:var(--yw);flex:1}
+.arch-section{margin-top:10px;border-radius:14px;border:1px dashed var(--bd);overflow:hidden}
+.arch-section summary{padding:14px 20px;cursor:pointer;color:var(--mt);font-size:.9rem;
+                       font-weight:600;list-style:none;background:var(--s2);
+                       display:flex;align-items:center;gap:8px}
+.arch-section summary:hover{color:var(--tx)}
+.arch-section summary span{font-size:.75rem;font-weight:400;margin-left:auto;color:var(--mt)}
+.arch-inner{padding:16px}
+.empty{background:var(--s);border:2px dashed var(--bd);border-radius:14px;
+        padding:50px;text-align:center;color:var(--mt);font-size:1rem}
+.search-ss-card{background:var(--s);border:1px solid var(--bd);border-radius:16px;margin-bottom:28px;overflow:hidden;box-shadow:0 4px 20px rgba(0,0,0,0.3)}
+.search-ss-hdr{background:linear-gradient(135deg,var(--s2),var(--s));padding:16px 24px;border-bottom:1px solid var(--bd);display:flex;justify-content:space-between;align-items:center}
+.search-ss-title{font-weight:700;color:#fff;font-size:1.05rem}
+.search-ss-sub{font-size:.78rem;color:var(--mt);margin-top:2px}
+.search-ss-body{position:relative;cursor:pointer;max-height:380px;overflow:hidden;background:#0d0f1a}
+.search-ss-img{width:100%;display:block;opacity:.88;transition:.3s all}
+.search-ss-body:hover .search-ss-img{opacity:1;transform:scale(1.005)}
+.search-ss-overlay{position:absolute;bottom:16px;left:50%;transform:translateX(-50%);background:rgba(13,15,26,.88);border:1px solid var(--ac);color:var(--ac);padding:8px 20px;border-radius:20px;font-size:.8rem;font-weight:700;backdrop-filter:blur(6px);pointer-events:none;box-shadow:0 4px 14px rgba(109,40,217,.3)}
+.toast{position:fixed;bottom:24px;right:24px;background:var(--s);
+        border:1px solid var(--bd);border-radius:12px;padding:12px 20px;
+        font-size:.85rem;z-index:999;transform:translateY(60px);opacity:0;
+        transition:.3s;max-width:280px}
+.toast.show{transform:translateY(0);opacity:1}
+.toast.ok{border-color:rgba(52,211,153,.4);color:var(--gn)}
+.toast.err{border-color:rgba(248,113,113,.4);color:var(--rd)}
+.modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.96);z-index:9999;
+        justify-content:center;align-items:center;padding:20px}
+.modal.open{display:flex}
+.modal-img{max-width:95vw;max-height:90vh;border-radius:12px;border:2px solid var(--ac)}
+.modal-x{position:fixed;top:18px;right:28px;color:var(--ac);font-size:2.2rem;
+          cursor:pointer;z-index:10000;transition:.2s}
+.modal-x:hover{color:#fff;transform:scale(1.1)}
+.confirm-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.8);
+                  z-index:8888;justify-content:center;align-items:center}
+.confirm-overlay.open{display:flex}
+.confirm-box{background:var(--s);border:1px solid var(--rd);border-radius:18px;
+              padding:32px 36px;max-width:380px;text-align:center}
+.confirm-box h3{color:#fff;margin-bottom:10px;font-size:1.1rem}
+.confirm-box p{color:var(--mt);font-size:.88rem;margin-bottom:24px;line-height:1.6}
+.confirm-btns{display:flex;gap:12px;justify-content:center}
+.cb-cancel{padding:10px 24px;border-radius:9px;border:1px solid var(--bd);
+            background:var(--s2);color:var(--tx);cursor:pointer;font-size:.9rem}
+.cb-delete{padding:10px 24px;border-radius:9px;border:none;
+            background:linear-gradient(135deg,#b91c1c,var(--rd));color:#fff;
+            cursor:pointer;font-size:.9rem;font-weight:700}
+.collapse-toolbar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:18px;flex-wrap:wrap;background:var(--s);padding:12px 20px;border-radius:12px;border:1px solid var(--bd)}
+.tool-btn{background:var(--s2);border:1px solid var(--bd);color:var(--ac);padding:7px 15px;border-radius:8px;font-size:.82rem;font-weight:700;cursor:pointer;transition:.2s}
+.tool-btn:hover{background:var(--ac2);color:#fff;border-color:var(--ac)}
+.view-pref{display:flex;align-items:center;gap:12px;font-size:.82rem;color:var(--mt)}
+.view-pref label{display:inline-flex;align-items:center;gap:6px;cursor:pointer;color:var(--tx);font-weight:600}
+.view-pref input[type="radio"]{accent-color:var(--ac);cursor:pointer}
+</style></head><body>
+<div class="topbar">
+  <a href="/results/FF9B86F8" class="back" onclick="if(window.location.protocol==='file:'){this.href='../index.html'}">← Back to Job</a>
+  <div class="ttl"><h1>🔍 Ami Simmons</h1>
+    <p>Location: Not specified · October 10, 2026 · 07:40 AM</p></div>
+  <div style="display:flex;gap:8px;margin-left:auto;flex-wrap:wrap">
+    <button class="social-top-btn" style="background:linear-gradient(135deg,#6d28d9,#a78bfa);color:#fff;cursor:pointer;border:none" onclick="redoReportLead('FF9B86F8', 1)" title="Re-run search for this lead">🔄 Re-do Search</button>
+    <a href="https://www.facebook.com/pfbid0s2FX5Rvn7tf8bjTdwMRXZgLoD5EEDnPTArvDZqs9YyL5hyx9FeVsfgbQRL4a6LGXl" target="_blank" rel="noopener noreferrer" class="social-top-btn" title="https://www.facebook.com/pfbid0s2FX5Rvn7tf8bjTdwMRXZgLoD5EEDnPTArvDZqs9YyL5hyx9FeVsfgbQRL4a6LGXl" onclick="event.stopPropagation()">🔗 Open Facebook</a>
+    
+    
+  </div>
+</div>
+<div class="stats">
+  <div class="sp hi"><div class="sv" id="active-count">10</div><div class="sl">Active Results</div></div>
+  <div class="sp"><div class="sv" style="color:var(--gn)">
+    ✓ Found</div><div class="sl">Status</div></div>
+  <div class="sp"><div class="sv" style="font-size:.9rem">N/A</div>
+    <div class="sl">Location</div></div>
+  <div class="sp"><div class="sv" style="font-size:.85rem"><a href="https://www.facebook.com/pfbid0s2FX5Rvn7tf8bjTdwMRXZgLoD5EEDnPTArvDZqs9YyL5hyx9FeVsfgbQRL4a6LGXl" target="_blank" rel="noopener noreferrer" class="url-link" title="https://www.facebook.com/pfbid0s2FX5Rvn7tf8bjTdwMRXZgLoD5EEDnPTArvDZqs9YyL5hyx9FeVsfgbQRL4a6LGXl" style="display:inline-block;max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;vertical-align:bottom">🔗 Facebook</a></div>
+    <div class="sl">Social Link</div></div>
+  <div class="sp"><div class="sv" style="font-size:.85rem"><span style="color:var(--mt)">N/A</span></div>
+    <div class="sl">Input Email</div></div>
+  <div class="sp"><div class="sv" style="font-size:.85rem"><span style="color:var(--mt)">N/A</span></div>
+    <div class="sl">Input Phone</div></div>
+</div>
+<div class="content">
+
+<div class="search-ss-card">
+  <div class="search-ss-hdr">
+    <div>
+      <div class="search-ss-title">🌐 FastPeopleSearch — Full Search Page Overview</div>
+      <div class="search-ss-sub">Live search results overview for "Ami Simmons" (US)</div>
+    </div>
+  </div>
+  <div class="search-ss-body" onclick="openModal('Ami_Simmons_search_page.png')">
+    <img src="Ami_Simmons_search_page.png" class="search-ss-img" title="Click to view full search page screenshot">
+    <div class="search-ss-overlay">🔍 Click to View Full Search Page Screenshot</div>
+  </div>
+</div>
+<div class="collapse-toolbar">
+  <div style="display:flex;align-items:center;gap:10px">
+    <button class="tool-btn" onclick="setAllCards(false)">▸ Collapse All</button>
+    <button class="tool-btn" onclick="setAllCards(true)">▾ Expand All</button>
+  </div>
+  <div class="view-pref">
+    <span>Default View:</span>
+    <label><input type="radio" name="default_view_pref" value="collapsed" id="pref-collapsed" onchange="setDefaultPref('collapsed')"> Collapsed</label>
+    <label><input type="radio" name="default_view_pref" value="expanded" id="pref-expanded" onchange="setDefaultPref('expanded')"> Expanded</label>
+  </div>
+</div>
+
+<details class="rcard " id="rcard-0">
+  <summary class="rcard-hdr">
+    <span class="rnum">#1</span>
+    <span class="rname">Ami Simmons · Age 56 · Greensboro, NC</span>
+    <span class="badge-group">
+      <span class="badge-tag">📞 10</span>
+      <span class="badge-tag">✉️ 7</span>
+    </span>
+    
+    <a href="https://www.fastpeoplesearch.com/ami-simmons_id_G6871491486601927399" target="_blank" class="profile-btn" onclick="event.stopPropagation()">🔗 View Profile</a>
+    <span class="expand-indicator">▼ Expand</span>
+  </summary>
+  <div class="rcard-body">
+    <div class="rinfo">
+      <div class="frow"><span class="fl">Full Name:</span><span class="fv fname">Ami Simmons</span></div>
+      <div class="frow"><span class="fl">Age:</span><span class="fv">56</span></div>
+      <div class="frow"><span class="fl">City / State:</span><span class="fv">Greensboro, NC</span></div>
+      <div class="frow"><span class="fl">Phone(s):</span><div class="addrs"><button class="copy-all-btn" onclick="copyList([&quot;(336) 337-7248&quot;, &quot;(336) 697-5767&quot;, &quot;(336) 292-2159&quot;, &quot;(336) 632-1849&quot;, &quot;(336) 854-0268&quot;, &quot;(336) 255-1026&quot;, &quot;(336) 855-6815&quot;, &quot;(336) 763-7013&quot;, &quot;(336) 898-4229&quot;, &quot;(336) 772-0300&quot;], 'Phones'); event.stopPropagation();">📋 Copy All Phones (10)</button><div class="addr-row">📞 <span>(336) 337-7248</span> <button class="copy-item-btn" onclick="copySingle('(336) 337-7248', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(336) 697-5767</span> <button class="copy-item-btn" onclick="copySingle('(336) 697-5767', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(336) 292-2159</span> <button class="copy-item-btn" onclick="copySingle('(336) 292-2159', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(336) 632-1849</span> <button class="copy-item-btn" onclick="copySingle('(336) 632-1849', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(336) 854-0268</span> <button class="copy-item-btn" onclick="copySingle('(336) 854-0268', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(336) 255-1026</span> <button class="copy-item-btn" onclick="copySingle('(336) 255-1026', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(336) 855-6815</span> <button class="copy-item-btn" onclick="copySingle('(336) 855-6815', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(336) 763-7013</span> <button class="copy-item-btn" onclick="copySingle('(336) 763-7013', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(336) 898-4229</span> <button class="copy-item-btn" onclick="copySingle('(336) 898-4229', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(336) 772-0300</span> <button class="copy-item-btn" onclick="copySingle('(336) 772-0300', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div></div></div>
+      <div class="frow"><span class="fl">Email(s):</span><div class="addrs"><button class="copy-all-btn" onclick="copyList([&quot;amisimmons@bellsouth.net&quot;, &quot;amisimmons@excite.co&quot;, &quot;amisimmons@excite.com&quot;, &quot;ami.simmons@syngenta-us.com&quot;, &quot;antsims4@yahoo.com&quot;, &quot;chelsea2435@hotmail.com&quot;, &quot;plowboy.3@hotmail.com&quot;], 'Emails'); event.stopPropagation();">📋 Copy All Emails (7)</button><div class="addr-row">✉️ <span>amisimmons@bellsouth.net</span> <button class="copy-item-btn" onclick="copySingle('amisimmons@bellsouth.net', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>amisimmons@excite.co</span> <button class="copy-item-btn" onclick="copySingle('amisimmons@excite.co', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>amisimmons@excite.com</span> <button class="copy-item-btn" onclick="copySingle('amisimmons@excite.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>ami.simmons@syngenta-us.com</span> <button class="copy-item-btn" onclick="copySingle('ami.simmons@syngenta-us.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>antsims4@yahoo.com</span> <button class="copy-item-btn" onclick="copySingle('antsims4@yahoo.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>chelsea2435@hotmail.com</span> <button class="copy-item-btn" onclick="copySingle('chelsea2435@hotmail.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>plowboy.3@hotmail.com</span> <button class="copy-item-btn" onclick="copySingle('plowboy.3@hotmail.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div></div></div>
+      <div class="frow"><span class="fl">Address(es):</span><div class="addrs"><div class="addr-row">📍 5302 Rolling Meadows Dr · Greensboro, NC</div><div class="addr-row">📍 212 Sandbar Cir Unit 3G · Greensboro, NC</div><div class="addr-row">📍 5604 Underwood Dr · Greensboro, NC</div><div class="addr-row">📍 5502 Richland St Unit A · Greensboro, NC</div><div class="addr-row">📍 3117 Darden Rd Unit A · Greensboro, NC</div><div class="addr-row">📍 4 River Oaks Ct Unit B · Greensboro, NC</div><div class="addr-row">📍 4 River Oaks Dr Unit B · Greensboro, NC</div></div></div>
+      <div class="frow"><span class="fl">Relatives:</span><span class="fv">George Simmons, Jane Fogleman, Linda Simmons, Michael Fogleman, Zachary Simmons</span></div>
+      <div class="frow"><span class="fl">AKA / Aliases:</span><span class="fv">Ami F Simmons, Ami E Simmons, Ami Elizabeth Fogleman, Ami E Fogleman</span></div>
+      <div class="frow"><span class="fl">Profile URL:</span>
+        <a href="https://www.fastpeoplesearch.com/ami-simmons_id_G6871491486601927399" target="_blank" class="url-link">https://www.fastpeoplesearch.com/ami-simmons_id_G6871491486601927399</a></div>
+    </div>
+    <div class="ss-wrap">
+                <img src="Ami_Simmons_result_1.png" class="ss-thumb"
+                     onclick="openModal('Ami_Simmons_result_1.png')"
+                     title="Click to view profile detail screenshot">
+                <div class="ss-lbl">📸 Profile Detail Screenshot — click to zoom</div>
+            </div>
+  </div>
+  
+  <div class="res-actions">
+    <button class="res-btn arch-btn" onclick="archiveResult(0)">🗃 Not This Person</button>
+    <button class="res-btn del-btn"  onclick="confirmDelete(0)">🗑 Delete Result</button>
+  </div>
+</details>
+<details class="rcard " id="rcard-1">
+  <summary class="rcard-hdr">
+    <span class="rnum">#2</span>
+    <span class="rname">Ami Simmons · Age 50 · Goshen, IN</span>
+    <span class="badge-group">
+      <span class="badge-tag">📞 7</span>
+      <span class="badge-tag">✉️ 10</span>
+    </span>
+    
+    <a href="https://www.fastpeoplesearch.com/ami-simmons_id_G-658637290103184942" target="_blank" class="profile-btn" onclick="event.stopPropagation()">🔗 View Profile</a>
+    <span class="expand-indicator">▼ Expand</span>
+  </summary>
+  <div class="rcard-body">
+    <div class="rinfo">
+      <div class="frow"><span class="fl">Full Name:</span><span class="fv fname">Ami Simmons</span></div>
+      <div class="frow"><span class="fl">Age:</span><span class="fv">50</span></div>
+      <div class="frow"><span class="fl">City / State:</span><span class="fv">Goshen, IN</span></div>
+      <div class="frow"><span class="fl">Phone(s):</span><div class="addrs"><button class="copy-all-btn" onclick="copyList([&quot;(574) 534-1638&quot;, &quot;(219) 534-1638&quot;, &quot;(574) 226-9806&quot;, &quot;(574) 534-4384&quot;, &quot;(574) 360-7919&quot;, &quot;(304) 766-9183&quot;, &quot;(574) 349-3530&quot;], 'Phones'); event.stopPropagation();">📋 Copy All Phones (7)</button><div class="addr-row">📞 <span>(574) 534-1638</span> <button class="copy-item-btn" onclick="copySingle('(574) 534-1638', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(219) 534-1638</span> <button class="copy-item-btn" onclick="copySingle('(219) 534-1638', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(574) 226-9806</span> <button class="copy-item-btn" onclick="copySingle('(574) 226-9806', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(574) 534-4384</span> <button class="copy-item-btn" onclick="copySingle('(574) 534-4384', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(574) 360-7919</span> <button class="copy-item-btn" onclick="copySingle('(574) 360-7919', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(304) 766-9183</span> <button class="copy-item-btn" onclick="copySingle('(304) 766-9183', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(574) 349-3530</span> <button class="copy-item-btn" onclick="copySingle('(574) 349-3530', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div></div></div>
+      <div class="frow"><span class="fl">Email(s):</span><div class="addrs"><button class="copy-all-btn" onclick="copyList([&quot;dmack55931@aol.com&quot;, &quot;amij6276@earthlink.com&quot;, &quot;ami.simmons@hotmail.com&quot;, &quot;amij@worldnet.att.net&quot;, &quot;amij6276@att.net&quot;, &quot;amij@aol.com&quot;, &quot;amij6276@aol.com&quot;, &quot;dorsch2@skysys.com&quot;, &quot;amij6276@worldnet.att.net&quot;, &quot;amij@att.net&quot;], 'Emails'); event.stopPropagation();">📋 Copy All Emails (10)</button><div class="addr-row">✉️ <span>dmack55931@aol.com</span> <button class="copy-item-btn" onclick="copySingle('dmack55931@aol.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>amij6276@earthlink.com</span> <button class="copy-item-btn" onclick="copySingle('amij6276@earthlink.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>ami.simmons@hotmail.com</span> <button class="copy-item-btn" onclick="copySingle('ami.simmons@hotmail.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>amij@worldnet.att.net</span> <button class="copy-item-btn" onclick="copySingle('amij@worldnet.att.net', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>amij6276@att.net</span> <button class="copy-item-btn" onclick="copySingle('amij6276@att.net', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>amij@aol.com</span> <button class="copy-item-btn" onclick="copySingle('amij@aol.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>amij6276@aol.com</span> <button class="copy-item-btn" onclick="copySingle('amij6276@aol.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>dorsch2@skysys.com</span> <button class="copy-item-btn" onclick="copySingle('dorsch2@skysys.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>amij6276@worldnet.att.net</span> <button class="copy-item-btn" onclick="copySingle('amij6276@worldnet.att.net', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>amij@att.net</span> <button class="copy-item-btn" onclick="copySingle('amij@att.net', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div></div></div>
+      <div class="frow"><span class="fl">Address(es):</span><div class="addrs"><div class="addr-row">📍 301 Crescent St · Goshen, IN</div><div class="addr-row">📍 60784 County Road 127 · Goshen, IN</div><div class="addr-row">📍 301 Crescent St · Elkhart, IN</div><div class="addr-row">📍 161 Roxbury Park · Goshen, IN</div><div class="addr-row">📍 318 N 1St St · Goshen, IN</div><div class="addr-row">📍 168 Roxbury Park · Goshen, IN</div><div class="addr-row">📍 1528 S 12Th St · Goshen, IN</div><div class="addr-row">📍 403 Post Rd · Goshen, IN</div><div class="addr-row">📍 521 W Lincoln Ave · Goshen, IN</div><div class="addr-row">📍 521 E Lincoln Ave · Goshen, IN</div></div></div>
+      <div class="frow"><span class="fl">Relatives:</span><span class="fv">Christian Simmons, Andi Simmons, Deandra Simmons, Jennifer Simmons, Joseph Roberts</span></div>
+      <div class="frow"><span class="fl">AKA / Aliases:</span><span class="fv">Ami J Simmons, Amy J Simmons, Andi Simmons, Amijo Simmons</span></div>
+      <div class="frow"><span class="fl">Profile URL:</span>
+        <a href="https://www.fastpeoplesearch.com/ami-simmons_id_G-658637290103184942" target="_blank" class="url-link">https://www.fastpeoplesearch.com/ami-simmons_id_G-658637290103184942</a></div>
+    </div>
+    <div class="ss-wrap">
+                <img src="Ami_Simmons_result_2.png" class="ss-thumb"
+                     onclick="openModal('Ami_Simmons_result_2.png')"
+                     title="Click to view profile detail screenshot">
+                <div class="ss-lbl">📸 Profile Detail Screenshot — click to zoom</div>
+            </div>
+  </div>
+  
+  <div class="res-actions">
+    <button class="res-btn arch-btn" onclick="archiveResult(1)">🗃 Not This Person</button>
+    <button class="res-btn del-btn"  onclick="confirmDelete(1)">🗑 Delete Result</button>
+  </div>
+</details>
+<details class="rcard " id="rcard-2">
+  <summary class="rcard-hdr">
+    <span class="rnum">#3</span>
+    <span class="rname">Amie Simmons · Age 47 · Greeley, CO</span>
+    <span class="badge-group">
+      <span class="badge-tag">📞 5</span>
+      <span class="badge-tag">✉️ 5</span>
+    </span>
+    
+    <a href="https://www.fastpeoplesearch.com/amie-simmons_id_G3198439041408986551" target="_blank" class="profile-btn" onclick="event.stopPropagation()">🔗 View Profile</a>
+    <span class="expand-indicator">▼ Expand</span>
+  </summary>
+  <div class="rcard-body">
+    <div class="rinfo">
+      <div class="frow"><span class="fl">Full Name:</span><span class="fv fname">Amie Simmons</span></div>
+      <div class="frow"><span class="fl">Age:</span><span class="fv">47</span></div>
+      <div class="frow"><span class="fl">City / State:</span><span class="fv">Greeley, CO</span></div>
+      <div class="frow"><span class="fl">Phone(s):</span><div class="addrs"><button class="copy-all-btn" onclick="copyList([&quot;(970) 339-1965&quot;, &quot;(303) 420-0613&quot;, &quot;(303) 245-0316&quot;, &quot;(303) 283-0880&quot;, &quot;(903) 891-8462&quot;], 'Phones'); event.stopPropagation();">📋 Copy All Phones (5)</button><div class="addr-row">📞 <span>(970) 339-1965</span> <button class="copy-item-btn" onclick="copySingle('(970) 339-1965', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(303) 420-0613</span> <button class="copy-item-btn" onclick="copySingle('(303) 420-0613', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(303) 245-0316</span> <button class="copy-item-btn" onclick="copySingle('(303) 245-0316', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(303) 283-0880</span> <button class="copy-item-btn" onclick="copySingle('(303) 283-0880', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(903) 891-8462</span> <button class="copy-item-btn" onclick="copySingle('(903) 891-8462', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div></div></div>
+      <div class="frow"><span class="fl">Email(s):</span><div class="addrs"><button class="copy-all-btn" onclick="copyList([&quot;amie.raines@cs.com&quot;, &quot;amieraines@hotmail.com&quot;, &quot;amie.raines@yahoo.com&quot;, &quot;amieraines@centurytel.net&quot;, &quot;pkamie.raines40@cs.com&quot;], 'Emails'); event.stopPropagation();">📋 Copy All Emails (5)</button><div class="addr-row">✉️ <span>amie.raines@cs.com</span> <button class="copy-item-btn" onclick="copySingle('amie.raines@cs.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>amieraines@hotmail.com</span> <button class="copy-item-btn" onclick="copySingle('amieraines@hotmail.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>amie.raines@yahoo.com</span> <button class="copy-item-btn" onclick="copySingle('amie.raines@yahoo.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>amieraines@centurytel.net</span> <button class="copy-item-btn" onclick="copySingle('amieraines@centurytel.net', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>pkamie.raines40@cs.com</span> <button class="copy-item-btn" onclick="copySingle('pkamie.raines40@cs.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div></div></div>
+      <div class="frow"><span class="fl">Address(es):</span><div class="addrs"><div class="addr-row">📍 230 49Th Ave · Greeley, CO</div><div class="addr-row">📍 133 50Th Avenue Ct · Greeley, CO</div><div class="addr-row">📍 2551 W 24Th St Unit A4 · Greeley, CO</div><div class="addr-row">📍 5750 W 20Th St Unit 18~4 · Greeley, CO</div><div class="addr-row">📍 815 1 2 9Th St Unit 2 · Greeley, CO</div><div class="addr-row">📍 5050 Carr St · Arvada, CO</div><div class="addr-row">📍 230 49Th Avenue Pl · Greeley, CO</div><div class="addr-row">📍 133 N 50Th Ave · Greeley, CO</div><div class="addr-row">📍 5750 W 20Th St Unit 20~1 · Greeley, CO</div><div class="addr-row">📍 5502 W 3Rd St · Greeley, CO</div></div></div>
+      <div class="frow"><span class="fl">Relatives:</span><span class="fv">Curtis Simmons, Bradley Simmons, Carrie Frost, Eli Raines, Lorena Simmons</span></div>
+      <div class="frow"><span class="fl">AKA / Aliases:</span><span class="fv">Amie L Simmons, Amie Lee Raines, Amie A Simmons, Amie C Simmons</span></div>
+      <div class="frow"><span class="fl">Profile URL:</span>
+        <a href="https://www.fastpeoplesearch.com/amie-simmons_id_G3198439041408986551" target="_blank" class="url-link">https://www.fastpeoplesearch.com/amie-simmons_id_G3198439041408986551</a></div>
+    </div>
+    <div class="ss-wrap">
+                <img src="Ami_Simmons_result_3.png" class="ss-thumb"
+                     onclick="openModal('Ami_Simmons_result_3.png')"
+                     title="Click to view profile detail screenshot">
+                <div class="ss-lbl">📸 Profile Detail Screenshot — click to zoom</div>
+            </div>
+  </div>
+  
+  <div class="res-actions">
+    <button class="res-btn arch-btn" onclick="archiveResult(2)">🗃 Not This Person</button>
+    <button class="res-btn del-btn"  onclick="confirmDelete(2)">🗑 Delete Result</button>
+  </div>
+</details>
+<details class="rcard " id="rcard-3">
+  <summary class="rcard-hdr">
+    <span class="rnum">#4</span>
+    <span class="rname">Amie Simmons · Age 51 · Libertyville, IL</span>
+    <span class="badge-group">
+      <span class="badge-tag">📞 12</span>
+      <span class="badge-tag">✉️ 7</span>
+    </span>
+    
+    <a href="https://www.fastpeoplesearch.com/amie-simmons_id_G2653305866875495345" target="_blank" class="profile-btn" onclick="event.stopPropagation()">🔗 View Profile</a>
+    <span class="expand-indicator">▼ Expand</span>
+  </summary>
+  <div class="rcard-body">
+    <div class="rinfo">
+      <div class="frow"><span class="fl">Full Name:</span><span class="fv fname">Amie Simmons</span></div>
+      <div class="frow"><span class="fl">Age:</span><span class="fv">51</span></div>
+      <div class="frow"><span class="fl">City / State:</span><span class="fv">Libertyville, IL</span></div>
+      <div class="frow"><span class="fl">Phone(s):</span><div class="addrs"><button class="copy-all-btn" onclick="copyList([&quot;(501) 517-6892&quot;, &quot;(501) 261-8027&quot;, &quot;(773) 559-2364&quot;, &quot;(501) 758-0402&quot;, &quot;(501) 758-6402&quot;, &quot;(501) 224-6404&quot;, &quot;(501) 313-5511&quot;, &quot;(501) 240-6402&quot;, &quot;(773) 472-2975&quot;, &quot;(501) 517-6890&quot;, &quot;(501) 261-8035&quot;, &quot;(501) 224-6402&quot;], 'Phones'); event.stopPropagation();">📋 Copy All Phones (12)</button><div class="addr-row">📞 <span>(501) 517-6892</span> <button class="copy-item-btn" onclick="copySingle('(501) 517-6892', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(501) 261-8027</span> <button class="copy-item-btn" onclick="copySingle('(501) 261-8027', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(773) 559-2364</span> <button class="copy-item-btn" onclick="copySingle('(773) 559-2364', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(501) 758-0402</span> <button class="copy-item-btn" onclick="copySingle('(501) 758-0402', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(501) 758-6402</span> <button class="copy-item-btn" onclick="copySingle('(501) 758-6402', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(501) 224-6404</span> <button class="copy-item-btn" onclick="copySingle('(501) 224-6404', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(501) 313-5511</span> <button class="copy-item-btn" onclick="copySingle('(501) 313-5511', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(501) 240-6402</span> <button class="copy-item-btn" onclick="copySingle('(501) 240-6402', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(773) 472-2975</span> <button class="copy-item-btn" onclick="copySingle('(773) 472-2975', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(501) 517-6890</span> <button class="copy-item-btn" onclick="copySingle('(501) 517-6890', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(501) 261-8035</span> <button class="copy-item-btn" onclick="copySingle('(501) 261-8035', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(501) 224-6402</span> <button class="copy-item-btn" onclick="copySingle('(501) 224-6402', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div></div></div>
+      <div class="frow"><span class="fl">Email(s):</span><div class="addrs"><button class="copy-all-btn" onclick="copyList([&quot;amiesimmons@gmail.com&quot;, &quot;betdameg@optonline.net&quot;, &quot;amiesimmons@webtv.net&quot;, &quot;julyfly56@yahoo.com&quot;, &quot;charly01girl@yahoo.com&quot;, &quot;amiesimmons@hotmail.com&quot;, &quot;draysandman72@gmail.com&quot;], 'Emails'); event.stopPropagation();">📋 Copy All Emails (7)</button><div class="addr-row">✉️ <span>amiesimmons@gmail.com</span> <button class="copy-item-btn" onclick="copySingle('amiesimmons@gmail.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>betdameg@optonline.net</span> <button class="copy-item-btn" onclick="copySingle('betdameg@optonline.net', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>amiesimmons@webtv.net</span> <button class="copy-item-btn" onclick="copySingle('amiesimmons@webtv.net', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>julyfly56@yahoo.com</span> <button class="copy-item-btn" onclick="copySingle('julyfly56@yahoo.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>charly01girl@yahoo.com</span> <button class="copy-item-btn" onclick="copySingle('charly01girl@yahoo.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>amiesimmons@hotmail.com</span> <button class="copy-item-btn" onclick="copySingle('amiesimmons@hotmail.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>draysandman72@gmail.com</span> <button class="copy-item-btn" onclick="copySingle('draysandman72@gmail.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div></div></div>
+      <div class="frow"><span class="fl">Address(es):</span><div class="addrs"><div class="addr-row">📍 631 Harvard Ln · Libertyville, IL</div><div class="addr-row">📍 29 Glasgow Ct · Little Rock, AR</div><div class="addr-row">📍 4 Wildwood Dr · Cabot, AR</div><div class="addr-row">📍 966 W Cuyler Ave Unit 1N · Chicago, IL</div><div class="addr-row">📍 803 Parliament St · Little Rock, AR</div><div class="addr-row">📍 5223 Glenmere Rd · North Little Rock, AR</div><div class="addr-row">📍 7977 Hunters Xing · Cordova, TN</div><div class="addr-row">📍 7977 Hunters Crossing Dr · Cordova, TN</div><div class="addr-row">📍 5223 Glenmere Rd · N Little Rock, AR</div><div class="addr-row">📍 966 W Cuyler Ave Unit T · Chicago, IL</div></div></div>
+      <div class="frow"><span class="fl">Relatives:</span><span class="fv">Alan Simmons, James Ward, James Ward, James Ward, James Ward</span></div>
+      <div class="frow"><span class="fl">AKA / Aliases:</span><span class="fv">Amie M Simmons, Amie Melinda Ward, Amie M Ward, Ami E Simmons</span></div>
+      <div class="frow"><span class="fl">Profile URL:</span>
+        <a href="https://www.fastpeoplesearch.com/amie-simmons_id_G2653305866875495345" target="_blank" class="url-link">https://www.fastpeoplesearch.com/amie-simmons_id_G2653305866875495345</a></div>
+    </div>
+    <div class="ss-wrap">
+                <img src="Ami_Simmons_result_4.png" class="ss-thumb"
+                     onclick="openModal('Ami_Simmons_result_4.png')"
+                     title="Click to view profile detail screenshot">
+                <div class="ss-lbl">📸 Profile Detail Screenshot — click to zoom</div>
+            </div>
+  </div>
+  
+  <div class="res-actions">
+    <button class="res-btn arch-btn" onclick="archiveResult(3)">🗃 Not This Person</button>
+    <button class="res-btn del-btn"  onclick="confirmDelete(3)">🗑 Delete Result</button>
+  </div>
+</details>
+<details class="rcard " id="rcard-4">
+  <summary class="rcard-hdr">
+    <span class="rnum">#5</span>
+    <span class="rname">Ami Linn · Age 41 · Indianapolis, IN</span>
+    <span class="badge-group">
+      <span class="badge-tag">📞 10</span>
+      <span class="badge-tag">✉️ 5</span>
+    </span>
+    
+    <a href="https://www.fastpeoplesearch.com/ami-linn_id_G6100152797629022611" target="_blank" class="profile-btn" onclick="event.stopPropagation()">🔗 View Profile</a>
+    <span class="expand-indicator">▼ Expand</span>
+  </summary>
+  <div class="rcard-body">
+    <div class="rinfo">
+      <div class="frow"><span class="fl">Full Name:</span><span class="fv fname">Ami Linn</span></div>
+      <div class="frow"><span class="fl">Age:</span><span class="fv">41</span></div>
+      <div class="frow"><span class="fl">City / State:</span><span class="fv">Indianapolis, IN</span></div>
+      <div class="frow"><span class="fl">Phone(s):</span><div class="addrs"><button class="copy-all-btn" onclick="copyList([&quot;(317) 502-9519&quot;, &quot;(317) 750-3992&quot;, &quot;(317) 859-7810&quot;, &quot;(850) 261-4249&quot;, &quot;(317) 359-1471&quot;, &quot;(317) 731-6172&quot;, &quot;(317) 322-9630&quot;, &quot;(847) 772-0204&quot;, &quot;(270) 646-8515&quot;, &quot;(317) 690-7415&quot;], 'Phones'); event.stopPropagation();">📋 Copy All Phones (10)</button><div class="addr-row">📞 <span>(317) 502-9519</span> <button class="copy-item-btn" onclick="copySingle('(317) 502-9519', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(317) 750-3992</span> <button class="copy-item-btn" onclick="copySingle('(317) 750-3992', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(317) 859-7810</span> <button class="copy-item-btn" onclick="copySingle('(317) 859-7810', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(850) 261-4249</span> <button class="copy-item-btn" onclick="copySingle('(850) 261-4249', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(317) 359-1471</span> <button class="copy-item-btn" onclick="copySingle('(317) 359-1471', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(317) 731-6172</span> <button class="copy-item-btn" onclick="copySingle('(317) 731-6172', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(317) 322-9630</span> <button class="copy-item-btn" onclick="copySingle('(317) 322-9630', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(847) 772-0204</span> <button class="copy-item-btn" onclick="copySingle('(847) 772-0204', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(270) 646-8515</span> <button class="copy-item-btn" onclick="copySingle('(270) 646-8515', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(317) 690-7415</span> <button class="copy-item-btn" onclick="copySingle('(317) 690-7415', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div></div></div>
+      <div class="frow"><span class="fl">Email(s):</span><div class="addrs"><button class="copy-all-btn" onclick="copyList([&quot;ami.linn@yahoo.com&quot;, &quot;nsimmons57@juno.com&quot;, &quot;ami.simmons@yahoo.com&quot;, &quot;aesimmon@indiana.edu&quot;, &quot;mercedes3892@aol.com&quot;], 'Emails'); event.stopPropagation();">📋 Copy All Emails (5)</button><div class="addr-row">✉️ <span>ami.linn@yahoo.com</span> <button class="copy-item-btn" onclick="copySingle('ami.linn@yahoo.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>nsimmons57@juno.com</span> <button class="copy-item-btn" onclick="copySingle('nsimmons57@juno.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>ami.simmons@yahoo.com</span> <button class="copy-item-btn" onclick="copySingle('ami.simmons@yahoo.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>aesimmon@indiana.edu</span> <button class="copy-item-btn" onclick="copySingle('aesimmon@indiana.edu', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>mercedes3892@aol.com</span> <button class="copy-item-btn" onclick="copySingle('mercedes3892@aol.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div></div></div>
+      <div class="frow"><span class="fl">Address(es):</span><div class="addrs"><div class="addr-row">📍 7409 Kidwell Dr · Indianapolis, IN</div><div class="addr-row">📍 8138 Fisher Bend Dr · Indianapolis, IN</div><div class="addr-row">📍 85 N 5Th Ave · Beech Grove, IN</div><div class="addr-row">📍 5520 Darby Dan Dr Unit F · Indianapolis, IN</div><div class="addr-row">📍 1626 Wimmenauer Dr · Indianapolis, IN</div><div class="addr-row">📍 3324 Robson St · Indianapolis, IN</div><div class="addr-row">📍 9923 E 11Th St · Indianapolis, IN</div></div></div>
+      <div class="frow"><span class="fl">Relatives:</span><span class="fv">David Linn, David Simmons, Kevin Simmons, Nellie Simmons, Beverly Price</span></div>
+      <div class="frow"><span class="fl">AKA / Aliases:</span><span class="fv">Ami Elizabeth Linn, Ami E Simmons, Ami B Simmons, Ami Simmons</span></div>
+      <div class="frow"><span class="fl">Profile URL:</span>
+        <a href="https://www.fastpeoplesearch.com/ami-linn_id_G6100152797629022611" target="_blank" class="url-link">https://www.fastpeoplesearch.com/ami-linn_id_G6100152797629022611</a></div>
+    </div>
+    <div class="ss-wrap">
+                <img src="Ami_Simmons_result_5.png" class="ss-thumb"
+                     onclick="openModal('Ami_Simmons_result_5.png')"
+                     title="Click to view profile detail screenshot">
+                <div class="ss-lbl">📸 Profile Detail Screenshot — click to zoom</div>
+            </div>
+  </div>
+  
+  <div class="res-actions">
+    <button class="res-btn arch-btn" onclick="archiveResult(4)">🗃 Not This Person</button>
+    <button class="res-btn del-btn"  onclick="confirmDelete(4)">🗑 Delete Result</button>
+  </div>
+</details>
+<details class="rcard " id="rcard-5">
+  <summary class="rcard-hdr">
+    <span class="rnum">#6</span>
+    <span class="rname">Amie Phillips · Age 65 · Greensboro, NC</span>
+    <span class="badge-group">
+      <span class="badge-tag">📞 8</span>
+      <span class="badge-tag">✉️ 7</span>
+    </span>
+    
+    <a href="https://www.fastpeoplesearch.com/amie-phillips_id_G-6839028254448715545" target="_blank" class="profile-btn" onclick="event.stopPropagation()">🔗 View Profile</a>
+    <span class="expand-indicator">▼ Expand</span>
+  </summary>
+  <div class="rcard-body">
+    <div class="rinfo">
+      <div class="frow"><span class="fl">Full Name:</span><span class="fv fname">Amie Phillips</span></div>
+      <div class="frow"><span class="fl">Age:</span><span class="fv">65</span></div>
+      <div class="frow"><span class="fl">City / State:</span><span class="fv">Greensboro, NC</span></div>
+      <div class="frow"><span class="fl">Phone(s):</span><div class="addrs"><button class="copy-all-btn" onclick="copyList([&quot;(336) 875-5578&quot;, &quot;(315) 923-1078&quot;, &quot;(315) 483-7234&quot;, &quot;(315) 483-9703&quot;, &quot;(315) 398-1527&quot;, &quot;(718) 240-7677&quot;, &quot;(315) 483-4082&quot;, &quot;(315) 946-1275&quot;], 'Phones'); event.stopPropagation();">📋 Copy All Phones (8)</button><div class="addr-row">📞 <span>(336) 875-5578</span> <button class="copy-item-btn" onclick="copySingle('(336) 875-5578', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(315) 923-1078</span> <button class="copy-item-btn" onclick="copySingle('(315) 923-1078', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(315) 483-7234</span> <button class="copy-item-btn" onclick="copySingle('(315) 483-7234', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(315) 483-9703</span> <button class="copy-item-btn" onclick="copySingle('(315) 483-9703', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(315) 398-1527</span> <button class="copy-item-btn" onclick="copySingle('(315) 398-1527', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(718) 240-7677</span> <button class="copy-item-btn" onclick="copySingle('(718) 240-7677', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(315) 483-4082</span> <button class="copy-item-btn" onclick="copySingle('(315) 483-4082', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(315) 946-1275</span> <button class="copy-item-btn" onclick="copySingle('(315) 946-1275', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div></div></div>
+      <div class="frow"><span class="fl">Email(s):</span><div class="addrs"><button class="copy-all-btn" onclick="copyList([&quot;amiesue1961@yahoo.com&quot;, &quot;mcgoughykichisa@yahoo.com&quot;, &quot;ashley061085@gmail.com&quot;, &quot;aphillips006@rochester.rr.com&quot;, &quot;amiesue1961@gmail.com&quot;, &quot;ajbarnellix8706@yahoo.com&quot;, &quot;ap02219@rochester.rr.com&quot;], 'Emails'); event.stopPropagation();">📋 Copy All Emails (7)</button><div class="addr-row">✉️ <span>amiesue1961@yahoo.com</span> <button class="copy-item-btn" onclick="copySingle('amiesue1961@yahoo.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>mcgoughykichisa@yahoo.com</span> <button class="copy-item-btn" onclick="copySingle('mcgoughykichisa@yahoo.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>ashley061085@gmail.com</span> <button class="copy-item-btn" onclick="copySingle('ashley061085@gmail.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>aphillips006@rochester.rr.com</span> <button class="copy-item-btn" onclick="copySingle('aphillips006@rochester.rr.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>amiesue1961@gmail.com</span> <button class="copy-item-btn" onclick="copySingle('amiesue1961@gmail.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>ajbarnellix8706@yahoo.com</span> <button class="copy-item-btn" onclick="copySingle('ajbarnellix8706@yahoo.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>ap02219@rochester.rr.com</span> <button class="copy-item-btn" onclick="copySingle('ap02219@rochester.rr.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div></div></div>
+      <div class="frow"><span class="fl">Address(es):</span><div class="addrs"><div class="addr-row">📍 4231 Edith Ln Unit A · Greensboro, NC</div><div class="addr-row">📍 519 Manley St · High Point, NC</div><div class="addr-row">📍 413 Pam St · High Point, NC</div><div class="addr-row">📍 35 Catherine St Unit 4 · Lyons, NY</div><div class="addr-row">📍 51 Mill St Unit B · Sodus, NY</div><div class="addr-row">📍 48 Carlton St · Sodus, NY</div><div class="addr-row">📍 95 Columbia St Unit 4 · Clyde, NY</div><div class="addr-row">📍 35 Catherine St Unit 2 · Lyons, NY</div><div class="addr-row">📍 Po Box 322 · Alton, NY</div><div class="addr-row">📍 7448 Ridge Rd Unit 12B · Sodus, NY</div></div></div>
+      <div class="frow"><span class="fl">Relatives:</span><span class="fv">Randy Simmons, Rebecca Phillips, Albert Epstein, Elizabeth Phillips, Helen Phillips</span></div>
+      <div class="frow"><span class="fl">AKA / Aliases:</span><span class="fv">Amie S Phillips, Amie Sur Phillips, Amie S Simmons, Philli Amie Simmons</span></div>
+      <div class="frow"><span class="fl">Profile URL:</span>
+        <a href="https://www.fastpeoplesearch.com/amie-phillips_id_G-6839028254448715545" target="_blank" class="url-link">https://www.fastpeoplesearch.com/amie-phillips_id_G-6839028254448715545</a></div>
+    </div>
+    <div class="ss-wrap">
+                <img src="Ami_Simmons_result_6.png" class="ss-thumb"
+                     onclick="openModal('Ami_Simmons_result_6.png')"
+                     title="Click to view profile detail screenshot">
+                <div class="ss-lbl">📸 Profile Detail Screenshot — click to zoom</div>
+            </div>
+  </div>
+  
+  <div class="res-actions">
+    <button class="res-btn arch-btn" onclick="archiveResult(5)">🗃 Not This Person</button>
+    <button class="res-btn del-btn"  onclick="confirmDelete(5)">🗑 Delete Result</button>
+  </div>
+</details>
+<details class="rcard " id="rcard-6">
+  <summary class="rcard-hdr">
+    <span class="rnum">#7</span>
+    <span class="rname">Ratsami Strother · Age 58 · Decatur, IL</span>
+    <span class="badge-group">
+      <span class="badge-tag">📞 10</span>
+      <span class="badge-tag">✉️ 10</span>
+    </span>
+    
+    <a href="https://www.fastpeoplesearch.com/ratsami-strother_id_G3878767485152586685" target="_blank" class="profile-btn" onclick="event.stopPropagation()">🔗 View Profile</a>
+    <span class="expand-indicator">▼ Expand</span>
+  </summary>
+  <div class="rcard-body">
+    <div class="rinfo">
+      <div class="frow"><span class="fl">Full Name:</span><span class="fv fname">Ratsami Strother</span></div>
+      <div class="frow"><span class="fl">Age:</span><span class="fv">58</span></div>
+      <div class="frow"><span class="fl">City / State:</span><span class="fv">Decatur, IL</span></div>
+      <div class="frow"><span class="fl">Phone(s):</span><div class="addrs"><button class="copy-all-btn" onclick="copyList([&quot;(217) 201-0922&quot;, &quot;(217) 428-1149&quot;, &quot;(217) 433-6903&quot;, &quot;(540) 829-0373&quot;, &quot;(540) 825-0373&quot;, &quot;(540) 825-2503&quot;, &quot;(217) 330-6268&quot;, &quot;(703) 437-0560&quot;, &quot;(217) 791-6021&quot;, &quot;(703) 476-5113&quot;], 'Phones'); event.stopPropagation();">📋 Copy All Phones (10)</button><div class="addr-row">📞 <span>(217) 201-0922</span> <button class="copy-item-btn" onclick="copySingle('(217) 201-0922', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(217) 428-1149</span> <button class="copy-item-btn" onclick="copySingle('(217) 428-1149', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(217) 433-6903</span> <button class="copy-item-btn" onclick="copySingle('(217) 433-6903', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(540) 829-0373</span> <button class="copy-item-btn" onclick="copySingle('(540) 829-0373', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(540) 825-0373</span> <button class="copy-item-btn" onclick="copySingle('(540) 825-0373', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(540) 825-2503</span> <button class="copy-item-btn" onclick="copySingle('(540) 825-2503', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(217) 330-6268</span> <button class="copy-item-btn" onclick="copySingle('(217) 330-6268', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(703) 437-0560</span> <button class="copy-item-btn" onclick="copySingle('(703) 437-0560', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(217) 791-6021</span> <button class="copy-item-btn" onclick="copySingle('(217) 791-6021', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(703) 476-5113</span> <button class="copy-item-btn" onclick="copySingle('(703) 476-5113', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div></div></div>
+      <div class="frow"><span class="fl">Email(s):</span><div class="addrs"><button class="copy-all-btn" onclick="copyList([&quot;diami22@gmail.com&quot;, &quot;amiluvsu@msn.com&quot;, &quot;iami22@gmail.com&quot;, &quot;clayami@live.com&quot;, &quot;ratsamics@gmail.com&quot;, &quot;clayami@msn.com&quot;, &quot;clayami@yahoo.com&quot;, &quot;amistrother@msn.com&quot;, &quot;clayami@attbi.com&quot;, &quot;strothera@alpa.org&quot;], 'Emails'); event.stopPropagation();">📋 Copy All Emails (10)</button><div class="addr-row">✉️ <span>diami22@gmail.com</span> <button class="copy-item-btn" onclick="copySingle('diami22@gmail.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>amiluvsu@msn.com</span> <button class="copy-item-btn" onclick="copySingle('amiluvsu@msn.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>iami22@gmail.com</span> <button class="copy-item-btn" onclick="copySingle('iami22@gmail.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>clayami@live.com</span> <button class="copy-item-btn" onclick="copySingle('clayami@live.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>ratsamics@gmail.com</span> <button class="copy-item-btn" onclick="copySingle('ratsamics@gmail.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>clayami@msn.com</span> <button class="copy-item-btn" onclick="copySingle('clayami@msn.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>clayami@yahoo.com</span> <button class="copy-item-btn" onclick="copySingle('clayami@yahoo.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>amistrother@msn.com</span> <button class="copy-item-btn" onclick="copySingle('amistrother@msn.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>clayami@attbi.com</span> <button class="copy-item-btn" onclick="copySingle('clayami@attbi.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>strothera@alpa.org</span> <button class="copy-item-btn" onclick="copySingle('strothera@alpa.org', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div></div></div>
+      <div class="frow"><span class="fl">Address(es):</span><div class="addrs"><div class="addr-row">📍 509 S 19Th St · Decatur, IL</div><div class="addr-row">📍 1861 E Decatur St · Decatur, IL</div><div class="addr-row">📍 Po Box 622 · Decatur, IL</div><div class="addr-row">📍 1921 King Arthur Dr · Decatur, IL</div><div class="addr-row">📍 233 S Fairview Ave · Decatur, IL</div><div class="addr-row">📍 36 Lombardy Dr · Decatur, IL</div><div class="addr-row">📍 Po Box 954 · Decatur, IL</div><div class="addr-row">📍 2066 W Ridgeview Dr · Decatur, IL</div><div class="addr-row">📍 410 Barberry St · Culpeper, VA</div><div class="addr-row">📍 13908 Route 50 · Chantilly, VA</div></div></div>
+      <div class="frow"><span class="fl">Relatives:</span><span class="fv">Clayton Strother, Alex Carrillo, Anita Maude, Anne Pariseau, Bounchanh Vanisavath</span></div>
+      <div class="frow"><span class="fl">AKA / Aliases:</span><span class="fv">Ratsami Constance Simmons, Ratsami C Simmons, Ratsami Simmons, Ami C Strother</span></div>
+      <div class="frow"><span class="fl">Profile URL:</span>
+        <a href="https://www.fastpeoplesearch.com/ratsami-strother_id_G3878767485152586685" target="_blank" class="url-link">https://www.fastpeoplesearch.com/ratsami-strother_id_G3878767485152586685</a></div>
+    </div>
+    <div class="ss-wrap">
+                <img src="Ami_Simmons_result_7.png" class="ss-thumb"
+                     onclick="openModal('Ami_Simmons_result_7.png')"
+                     title="Click to view profile detail screenshot">
+                <div class="ss-lbl">📸 Profile Detail Screenshot — click to zoom</div>
+            </div>
+  </div>
+  
+  <div class="res-actions">
+    <button class="res-btn arch-btn" onclick="archiveResult(6)">🗃 Not This Person</button>
+    <button class="res-btn del-btn"  onclick="confirmDelete(6)">🗑 Delete Result</button>
+  </div>
+</details>
+<details class="rcard " id="rcard-7">
+  <summary class="rcard-hdr">
+    <span class="rnum">#8</span>
+    <span class="rname">Ami Rodriguez · Age 50 · Ruskin, FL</span>
+    <span class="badge-group">
+      <span class="badge-tag">📞 8</span>
+      <span class="badge-tag">✉️ 7</span>
+    </span>
+    
+    <a href="https://www.fastpeoplesearch.com/ami-rodriguez_id_G-7186016409759488150" target="_blank" class="profile-btn" onclick="event.stopPropagation()">🔗 View Profile</a>
+    <span class="expand-indicator">▼ Expand</span>
+  </summary>
+  <div class="rcard-body">
+    <div class="rinfo">
+      <div class="frow"><span class="fl">Full Name:</span><span class="fv fname">Ami Rodriguez</span></div>
+      <div class="frow"><span class="fl">Age:</span><span class="fv">50</span></div>
+      <div class="frow"><span class="fl">City / State:</span><span class="fv">Ruskin, FL</span></div>
+      <div class="frow"><span class="fl">Phone(s):</span><div class="addrs"><button class="copy-all-btn" onclick="copyList([&quot;(813) 672-4539&quot;, &quot;(813) 523-1924&quot;, &quot;(505) 523-5095&quot;, &quot;(409) 696-1831&quot;, &quot;(813) 672-0000&quot;, &quot;(813) 829-9743&quot;, &quot;(813) 753-5278&quot;, &quot;(254) 933-1700&quot;], 'Phones'); event.stopPropagation();">📋 Copy All Phones (8)</button><div class="addr-row">📞 <span>(813) 672-4539</span> <button class="copy-item-btn" onclick="copySingle('(813) 672-4539', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(813) 523-1924</span> <button class="copy-item-btn" onclick="copySingle('(813) 523-1924', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(505) 523-5095</span> <button class="copy-item-btn" onclick="copySingle('(505) 523-5095', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(409) 696-1831</span> <button class="copy-item-btn" onclick="copySingle('(409) 696-1831', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(813) 672-0000</span> <button class="copy-item-btn" onclick="copySingle('(813) 672-0000', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(813) 829-9743</span> <button class="copy-item-btn" onclick="copySingle('(813) 829-9743', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(813) 753-5278</span> <button class="copy-item-btn" onclick="copySingle('(813) 753-5278', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(254) 933-1700</span> <button class="copy-item-btn" onclick="copySingle('(254) 933-1700', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div></div></div>
+      <div class="frow"><span class="fl">Email(s):</span><div class="addrs"><button class="copy-all-btn" onclick="copyList([&quot;amichris0827@msn.com&quot;, &quot;amikrodriguez@hotmail.com&quot;, &quot;amirodriguez@aol.com&quot;, &quot;ami.rodriguez@msn.com&quot;, &quot;amimacchi@cs.com&quot;, &quot;amicharis0827@msn.com&quot;, &quot;amikrodriguez4@hotmail.com&quot;], 'Emails'); event.stopPropagation();">📋 Copy All Emails (7)</button><div class="addr-row">✉️ <span>amichris0827@msn.com</span> <button class="copy-item-btn" onclick="copySingle('amichris0827@msn.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>amikrodriguez@hotmail.com</span> <button class="copy-item-btn" onclick="copySingle('amikrodriguez@hotmail.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>amirodriguez@aol.com</span> <button class="copy-item-btn" onclick="copySingle('amirodriguez@aol.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>ami.rodriguez@msn.com</span> <button class="copy-item-btn" onclick="copySingle('ami.rodriguez@msn.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>amimacchi@cs.com</span> <button class="copy-item-btn" onclick="copySingle('amimacchi@cs.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>amicharis0827@msn.com</span> <button class="copy-item-btn" onclick="copySingle('amicharis0827@msn.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>amikrodriguez4@hotmail.com</span> <button class="copy-item-btn" onclick="copySingle('amikrodriguez4@hotmail.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div></div></div>
+      <div class="frow"><span class="fl">Address(es):</span><div class="addrs"><div class="addr-row">📍 7305 Somerset Pond Dr · Ruskin, FL</div><div class="addr-row">📍 9925 Windsor Club Dr Unit 101 · Riverview, FL</div><div class="addr-row">📍 10716 Moss Island Dr · Riverview, FL</div><div class="addr-row">📍 216 W Rio Grande Ave Unit 2 · El Paso, TX</div><div class="addr-row">📍 15909 Armistead Ln · Odessa, FL</div><div class="addr-row">📍 1782 Webster Ave · Las Cruces, NM</div><div class="addr-row">📍 307 Manuel Dr Unit A · College Sta, TX</div><div class="addr-row">📍 3406 Cottonwood Ln · Temple, TX</div><div class="addr-row">📍 1758 Webster Ave · Las Cruces, NM</div><div class="addr-row">📍 3113 River Place Dr · Belton, TX</div></div></div>
+      <div class="frow"><span class="fl">Relatives:</span><span class="fv">Steven Rodriguez, Ariel Rodriguez, Christian Rodriguez, Daniel Rodriguez, David Woodard</span></div>
+      <div class="frow"><span class="fl">AKA / Aliases:</span><span class="fv">Ami Kristin Simmons, Ami Simmons, Ami Kristin Macchi, Ami K Macchi</span></div>
+      <div class="frow"><span class="fl">Profile URL:</span>
+        <a href="https://www.fastpeoplesearch.com/ami-rodriguez_id_G-7186016409759488150" target="_blank" class="url-link">https://www.fastpeoplesearch.com/ami-rodriguez_id_G-7186016409759488150</a></div>
+    </div>
+    <div class="ss-wrap">
+                <img src="Ami_Simmons_result_8.png" class="ss-thumb"
+                     onclick="openModal('Ami_Simmons_result_8.png')"
+                     title="Click to view profile detail screenshot">
+                <div class="ss-lbl">📸 Profile Detail Screenshot — click to zoom</div>
+            </div>
+  </div>
+  
+  <div class="res-actions">
+    <button class="res-btn arch-btn" onclick="archiveResult(7)">🗃 Not This Person</button>
+    <button class="res-btn del-btn"  onclick="confirmDelete(7)">🗑 Delete Result</button>
+  </div>
+</details>
+<details class="rcard " id="rcard-8">
+  <summary class="rcard-hdr">
+    <span class="rnum">#9</span>
+    <span class="rname">Ami Feltovich · Age 53 · Houston, TX</span>
+    <span class="badge-group">
+      <span class="badge-tag">📞 12</span>
+      <span class="badge-tag">✉️ 9</span>
+    </span>
+    
+    <a href="https://www.fastpeoplesearch.com/ami-feltovich_id_G-5650163847733086750" target="_blank" class="profile-btn" onclick="event.stopPropagation()">🔗 View Profile</a>
+    <span class="expand-indicator">▼ Expand</span>
+  </summary>
+  <div class="rcard-body">
+    <div class="rinfo">
+      <div class="frow"><span class="fl">Full Name:</span><span class="fv fname">Ami Feltovich</span></div>
+      <div class="frow"><span class="fl">Age:</span><span class="fv">53</span></div>
+      <div class="frow"><span class="fl">City / State:</span><span class="fv">Houston, TX</span></div>
+      <div class="frow"><span class="fl">Phone(s):</span><div class="addrs"><button class="copy-all-btn" onclick="copyList([&quot;(713) 530-0063&quot;, &quot;(713) 532-0313&quot;, &quot;(713) 819-3295&quot;, &quot;(713) 218-0600&quot;, &quot;(713) 662-9837&quot;, &quot;(713) 592-0000&quot;, &quot;(713) 623-0000&quot;, &quot;(713) 218-7693&quot;, &quot;(713) 627-7081&quot;, &quot;(713) 627-9058&quot;, &quot;(713) 662-0569&quot;, &quot;(713) 777-9102&quot;], 'Phones'); event.stopPropagation();">📋 Copy All Phones (12)</button><div class="addr-row">📞 <span>(713) 530-0063</span> <button class="copy-item-btn" onclick="copySingle('(713) 530-0063', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(713) 532-0313</span> <button class="copy-item-btn" onclick="copySingle('(713) 532-0313', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(713) 819-3295</span> <button class="copy-item-btn" onclick="copySingle('(713) 819-3295', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(713) 218-0600</span> <button class="copy-item-btn" onclick="copySingle('(713) 218-0600', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(713) 662-9837</span> <button class="copy-item-btn" onclick="copySingle('(713) 662-9837', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(713) 592-0000</span> <button class="copy-item-btn" onclick="copySingle('(713) 592-0000', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(713) 623-0000</span> <button class="copy-item-btn" onclick="copySingle('(713) 623-0000', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(713) 218-7693</span> <button class="copy-item-btn" onclick="copySingle('(713) 218-7693', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(713) 627-7081</span> <button class="copy-item-btn" onclick="copySingle('(713) 627-7081', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(713) 627-9058</span> <button class="copy-item-btn" onclick="copySingle('(713) 627-9058', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(713) 662-0569</span> <button class="copy-item-btn" onclick="copySingle('(713) 662-0569', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(713) 777-9102</span> <button class="copy-item-btn" onclick="copySingle('(713) 777-9102', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div></div></div>
+      <div class="frow"><span class="fl">Email(s):</span><div class="addrs"><button class="copy-all-btn" onclick="copyList([&quot;amimichelle@gmail.com&quot;, &quot;mif@ucgi.com&quot;, &quot;amimichellef@yahoo.com&quot;, &quot;afeltovich@sbcglobal.net&quot;, &quot;amif@ucgi.com&quot;, &quot;afeltovich@aol.com&quot;, &quot;afeltovich@comcast.net&quot;, &quot;amifeltovich@yahoo.com&quot;, &quot;amif@satx.rr.com&quot;], 'Emails'); event.stopPropagation();">📋 Copy All Emails (9)</button><div class="addr-row">✉️ <span>amimichelle@gmail.com</span> <button class="copy-item-btn" onclick="copySingle('amimichelle@gmail.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>mif@ucgi.com</span> <button class="copy-item-btn" onclick="copySingle('mif@ucgi.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>amimichellef@yahoo.com</span> <button class="copy-item-btn" onclick="copySingle('amimichellef@yahoo.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>afeltovich@sbcglobal.net</span> <button class="copy-item-btn" onclick="copySingle('afeltovich@sbcglobal.net', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>amif@ucgi.com</span> <button class="copy-item-btn" onclick="copySingle('amif@ucgi.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>afeltovich@aol.com</span> <button class="copy-item-btn" onclick="copySingle('afeltovich@aol.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>afeltovich@comcast.net</span> <button class="copy-item-btn" onclick="copySingle('afeltovich@comcast.net', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>amifeltovich@yahoo.com</span> <button class="copy-item-btn" onclick="copySingle('amifeltovich@yahoo.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>amif@satx.rr.com</span> <button class="copy-item-btn" onclick="copySingle('amif@satx.rr.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div></div></div>
+      <div class="frow"><span class="fl">Address(es):</span><div class="addrs"><div class="addr-row">📍 4119 Mcdermed Dr · Houston, TX</div><div class="addr-row">📍 9550 Meyer Forest Dr Unit 731 · Houston, TX</div><div class="addr-row">📍 4533 Acacia St · Bellaire, TX</div><div class="addr-row">📍 5542 Grand Lake St · Bellaire, TX</div><div class="addr-row">📍 Po Box 571315 · Houston, TX</div><div class="addr-row">📍 6111 Beverlyhill St Unit 4 · Houston, TX</div><div class="addr-row">📍 5926 Indigo St · Houston, TX</div><div class="addr-row">📍 3730 Kirby Dr Unit 1165 · Houston, TX</div><div class="addr-row">📍 Po Box 440391 · Houston, TX</div><div class="addr-row">📍 5502 Grape St · Houston, TX</div></div></div>
+      <div class="frow"><span class="fl">Relatives:</span><span class="fv">Amy Feltovich, Dawn Simmons, Jane Feltovich, Michael Feltovich, Paul Feltovich</span></div>
+      <div class="frow"><span class="fl">AKA / Aliases:</span><span class="fv">Ami M Feltovich, Ami M Simmons, Aml Feltovich, Ami Simmons</span></div>
+      <div class="frow"><span class="fl">Profile URL:</span>
+        <a href="https://www.fastpeoplesearch.com/ami-feltovich_id_G-5650163847733086750" target="_blank" class="url-link">https://www.fastpeoplesearch.com/ami-feltovich_id_G-5650163847733086750</a></div>
+    </div>
+    <div class="ss-wrap">
+                <img src="Ami_Simmons_result_9.png" class="ss-thumb"
+                     onclick="openModal('Ami_Simmons_result_9.png')"
+                     title="Click to view profile detail screenshot">
+                <div class="ss-lbl">📸 Profile Detail Screenshot — click to zoom</div>
+            </div>
+  </div>
+  
+  <div class="res-actions">
+    <button class="res-btn arch-btn" onclick="archiveResult(8)">🗃 Not This Person</button>
+    <button class="res-btn del-btn"  onclick="confirmDelete(8)">🗑 Delete Result</button>
+  </div>
+</details>
+<details class="rcard " id="rcard-9">
+  <summary class="rcard-hdr">
+    <span class="rnum">#10</span>
+    <span class="rname">Amie Wolff · Age 54 · South Elgin, IL</span>
+    <span class="badge-group">
+      <span class="badge-tag">📞 12</span>
+      <span class="badge-tag">✉️ 10</span>
+    </span>
+    
+    <a href="https://www.fastpeoplesearch.com/amie-wolff_id_G7780550334998715556" target="_blank" class="profile-btn" onclick="event.stopPropagation()">🔗 View Profile</a>
+    <span class="expand-indicator">▼ Expand</span>
+  </summary>
+  <div class="rcard-body">
+    <div class="rinfo">
+      <div class="frow"><span class="fl">Full Name:</span><span class="fv fname">Amie Wolff</span></div>
+      <div class="frow"><span class="fl">Age:</span><span class="fv">54</span></div>
+      <div class="frow"><span class="fl">City / State:</span><span class="fv">South Elgin, IL</span></div>
+      <div class="frow"><span class="fl">Phone(s):</span><div class="addrs"><button class="copy-all-btn" onclick="copyList([&quot;(847) 732-7098&quot;, &quot;(630) 855-4720&quot;, &quot;(630) 351-1076&quot;, &quot;(630) 653-0247&quot;, &quot;(630) 584-6008&quot;, &quot;(815) 363-0618&quot;, &quot;(630) 885-4720&quot;, &quot;(203) 509-7359&quot;, &quot;(630) 397-9047&quot;, &quot;(224) 281-4899&quot;, &quot;(630) 333-5314&quot;, &quot;(630) 797-5189&quot;], 'Phones'); event.stopPropagation();">📋 Copy All Phones (12)</button><div class="addr-row">📞 <span>(847) 732-7098</span> <button class="copy-item-btn" onclick="copySingle('(847) 732-7098', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(630) 855-4720</span> <button class="copy-item-btn" onclick="copySingle('(630) 855-4720', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(630) 351-1076</span> <button class="copy-item-btn" onclick="copySingle('(630) 351-1076', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(630) 653-0247</span> <button class="copy-item-btn" onclick="copySingle('(630) 653-0247', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(630) 584-6008</span> <button class="copy-item-btn" onclick="copySingle('(630) 584-6008', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(815) 363-0618</span> <button class="copy-item-btn" onclick="copySingle('(815) 363-0618', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(630) 885-4720</span> <button class="copy-item-btn" onclick="copySingle('(630) 885-4720', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(203) 509-7359</span> <button class="copy-item-btn" onclick="copySingle('(203) 509-7359', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(630) 397-9047</span> <button class="copy-item-btn" onclick="copySingle('(630) 397-9047', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(224) 281-4899</span> <button class="copy-item-btn" onclick="copySingle('(224) 281-4899', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(630) 333-5314</span> <button class="copy-item-btn" onclick="copySingle('(630) 333-5314', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(630) 797-5189</span> <button class="copy-item-btn" onclick="copySingle('(630) 797-5189', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div></div></div>
+      <div class="frow"><span class="fl">Email(s):</span><div class="addrs"><button class="copy-all-btn" onclick="copyList([&quot;amiewolff@yahoo.com&quot;, &quot;abercromieprncss@yahoo.com&quot;, &quot;amie.swanson@yahoo.com&quot;, &quot;amiesimmons@earthlink.net&quot;, &quot;amiesimmons@yahoo.com&quot;, &quot;abercromieprncss@aol.com&quot;, &quot;martese.rowell@yahoo.com&quot;, &quot;larry.swanson@aol.com&quot;, &quot;larswan@inil.com&quot;, &quot;furrjan@yahoo.com&quot;], 'Emails'); event.stopPropagation();">📋 Copy All Emails (10)</button><div class="addr-row">✉️ <span>amiewolff@yahoo.com</span> <button class="copy-item-btn" onclick="copySingle('amiewolff@yahoo.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>abercromieprncss@yahoo.com</span> <button class="copy-item-btn" onclick="copySingle('abercromieprncss@yahoo.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>amie.swanson@yahoo.com</span> <button class="copy-item-btn" onclick="copySingle('amie.swanson@yahoo.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>amiesimmons@earthlink.net</span> <button class="copy-item-btn" onclick="copySingle('amiesimmons@earthlink.net', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>amiesimmons@yahoo.com</span> <button class="copy-item-btn" onclick="copySingle('amiesimmons@yahoo.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>abercromieprncss@aol.com</span> <button class="copy-item-btn" onclick="copySingle('abercromieprncss@aol.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>martese.rowell@yahoo.com</span> <button class="copy-item-btn" onclick="copySingle('martese.rowell@yahoo.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>larry.swanson@aol.com</span> <button class="copy-item-btn" onclick="copySingle('larry.swanson@aol.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>larswan@inil.com</span> <button class="copy-item-btn" onclick="copySingle('larswan@inil.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>furrjan@yahoo.com</span> <button class="copy-item-btn" onclick="copySingle('furrjan@yahoo.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div></div></div>
+      <div class="frow"><span class="fl">Address(es):</span><div class="addrs"><div class="addr-row">📍 1242 Lansbrook Dr · South Elgin, IL</div><div class="addr-row">📍 115 Wallace St · Bartlett, IL</div><div class="addr-row">📍 107 Golfview Dr · Glendale Heights, IL</div><div class="addr-row">📍 205 Regency Dr Unit 401 · Bloomingdale, IL</div><div class="addr-row">📍 106 Edgewild Ct · St Charles, IL</div><div class="addr-row">📍 106 Edgewild Ct · Saint Charles, IL</div><div class="addr-row">📍 107 Golfview Dr · Glendale Hts, IL</div><div class="addr-row">📍 115E Wallace St · Bartlett, IL</div><div class="addr-row">📍 1383 Sacramento Dr · Hanover Park, IL</div><div class="addr-row">📍 505 Autumn Blvd Unit 101 · Lakemoor, IL</div></div></div>
+      <div class="frow"><span class="fl">Relatives:</span><span class="fv">Travis Wolff, Eleanor Swanson, Emma Swanson, John Simmons, Karen Swanson</span></div>
+      <div class="frow"><span class="fl">AKA / Aliases:</span><span class="fv">Amie L Wolff, Amie Laurel Swanson, Amie L Swanson, Amie S Wolff</span></div>
+      <div class="frow"><span class="fl">Profile URL:</span>
+        <a href="https://www.fastpeoplesearch.com/amie-wolff_id_G7780550334998715556" target="_blank" class="url-link">https://www.fastpeoplesearch.com/amie-wolff_id_G7780550334998715556</a></div>
+    </div>
+    <div class="ss-wrap">
+                <img src="Ami_Simmons_result_10.png" class="ss-thumb"
+                     onclick="openModal('Ami_Simmons_result_10.png')"
+                     title="Click to view profile detail screenshot">
+                <div class="ss-lbl">📸 Profile Detail Screenshot — click to zoom</div>
+            </div>
+  </div>
+  
+  <div class="res-actions">
+    <button class="res-btn arch-btn" onclick="archiveResult(9)">🗃 Not This Person</button>
+    <button class="res-btn del-btn"  onclick="confirmDelete(9)">🗑 Delete Result</button>
+  </div>
+</details>
+</div>
+<div class="toast" id="toast"></div>
+<div class="modal" id="modal" onclick="if(event.target===this)this.classList.remove('open')">
+  <span class="modal-x" onclick="document.getElementById('modal').classList.remove('open')">✕</span>
+  <img id="modal-img" src="" class="modal-img" onclick="event.stopPropagation()">
+</div>
+<div class="confirm-overlay" id="confirm-overlay">
+  <div class="confirm-box">
+    <h3>🗑 Delete This Result?</h3>
+    <p>This will permanently remove the result and its screenshot.<br>This <strong>cannot be undone</strong>.</p>
+    <div class="confirm-btns">
+      <button class="cb-cancel" onclick="closeConfirm()">Cancel</button>
+      <button class="cb-delete" id="cb-confirm-btn" onclick="doDelete()">Delete Permanently</button>
+    </div>
+  </div>
+</div>
+<script>
+const JOB_ID   = 'FF9B86F8';
+const LEAD_IDX = 1;
+const API      = (window.location.protocol.startsWith('http') ? window.location.origin : 'http://localhost:5050');
+let _pendingDeleteIdx = null;
+
+function copySingle(val, label) {
+  navigator.clipboard.writeText(val).then(() => {
+    showToast(label + ' copied to clipboard!', 'ok');
+  }).catch(() => {
+    const ta = document.createElement('textarea');
+    ta.value = val;
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    showToast(label + ' copied!', 'ok');
+  });
+}
+
+function copyList(arr, label) {
+  if (!arr || !arr.length) return;
+  const text = arr.join('\\n');
+  navigator.clipboard.writeText(text).then(() => {
+    showToast(arr.length + ' ' + label + ' copied to clipboard!', 'ok');
+  }).catch(() => {
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    showToast(arr.length + ' ' + label + ' copied!', 'ok');
+  });
+}
+
+function openModal(src){
+  document.getElementById('modal-img').src=src;
+  document.getElementById('modal').classList.add('open');
+}
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape'){
+    document.getElementById('modal').classList.remove('open');
+    closeConfirm();
+  }
+});
+
+function showToast(msg, type='ok'){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast ' + type + ' show';
+  setTimeout(()=>t.classList.remove('show'), 3500);
+}
+
+function confirmDelete(idx){
+  _pendingDeleteIdx = idx;
+  document.getElementById('confirm-overlay').classList.add('open');
+}
+function closeConfirm(){
+  document.getElementById('confirm-overlay').classList.remove('open');
+  _pendingDeleteIdx = null;
+}
+async function doDelete(){
+  const idx = _pendingDeleteIdx;
+  closeConfirm();
+  if (idx === null || !JOB_ID) return;
+  await deleteResult(idx);
+}
+async function deleteResult(idx){
+  if (!JOB_ID) { showToast('No job ID — open via dashboard', 'err'); return; }
+  const card = document.getElementById('rcard-' + idx);
+  if (card) card.classList.add('removing');
+  try {
+    const r = await fetch(`${API}/api/jobs/${JOB_ID}/leads/${LEAD_IDX}/results/${idx}/delete`,
+                          {method:'POST'});
+    const d = await r.json();
+    if (r.ok) {
+      setTimeout(()=>{ if(card) card.remove(); updateCount(-1); }, 250);
+      showToast('Result deleted permanently', 'ok');
+    } else {
+      if (card) card.classList.remove('removing');
+      showToast(d.error || 'Delete failed', 'err');
+    }
+  } catch(e) {
+    if (card) card.classList.remove('removing');
+    showToast('Network error: ' + (e.message || e), 'err');
+  }
+}
+async function archiveResult(idx){
+  if (!JOB_ID) { showToast('No job ID — open via dashboard', 'err'); return; }
+  const card = document.getElementById('rcard-' + idx);
+  if (card) {
+    card.style.transition = '0.25s all';
+    card.style.opacity = '0.3';
+    card.style.transform = 'scale(0.98)';
+  }
+  showToast('Updating status...', 'ok');
+  try {
+    const r = await fetch(`${API}/api/jobs/${JOB_ID}/leads/${LEAD_IDX}/results/${idx}/archive`,
+                          {method:'POST'});
+    const d = await r.json();
+    if (r.ok) {
+      showToast('Marked as Not This Person', 'ok');
+      setTimeout(()=>{
+        const u = new URL(window.location.href);
+        u.searchParams.set('_t', Date.now());
+        window.location.replace(u.href);
+      }, 300);
+    } else {
+      if (card) { card.style.opacity = '1'; card.style.transform = 'none'; }
+      showToast(d.error || 'Archive failed', 'err');
+    }
+  } catch(e) {
+    if (card) { card.style.opacity = '1'; card.style.transform = 'none'; }
+    showToast('Network error: ' + (e.message || e), 'err');
+  }
+}
+async function unarchiveResult(idx){
+  if (!JOB_ID) return;
+  const card = document.getElementById('rcard-' + idx);
+  if (card) {
+    card.style.transition = '0.25s all';
+    card.style.opacity = '0.3';
+  }
+  showToast('Restoring result...', 'ok');
+  try {
+    const r = await fetch(`${API}/api/jobs/${JOB_ID}/leads/${LEAD_IDX}/results/${idx}/unarchive`,
+                          {method:'POST'});
+    const d = await r.json();
+    if (r.ok) {
+      showToast('Result restored', 'ok');
+      setTimeout(()=>{
+        const u = new URL(window.location.href);
+        u.searchParams.set('_t', Date.now());
+        window.location.replace(u.href);
+      }, 300);
+    } else {
+      if (card) { card.style.opacity = '1'; card.style.transform = 'none'; }
+      showToast(d.error || 'Restore failed', 'err');
+    }
+  } catch(e) {
+    if (card) { card.style.opacity = '1'; card.style.transform = 'none'; }
+    showToast('Network error: ' + (e.message || e), 'err');
+  }
+}
+function setAllCards(expanded) {
+  document.querySelectorAll('details.rcard:not(.archived-card)').forEach(d => d.open = expanded);
+}
+function setDefaultPref(pref) {
+  localStorage.setItem('leadsosint_default_view', pref);
+  showToast('Default view saved: ' + (pref === 'expanded' ? 'Expanded' : 'Collapsed'), 'ok');
+  setAllCards(pref === 'expanded');
+}
+(function() {
+  const pref = localStorage.getItem('leadsosint_default_view') || 'collapsed';
+  if (pref === 'expanded') {
+    const el = document.getElementById('pref-expanded');
+    if (el) el.checked = true;
+    setAllCards(true);
+  } else {
+    const el = document.getElementById('pref-collapsed');
+    if (el) el.checked = true;
+    setAllCards(false);
+  }
+})();
+function updateCount(delta){
+  const el = document.getElementById('active-count');
+  if (el) el.textContent = Math.max(0, parseInt(el.textContent||'0') + delta);
+}
+async function redoReportLead(jobId, idx){
+  if (!confirm('Re-run search for this lead now?')) return;
+  try {
+    const r = await fetch(`${API}/api/jobs/${jobId}/leads/${idx}/retry`, {method:'POST'});
+    if (r.ok) {
+      showToast('Re-starting search...', 'ok');
+      setTimeout(()=>location.reload(), 2000);
+    } else {
+      const d = await r.json().catch(()=>({}));
+      showToast(d.error || 'Retry error', 'err');
+    }
+  } catch(e) {
+    showToast('Network error: ' + (e.message || e), 'err');
+  }
+}
+</script>
+</body></html>

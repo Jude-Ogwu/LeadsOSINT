@@ -1,0 +1,1048 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>william.campbell@gmail.com — LeadsOSINT</title>
+<style>
+:root{--bg:#0d0f1a;--s:#1a1d3a;--s2:#22264a;--bd:#3a3f7a;--ac:#a78bfa;--ac2:#6d28d9;
+      --tx:#e0e6ff;--mt:#8b95c4;--gn:#34d399;--rd:#f87171;--bl:#60a5fa;--yw:#fbbf24}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:"Segoe UI",system-ui,sans-serif;background:var(--bg);color:var(--tx);min-height:100vh}
+.topbar{background:linear-gradient(135deg,#1a1d3a,#0d0f1a);border-bottom:1px solid var(--bd);
+         padding:18px 40px;display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.back{background:var(--s2);border:1px solid var(--bd);color:var(--ac);padding:9px 18px;
+       border-radius:9px;font-size:.85rem;text-decoration:none;transition:.2s}
+.back:hover{border-color:var(--ac);background:var(--ac2);color:#fff}
+.ttl h1{font-size:1.5rem;color:#fff;font-weight:700}
+.ttl p{color:var(--mt);font-size:.8rem;margin-top:3px}
+.social-top-btn{background:linear-gradient(135deg,#2563eb,#60a5fa);color:#fff;padding:8px 16px;border-radius:9px;font-size:.82rem;font-weight:700;text-decoration:none;transition:.2s;box-shadow:0 4px 14px rgba(37,99,235,.3)}
+.social-top-btn:hover{transform:translateY(-1px);color:#fff;box-shadow:0 6px 20px rgba(96,165,250,.4)}
+.stats{display:flex;gap:14px;padding:20px 40px;background:var(--s);border-bottom:1px solid var(--bd);flex-wrap:wrap}
+.sp{background:var(--bg);border:1px solid var(--bd);border-radius:10px;
+     padding:12px 20px;text-align:center}
+.sp.hi{border-color:var(--ac);background:rgba(167,139,250,.07)}
+.sv{font-size:1.4rem;font-weight:800;color:var(--ac)}
+.sl{font-size:.7rem;color:var(--mt);text-transform:uppercase;letter-spacing:.5px;margin-top:2px}
+.content{padding:28px 40px;max-width:1400px;margin:0 auto}
+.rcard{background:var(--s);border:1px solid var(--bd);border-radius:16px;
+        margin-bottom:24px;overflow:hidden;transition:.4s all}
+.rcard:hover{border-color:var(--ac);transform:translateY(-2px);
+              box-shadow:0 10px 36px rgba(109,40,217,.2)}
+.rcard.removing{opacity:0;transform:translateY(-12px) scale(.97);pointer-events:none}
+.archived-card{opacity:.55;border-style:dashed;filter:grayscale(.3)}
+.rcard-hdr{background:linear-gradient(135deg,var(--s2),var(--s));padding:16px 24px;
+            display:flex;align-items:center;gap:14px;border-bottom:1px solid var(--bd);flex-wrap:wrap;cursor:pointer;list-style:none}
+.rcard-hdr::-webkit-details-marker{display:none}
+.rnum{background:linear-gradient(135deg,var(--ac2),var(--ac));color:#fff;
+       font-size:.78rem;font-weight:700;padding:4px 12px;border-radius:16px;flex-shrink:0}
+.rname{font-size:1.15rem;font-weight:700;color:#fff;flex:1}
+.rcard-hdr-top{display:flex;align-items:center;justify-content:space-between;width:100%;gap:10px}
+.rname-person{font-size:1.15rem;font-weight:800;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rcard-hdr-meta{display:flex;align-items:center;justify-content:space-between;width:100%;gap:8px;flex-wrap:wrap}
+.rcard-meta-left{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.rcard-meta-pill{font-size:.78rem;color:var(--mt);font-weight:600;display:inline-flex;align-items:center;gap:4px}
+.badge-group{display:flex;gap:6px;align-items:center}
+.badge-tag{background:rgba(167,139,250,.15);border:1px solid rgba(167,139,250,.3);color:var(--ac);font-size:.75rem;padding:3px 8px;border-radius:6px;font-weight:600}
+.expand-indicator{color:var(--ac);font-size:.8rem;font-weight:700;margin-left:8px}
+.arch-tag{background:rgba(251,191,36,.15);border:1px solid rgba(251,191,36,.3);
+           color:var(--yw);font-size:.72rem;padding:3px 10px;border-radius:10px;flex-shrink:0}
+.profile-btn{background:linear-gradient(135deg,#4c3d8f,var(--ac2));color:#fff;
+              padding:8px 16px;border-radius:9px;font-size:.8rem;
+              font-weight:600;text-decoration:none;transition:.2s;flex-shrink:0}
+.profile-btn:hover{background:linear-gradient(135deg,var(--ac2),var(--ac));
+                    transform:translateY(-1px);color:#fff}
+.copy-all-btn{background:linear-gradient(135deg,var(--ac2),var(--ac3));color:#fff;border:none;padding:5px 12px;border-radius:6px;font-size:.75rem;font-weight:600;cursor:pointer;margin-bottom:6px;display:inline-block}
+.copy-all-btn:hover{background:var(--ac2)}
+.copy-item-btn{background:transparent;border:none;color:var(--mt);cursor:pointer;font-size:.8rem;padding:0 4px;margin-left:auto}
+.copy-item-btn:hover{color:var(--ac)}
+.addr-row{color:#c4caf0;font-size:.88rem;padding:6px 12px;
+           background:rgba(255,255,255,.03);border-radius:7px;border:1px solid var(--bd);display:flex;align-items:center;gap:8px}
+.url-link{color:var(--bl);font-size:.82rem;word-break:break-all;text-decoration:underline}
+.url-link:hover{color:var(--ac)}
+.rcard-body{padding:24px 28px;display:flex;gap:24px;align-items:flex-start;flex-wrap:wrap}
+.rinfo{flex:1;min-width:320px;display:flex;flex-direction:column;gap:14px}
+.frow{display:grid;grid-template-columns:140px 1fr;gap:12px;align-items:start;font-size:.92rem}
+.fl{font-weight:700;color:var(--mt);font-size:.85rem;letter-spacing:.3px;padding-top:4px}
+.fv{color:#fff;font-weight:600;line-height:1.5}
+.fname{font-size:1.15rem;color:var(--ac);font-weight:700}
+.bg-report-row{align-items:start}
+.bg-report-box{background:var(--s2);border:1px solid var(--bd);border-radius:10px;padding:12px 14px;display:flex;flex-direction:column;gap:10px}
+.bg-report-hdr{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.bg-report-title{font-weight:700;color:var(--ac);font-size:.88rem;display:flex;align-items:center;gap:6px}
+.bg-report-text{color:var(--tx);font-size:.86rem;line-height:1.6;user-select:text;background:rgba(13,15,26,0.6);padding:10px 12px;border-radius:8px;border:1px solid rgba(255,255,255,0.05);word-break:break-word}
+.ss-wrap{flex:0 0 320px;display:flex;flex-direction:column;align-items:center}
+.ss-thumb{width:100%;border-radius:10px;border:2px solid var(--bd);cursor:pointer;
+           transition:.2s;display:block}
+.ss-thumb:hover{border-color:var(--ac);transform:scale(1.02);
+                 box-shadow:0 6px 24px rgba(167,139,250,.3)}
+.ss-lbl{color:var(--mt);font-size:.78rem;margin-top:8px;text-align:center}
+.ss-missing{color:var(--mt);font-size:.82rem;padding:20px;text-align:center;
+             background:var(--s2);border-radius:10px;border:1px dashed var(--bd)}
+.res-actions{padding:14px 24px;border-top:1px solid var(--bd);
+              display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.res-actions.arch-mode{background:rgba(251,191,36,.04)}
+.res-btn{padding:8px 16px;border-radius:8px;font-size:.8rem;font-weight:600;
+          cursor:pointer;transition:.2s;border:1px solid;background:transparent}
+.arch-btn{border-color:rgba(251,191,36,.5);color:var(--yw);}
+.arch-btn:hover{background:rgba(251,191,36,.1)}
+.del-btn{border-color:rgba(248,113,113,.5);color:var(--rd);}
+.del-btn:hover{background:rgba(248,113,113,.1)}
+.unarch-btn{border-color:rgba(96,165,250,.5);color:var(--bl);}
+.unarch-btn:hover{background:rgba(96,165,250,.1)}
+.arch-label{font-size:.8rem;color:var(--yw);flex:1}
+.arch-section{margin-top:10px;border-radius:14px;border:1px dashed var(--bd);overflow:hidden}
+.arch-section summary{padding:14px 20px;cursor:pointer;color:var(--mt);font-size:.9rem;
+                       font-weight:600;list-style:none;background:var(--s2);
+                       display:flex;align-items:center;gap:8px}
+.arch-section summary:hover{color:var(--tx)}
+.arch-section summary span{font-size:.75rem;font-weight:400;margin-left:auto;color:var(--mt)}
+.arch-inner{padding:16px}
+.empty{background:var(--s);border:2px dashed var(--bd);border-radius:14px;
+        padding:50px;text-align:center;color:var(--mt);font-size:1rem}
+.search-ss-card{background:var(--s);border:1px solid var(--bd);border-radius:16px;margin-bottom:28px;overflow:hidden;box-shadow:0 4px 20px rgba(0,0,0,0.3)}
+.search-ss-hdr{background:linear-gradient(135deg,var(--s2),var(--s));padding:16px 24px;border-bottom:1px solid var(--bd);display:flex;justify-content:space-between;align-items:center}
+.search-ss-title{font-weight:700;color:#fff;font-size:1.05rem}
+.search-ss-sub{font-size:.78rem;color:var(--mt);margin-top:2px}
+.search-ss-body{position:relative;cursor:pointer;max-height:380px;overflow:hidden;background:#0d0f1a}
+.search-ss-img{width:100%;display:block;opacity:.88;transition:.3s all}
+.search-ss-body:hover .search-ss-img{opacity:1;transform:scale(1.005)}
+.search-ss-overlay{position:absolute;bottom:16px;left:50%;transform:translateX(-50%);background:rgba(13,15,26,.88);border:1px solid var(--ac);color:var(--ac);padding:8px 20px;border-radius:20px;font-size:.8rem;font-weight:700;backdrop-filter:blur(6px);pointer-events:none;box-shadow:0 4px 14px rgba(109,40,217,.3)}
+.toast{position:fixed;bottom:24px;right:24px;background:var(--s);
+        border:1px solid var(--bd);border-radius:12px;padding:12px 20px;
+        font-size:.85rem;z-index:999;transform:translateY(60px);opacity:0;
+        transition:.3s;max-width:280px}
+.toast.show{transform:translateY(0);opacity:1}
+.toast.ok{border-color:rgba(52,211,153,.4);color:var(--gn)}
+.toast.err{border-color:rgba(248,113,113,.4);color:var(--rd)}
+.modal{display:none;position:fixed;inset:0;background:#060813;z-index:99999;
+        overflow-y:auto;overflow-x:hidden;padding:70px 20px 40px 20px;-webkit-overflow-scrolling:touch}
+.modal.open{display:block}
+.modal-bar{position:fixed;top:0;left:0;right:0;height:56px;background:rgba(19,23,46,0.96);border-bottom:1px solid var(--bd);display:flex;align-items:center;justify-content:space-between;padding:0 24px;z-index:100000}
+.modal-bar-ttl{font-size:.92rem;font-weight:700;color:#fff;display:flex;align-items:center;gap:8px}
+.modal-bar-actions{display:flex;align-items:center;gap:12px}
+.modal-bar-btn{background:var(--s2);border:1px solid var(--bd);color:var(--tx);padding:7px 16px;border-radius:7px;font-size:.82rem;font-weight:600;cursor:pointer;text-decoration:none;transition:.2s;display:inline-flex;align-items:center;gap:6px}
+.modal-bar-btn:hover{background:var(--ac2);color:#fff;border-color:var(--ac)}
+.modal-wrap{max-width:1040px;margin:10px auto 40px auto;text-align:center;position:relative}
+.modal-img{width:100%;max-width:1040px;height:auto;margin:0 auto;display:none;border-radius:8px;border:1px solid var(--bd);box-shadow:0 12px 48px rgba(0,0,0,0.9);background:#fff}
+.modal-loading{display:none;padding:40px 20px;color:var(--ac);font-weight:700;font-size:1rem}
+.confirm-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.8);
+                  z-index:8888;justify-content:center;align-items:center}
+.confirm-overlay.open{display:flex}
+.confirm-box{background:var(--s);border:1px solid var(--rd);border-radius:18px;
+              padding:32px 36px;max-width:380px;text-align:center}
+.confirm-box h3{color:#fff;margin-bottom:10px;font-size:1.1rem}
+.confirm-box p{color:var(--mt);font-size:.88rem;margin-bottom:24px;line-height:1.6}
+.confirm-btns{display:flex;gap:12px;justify-content:center}
+.cb-cancel{padding:10px 24px;border-radius:9px;border:1px solid var(--bd);
+            background:var(--s2);color:var(--tx);cursor:pointer;font-size:.9rem}
+.cb-delete{padding:10px 24px;border-radius:9px;border:none;
+            background:linear-gradient(135deg,#b91c1c,var(--rd));color:#fff;
+            cursor:pointer;font-size:.9rem;font-weight:700}
+.collapse-toolbar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:18px;flex-wrap:wrap;background:var(--s);padding:12px 20px;border-radius:12px;border:1px solid var(--bd)}
+.tool-btn{background:var(--s2);border:1px solid var(--bd);color:var(--ac);padding:7px 15px;border-radius:8px;font-size:.82rem;font-weight:700;cursor:pointer;transition:.2s}
+.tool-btn:hover{background:var(--ac2);color:#fff;border-color:var(--ac)}
+.view-pref{display:flex;align-items:center;gap:12px;font-size:.82rem;color:var(--mt)}
+.view-pref label{display:inline-flex;align-items:center;gap:6px;cursor:pointer;color:var(--tx);font-weight:600}
+.view-pref input[type="radio"]{accent-color:var(--ac);cursor:pointer}
+.back-to-top{position:fixed;bottom:28px;right:28px;z-index:999;background:linear-gradient(135deg,var(--ac2),var(--ac));color:#fff;border:none;padding:11px 18px;border-radius:30px;font-size:.85rem;font-weight:700;cursor:pointer;box-shadow:0 6px 20px rgba(109,40,217,.4);transition:all .3s ease;opacity:0;pointer-events:none;display:flex;align-items:center;gap:6px}
+.back-to-top.visible{opacity:1;pointer-events:auto;transform:translateY(0)}
+.back-to-top:hover{transform:translateY(-3px);box-shadow:0 10px 25px rgba(109,40,217,.6)}
+.share-modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:99999;justify-content:center;align-items:center;padding:20px;backdrop-filter:blur(6px)}
+.share-modal.open{display:flex}
+.share-box{background:var(--s);border:1px solid var(--bd);border-radius:18px;padding:26px;max-width:480px;width:100%;box-shadow:0 10px 30px rgba(0,0,0,.5)}
+.share-hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.share-hdr h3{color:#fff;font-size:1.15rem}
+.share-close{color:var(--mt);font-size:1.4rem;cursor:pointer}
+.share-close:hover{color:#fff}
+.share-box p{color:var(--mt);font-size:.85rem;margin-bottom:18px;line-height:1.5}
+.share-input-wrap{display:flex;gap:8px;margin-bottom:20px}
+.share-input-wrap input{flex:1;background:var(--s2);border:1px solid var(--bd);border-radius:8px;padding:10px 14px;color:#fff;font-size:.85rem;outline:none}
+.share-copy-btn{background:linear-gradient(135deg,var(--ac2),var(--ac));color:#fff;border:none;border-radius:8px;padding:0 18px;font-weight:700;cursor:pointer;font-size:.85rem}
+.share-socials{display:flex;gap:10px;flex-wrap:wrap}
+.soc-btn{flex:1;min-width:110px;text-align:center;padding:10px;border-radius:8px;font-size:.82rem;font-weight:700;color:#fff;text-decoration:none;transition:.2s}
+.soc-wa{background:#16a34a}
+.soc-tg{background:#0284c7}
+.soc-x{background:#0f172a;border:1px solid var(--bd)}
+.soc-btn:hover{opacity:.9;transform:translateY(-1px)}
+@media (max-width:768px){
+  .topbar{flex-direction:column;align-items:stretch;gap:12px;padding:14px 16px}
+  .topbar > div:last-child{width:100%;justify-content:flex-start;display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:6px}
+  .social-top-btn{width:100%;text-align:center;justify-content:center;padding:7px 10px;font-size:.78rem}
+  /* Compact & beautiful stats bar on mobile */
+  .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(105px,1fr));gap:6px;padding:10px 12px}
+  .sp{padding:8px 10px}
+  .sv{font-size:1.15rem}
+  .sl{font-size:.65rem}
+  .content{padding:14px 10px}
+  .search-ss-hdr{padding:12px 14px}
+  .search-ss-title{font-size:.92rem}
+  .search-ss-body{max-height:180px}
+  .search-ss-overlay{font-size:.72rem;padding:6px 12px;width:90%;text-align:center}
+  .rcard{margin-bottom:14px;border-radius:12px}
+  .rcard-hdr{padding:12px 14px;gap:8px;flex-direction:column;align-items:stretch}
+  .rname-person{font-size:1.05rem}
+  .rcard-meta-pill{font-size:.74rem}
+  .badge-tag{font-size:.7rem;padding:2px 6px}
+  .expand-indicator{font-size:.75rem}
+  .rcard-body{flex-direction:column;padding:14px 12px;gap:14px}
+  .rinfo{min-width:100%}
+  .frow{grid-template-columns:1fr;gap:4px}
+  .fl{font-size:.76rem}
+  .fv{font-size:.85rem}
+  .ss-wrap{width:100%;flex:1 1 100%}
+  .modal{padding:54px 8px 24px 8px}
+  .modal-bar{padding:0 10px;height:48px}
+  .modal-bar-ttl span{display:none}
+  .modal-bar-btn{padding:6px 8px;font-size:.72rem}
+  .modal-wrap{max-width:100%;margin:4px auto 16px auto}
+  .modal-img{width:100%;max-width:100%}
+}
+</style></head><body>
+<div class="topbar">
+  <a href="/results/7C2AF930" class="back" onclick="if(window.location.protocol==='file:'){this.href='../index.html'}">← Back to Job</a>
+  <div class="ttl"><h1>🔍 william.campbell@gmail.com</h1>
+    <p>Location: Not specified · November 01, 2026 · 06:56 PM</p></div>
+  <div style="display:flex;gap:8px;margin-left:auto;flex-wrap:wrap">
+    <button class="social-top-btn" style="background:linear-gradient(135deg,#0284c7,#38bdf8);color:#fff;cursor:pointer;border:none" onclick="openShareModal()" title="Share Result">🔗 Share</button>
+    <button class="social-top-btn" style="background:linear-gradient(135deg,#6d28d9,#a78bfa);color:#fff;cursor:pointer;border:none" onclick="redoReportLead('7C2AF930', 0)" title="Re-run search for this lead">🔄 Re-do Search</button>
+    
+    
+    
+  </div>
+</div>
+<div class="stats">
+  <div class="sp hi"><div class="sv" id="active-count">9</div><div class="sl">Active Results</div></div>
+  <div class="sp"><div class="sv" style="color:var(--gn)">
+    ✓ Found</div><div class="sl">Status</div></div>
+  <div class="sp"><div class="sv" style="font-size:.9rem">N/A</div>
+    <div class="sl">Location</div></div>
+  <div class="sp"><div class="sv" style="font-size:.85rem"><span style="color:var(--mt)">N/A</span></div>
+    <div class="sl">Social Link</div></div>
+  <div class="sp"><div class="sv" style="font-size:.85rem"><span style="color:var(--mt)">N/A</span></div>
+    <div class="sl">Input Email</div></div>
+  <div class="sp"><div class="sv" style="font-size:.85rem"><span style="color:var(--mt)">N/A</span></div>
+    <div class="sl">Input Phone</div></div>
+</div>
+<div class="content">
+
+<div class="search-ss-card">
+  <div class="search-ss-hdr">
+    <div>
+      <div class="search-ss-title">🌐 Live Public Records Overview</div>
+      <div class="search-ss-sub">Live search results overview for "william.campbell@gmail.com" (US)</div>
+    </div>
+  </div>
+  <div class="search-ss-body" onclick="openModal('william_campbell_gmail_com_1_search_page.png')">
+    <img src="william_campbell_gmail_com_1_search_page.png" class="search-ss-img" title="Click to view full search page screenshot">
+    <div class="search-ss-overlay">🔍 Click to View Full Search Page Screenshot</div>
+  </div>
+</div>
+<div class="collapse-toolbar">
+  <div style="display:flex;align-items:center;gap:10px">
+    <button class="tool-btn" onclick="setAllCards(false)">▸ Collapse All</button>
+    <button class="tool-btn" onclick="setAllCards(true)">▾ Expand All</button>
+  </div>
+  <div class="view-pref">
+    <span>Default View:</span>
+    <label><input type="radio" name="default_view_pref" value="collapsed" id="pref-collapsed" onchange="setDefaultPref('collapsed')"> Collapsed</label>
+    <label><input type="radio" name="default_view_pref" value="expanded" id="pref-expanded" onchange="setDefaultPref('expanded')"> Expanded</label>
+  </div>
+</div>
+
+<details class="rcard " id="rcard-0">
+  <summary class="rcard-hdr">
+    <div class="rcard-hdr-top">
+      <div style="display:flex;align-items:center;gap:8px;min-width:0">
+        <span class="rnum">#1</span>
+        <span class="rname-person">William Campbell</span>
+        
+      </div>
+      <span class="expand-indicator">▼ Expand</span>
+    </div>
+    <div class="rcard-hdr-meta">
+      <div class="rcard-meta-left">
+        <span class="rcard-meta-pill">🎂 Age 36</span>
+        <span class="rcard-meta-pill">📍 Rochester, MN</span>
+      </div>
+      <div class="badge-group">
+        <span class="badge-tag">📞 1</span>
+        <span class="badge-tag">✉️ 1</span>
+      </div>
+    </div>
+  </summary>
+  <div class="rcard-body">
+    <div class="rinfo">
+      <div class="frow"><span class="fl">Full Name:</span><span class="fv fname">William Campbell</span></div>
+      <div class="frow"><span class="fl">Age:</span><span class="fv">36</span></div>
+      <div class="frow"><span class="fl">City / State:</span><span class="fv">Rochester, MN</span></div>
+      <div class="frow"><span class="fl">Phone(s):</span><div class="addrs"><button class="copy-all-btn" onclick="copyList([&quot;(507) 517-1917&quot;], 'Phones'); event.stopPropagation();">📋 Copy All Phones (1)</button><div class="addr-row">📞 <span>(507) 517-1917</span> <button class="copy-item-btn" onclick="copySingle('(507) 517-1917', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div></div></div>
+      <div class="frow"><span class="fl">Email(s):</span><div class="addrs"><button class="copy-all-btn" onclick="copyList([&quot;william.campbell@gmail.com&quot;], 'Emails'); event.stopPropagation();">📋 Copy All Emails (1)</button><div class="addr-row">✉️ <span>william.campbell@gmail.com</span> <button class="copy-item-btn" onclick="copySingle('william.campbell@gmail.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div></div></div>
+      <div class="frow"><span class="fl">Address(es):</span><div class="addrs"><div class="addr-row">📍 2832 Shadow Dr Se · Rochester, MN</div></div></div>
+      <div class="frow"><span class="fl">Relatives:</span><span class="fv">N/A</span></div>
+      <div class="frow"><span class="fl">AKA / Aliases:</span><span class="fv">N/A</span></div>
+      
+      <div class="frow bg-report-row">
+        <span class="fl">Background:</span>
+        <div class="bg-report-box">
+          <div class="bg-report-hdr">
+            <span class="bg-report-title">📄 FREE Background Report</span>
+            <button class="copy-all-btn" onclick="copyBgReport(0); event.stopPropagation();">📋 Copy Report Text</button>
+          </div>
+          <div class="bg-report-text" id="bg-report-0">William Campbell is 36 years old and was born in October of 1990. Currently William lives at the address 2832 Shadow DR SE, Rochester MN 55904 . William has lived at this Rochester, MN address for about 3 years, after moving in around October of 2023. William&#x27;s current phone number is (507) 517-1917 . This Wireless number was issued by &#x27;Cellco Partnership dba Verizon Wireless - CA&#x27;, first reported in public records on October of 2023.</div>
+        </div>
+      </div>
+    </div>
+    <div class="ss-wrap">
+                <img src="william_campbell_gmail_com_1_result_1.png" class="ss-thumb"
+                     onclick="openModal('william_campbell_gmail_com_1_result_1.png')"
+                     title="Click to view profile detail screenshot">
+                <div class="ss-lbl">📸 Profile Detail Screenshot — click to zoom</div>
+            </div>
+  </div>
+  
+  <div class="res-actions">
+    <button class="res-btn arch-btn" onclick="archiveResult(0)">🗃 Not This Person</button>
+    <button class="res-btn del-btn"  onclick="confirmDelete(0)">🗑 Delete Result</button>
+  </div>
+</details>
+<details class="rcard " id="rcard-1">
+  <summary class="rcard-hdr">
+    <div class="rcard-hdr-top">
+      <div style="display:flex;align-items:center;gap:8px;min-width:0">
+        <span class="rnum">#2</span>
+        <span class="rname-person">William Campbell</span>
+        
+      </div>
+      <span class="expand-indicator">▼ Expand</span>
+    </div>
+    <div class="rcard-hdr-meta">
+      <div class="rcard-meta-left">
+        <span class="rcard-meta-pill">🎂 Age 46</span>
+        <span class="rcard-meta-pill">📍 Lakeland, FL</span>
+      </div>
+      <div class="badge-group">
+        <span class="badge-tag">📞 8</span>
+        <span class="badge-tag">✉️ 6</span>
+      </div>
+    </div>
+  </summary>
+  <div class="rcard-body">
+    <div class="rinfo">
+      <div class="frow"><span class="fl">Full Name:</span><span class="fv fname">William Campbell</span></div>
+      <div class="frow"><span class="fl">Age:</span><span class="fv">46</span></div>
+      <div class="frow"><span class="fl">City / State:</span><span class="fv">Lakeland, FL</span></div>
+      <div class="frow"><span class="fl">Phone(s):</span><div class="addrs"><button class="copy-all-btn" onclick="copyList([&quot;(919) 793-5199&quot;, &quot;(919) 829-0377&quot;, &quot;(863) 646-9143&quot;, &quot;(863) 648-4024&quot;, &quot;(760) 419-8075&quot;, &quot;(863) 607-6778&quot;, &quot;(863) 646-5848&quot;, &quot;(813) 251-3893&quot;], 'Phones'); event.stopPropagation();">📋 Copy All Phones (8)</button><div class="addr-row">📞 <span>(919) 793-5199</span> <button class="copy-item-btn" onclick="copySingle('(919) 793-5199', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(919) 829-0377</span> <button class="copy-item-btn" onclick="copySingle('(919) 829-0377', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(863) 646-9143</span> <button class="copy-item-btn" onclick="copySingle('(863) 646-9143', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(863) 648-4024</span> <button class="copy-item-btn" onclick="copySingle('(863) 648-4024', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(760) 419-8075</span> <button class="copy-item-btn" onclick="copySingle('(760) 419-8075', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(863) 607-6778</span> <button class="copy-item-btn" onclick="copySingle('(863) 607-6778', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(863) 646-5848</span> <button class="copy-item-btn" onclick="copySingle('(863) 646-5848', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(813) 251-3893</span> <button class="copy-item-btn" onclick="copySingle('(813) 251-3893', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div></div></div>
+      <div class="frow"><span class="fl">Email(s):</span><div class="addrs"><button class="copy-all-btn" onclick="copyList([&quot;wv.campbell7899@gmail.com&quot;, &quot;willcampbell2@me.com&quot;, &quot;luciajane1@hotmail.com&quot;, &quot;secamp99@aol.com&quot;, &quot;osbornjluia@hotmail.com&quot;, &quot;entrop111@aol.com&quot;], 'Emails'); event.stopPropagation();">📋 Copy All Emails (6)</button><div class="addr-row">✉️ <span>wv.campbell7899@gmail.com</span> <button class="copy-item-btn" onclick="copySingle('wv.campbell7899@gmail.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>willcampbell2@me.com</span> <button class="copy-item-btn" onclick="copySingle('willcampbell2@me.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>luciajane1@hotmail.com</span> <button class="copy-item-btn" onclick="copySingle('luciajane1@hotmail.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>secamp99@aol.com</span> <button class="copy-item-btn" onclick="copySingle('secamp99@aol.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>osbornjluia@hotmail.com</span> <button class="copy-item-btn" onclick="copySingle('osbornjluia@hotmail.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>entrop111@aol.com</span> <button class="copy-item-btn" onclick="copySingle('entrop111@aol.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div></div></div>
+      <div class="frow"><span class="fl">Address(es):</span><div class="addrs"><div class="addr-row">📍 5319 Serrento · Lakeland, FL</div><div class="addr-row">📍 14 Casa Loma Way Unit 14 · Lakeland, FL</div><div class="addr-row">📍 3150 Pattiz Ave · Long Beach, CA</div><div class="addr-row">📍 3803 N Greenbrier Rd · Long Beach, CA</div><div class="addr-row">📍 5209 Serrento Ct · Lakeland, FL</div><div class="addr-row">📍 85 Crooke Ave Unit 2 · Brooklyn, NY</div><div class="addr-row">📍 170 Clinton St Unit 2 · Brooklyn, NY</div><div class="addr-row">📍 2111 New Bern Ave · Raleigh, NC</div><div class="addr-row">📍 149 Hunt Club Ln Unit D · Raleigh, NC</div><div class="addr-row">📍 1819 W Hills Ave Unit 7B · Tampa, FL</div></div></div>
+      <div class="frow"><span class="fl">Relatives:</span><span class="fv">Bradley Campbell, Lucia Campbell, Lucia Campbell, Raymond Campbell, Susan Campbell</span></div>
+      <div class="frow"><span class="fl">AKA / Aliases:</span><span class="fv">William A Campbell Jr, William A Campbell, William 2 Campbell, William Audley Campbell</span></div>
+      
+      <div class="frow bg-report-row">
+        <span class="fl">Background:</span>
+        <div class="bg-report-box">
+          <div class="bg-report-hdr">
+            <span class="bg-report-title">📄 FREE Background Report</span>
+            <button class="copy-all-btn" onclick="copyBgReport(1); event.stopPropagation();">📋 Copy Report Text</button>
+          </div>
+          <div class="bg-report-text" id="bg-report-1">William Audley Campbell JR is 46 years old and was born in April of 1980. Currently William lives at the address 5319 Serrento, Lakeland FL 33813 . William has lived at this Lakeland, FL address for about 25 years, after moving in around February of 2001. William previously lived at 14 Casa Loma Way, Unit 14, Lakeland FL 33813 , starting in May of 2025. Going further back, starting in January of 2020, William lived at 3150 Pattiz AVE, Long Beach CA 90808 for 1 year. Public records do not indicate that William Audley Campbell JR is currently married. The following people are relatives or close associates of William: Bradley Campbell (43), Lucia Campbell (81), Lucia Campbell (60), Raymond Campbell (71), Susan Campbell (50), William Campbell (81), Amanda Hodges (46), Bruce Campbell (65), Chad Sheby (35), Charles Sheby (104) and Christina Campbell (73). William&#x27;s current phone number is (919) 793-5199 . This Wireless number was issued by &#x27;New Cingular Wireless PCS LLC - GA&#x27;, first reported in public records on May of 2013. Past phone numbers for William include (919) 829-0377 , (863) 646-9143 and (863) 648-4024 . The primary email address for William is wv.campbell7899@gmail.com . William has also used the following email accounts: willcampbell2@me.com , luciajane1@hotmail.com , secamp99@aol.com , osbornjluia@hotmail.com and entrop111@aol.com .</div>
+        </div>
+      </div>
+    </div>
+    <div class="ss-wrap">
+                <img src="william_campbell_gmail_com_1_result_2.png" class="ss-thumb"
+                     onclick="openModal('william_campbell_gmail_com_1_result_2.png')"
+                     title="Click to view profile detail screenshot">
+                <div class="ss-lbl">📸 Profile Detail Screenshot — click to zoom</div>
+            </div>
+  </div>
+  
+  <div class="res-actions">
+    <button class="res-btn arch-btn" onclick="archiveResult(1)">🗃 Not This Person</button>
+    <button class="res-btn del-btn"  onclick="confirmDelete(1)">🗑 Delete Result</button>
+  </div>
+</details>
+<details class="rcard " id="rcard-2">
+  <summary class="rcard-hdr">
+    <div class="rcard-hdr-top">
+      <div style="display:flex;align-items:center;gap:8px;min-width:0">
+        <span class="rnum">#3</span>
+        <span class="rname-person">William Campbell</span>
+        
+      </div>
+      <span class="expand-indicator">▼ Expand</span>
+    </div>
+    <div class="rcard-hdr-meta">
+      <div class="rcard-meta-left">
+        <span class="rcard-meta-pill">🎂 Age 49</span>
+        <span class="rcard-meta-pill">📍 Brooksville, FL</span>
+      </div>
+      <div class="badge-group">
+        <span class="badge-tag">📞 6</span>
+        <span class="badge-tag">✉️ 10</span>
+      </div>
+    </div>
+  </summary>
+  <div class="rcard-body">
+    <div class="rinfo">
+      <div class="frow"><span class="fl">Full Name:</span><span class="fv fname">William Campbell</span></div>
+      <div class="frow"><span class="fl">Age:</span><span class="fv">49</span></div>
+      <div class="frow"><span class="fl">City / State:</span><span class="fv">Brooksville, FL</span></div>
+      <div class="frow"><span class="fl">Phone(s):</span><div class="addrs"><button class="copy-all-btn" onclick="copyList([&quot;(727) 510-7321&quot;, &quot;(727) 849-1903&quot;, &quot;(352) 464-5632&quot;, &quot;(727) 848-9404&quot;, &quot;(352) 835-4221&quot;, &quot;(727) 505-6963&quot;], 'Phones'); event.stopPropagation();">📋 Copy All Phones (6)</button><div class="addr-row">📞 <span>(727) 510-7321</span> <button class="copy-item-btn" onclick="copySingle('(727) 510-7321', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(727) 849-1903</span> <button class="copy-item-btn" onclick="copySingle('(727) 849-1903', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(352) 464-5632</span> <button class="copy-item-btn" onclick="copySingle('(352) 464-5632', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(727) 848-9404</span> <button class="copy-item-btn" onclick="copySingle('(727) 848-9404', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(352) 835-4221</span> <button class="copy-item-btn" onclick="copySingle('(352) 835-4221', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(727) 505-6963</span> <button class="copy-item-btn" onclick="copySingle('(727) 505-6963', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div></div></div>
+      <div class="frow"><span class="fl">Email(s):</span><div class="addrs"><button class="copy-all-btn" onclick="copyList([&quot;outlaw11car@gmail.com&quot;, &quot;bc1119racingdad@yahoo.com&quot;, &quot;outlaw11car@aol.com&quot;, &quot;outlawcar@centurytel.net&quot;, &quot;outlawcar@aol.com&quot;, &quot;wcbill@aol.com&quot;, &quot;wcbill11@aol.com&quot;, &quot;wcbill11@tampabay.rr.com&quot;, &quot;wcbill@onebox.com&quot;, &quot;wcbill11@onebox.com&quot;], 'Emails'); event.stopPropagation();">📋 Copy All Emails (10)</button><div class="addr-row">✉️ <span>outlaw11car@gmail.com</span> <button class="copy-item-btn" onclick="copySingle('outlaw11car@gmail.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>bc1119racingdad@yahoo.com</span> <button class="copy-item-btn" onclick="copySingle('bc1119racingdad@yahoo.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>outlaw11car@aol.com</span> <button class="copy-item-btn" onclick="copySingle('outlaw11car@aol.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>outlawcar@centurytel.net</span> <button class="copy-item-btn" onclick="copySingle('outlawcar@centurytel.net', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>outlawcar@aol.com</span> <button class="copy-item-btn" onclick="copySingle('outlawcar@aol.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>wcbill@aol.com</span> <button class="copy-item-btn" onclick="copySingle('wcbill@aol.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>wcbill11@aol.com</span> <button class="copy-item-btn" onclick="copySingle('wcbill11@aol.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>wcbill11@tampabay.rr.com</span> <button class="copy-item-btn" onclick="copySingle('wcbill11@tampabay.rr.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>wcbill@onebox.com</span> <button class="copy-item-btn" onclick="copySingle('wcbill@onebox.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>wcbill11@onebox.com</span> <button class="copy-item-btn" onclick="copySingle('wcbill11@onebox.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div></div></div>
+      <div class="frow"><span class="fl">Address(es):</span><div class="addrs"><div class="addr-row">📍 14313 Evermore St · Brooksville, FL</div><div class="addr-row">📍 11660 S Turner Ave · Floral City, FL</div><div class="addr-row">📍 718 New Jersey St Unit 3 · Clearwater, FL</div><div class="addr-row">📍 Po Box 7013 · Hudson, FL</div><div class="addr-row">📍 9245 Dresden Ln · Port Richey, FL</div><div class="addr-row">📍 4169 Highland Loop · New Port Richey, FL</div><div class="addr-row">📍 13418 Waterford Castle Dr · Dade City, FL</div><div class="addr-row">📍 38906 Clinton Ave · Dade City, FL</div><div class="addr-row">📍 3242 Maitland Dr · Holiday, FL</div><div class="addr-row">📍 3242 Maitland Dr · Tarpon Spngs, FL</div></div></div>
+      <div class="frow"><span class="fl">Relatives:</span><span class="fv">Kimberly Evans, Christina Falakos, Danielle Johns, Derek Campbell, Diane Campbell</span></div>
+      <div class="frow"><span class="fl">AKA / Aliases:</span><span class="fv">William E Campbell Jr, William Diane Campbell Jr, William Campbell Jr, William D Campbell Jr</span></div>
+      
+      <div class="frow bg-report-row">
+        <span class="fl">Background:</span>
+        <div class="bg-report-box">
+          <div class="bg-report-hdr">
+            <span class="bg-report-title">📄 FREE Background Report</span>
+            <button class="copy-all-btn" onclick="copyBgReport(2); event.stopPropagation();">📋 Copy Report Text</button>
+          </div>
+          <div class="bg-report-text" id="bg-report-2">William Edward Campbell JR is 49 years old and was born in March of 1977. Currently William lives at the address 14313 Evermore St, Brooksville FL 34613 . William has lived at this Brooksville, FL address for about 3 years, after moving in around July of 2023. William previously lived at 11660 S Turner Ave, Floral City FL 34436 for 7 months, starting in August of 2022. Going further back, starting in April of 2022, William lived at 718 New Jersey ST, Unit 3, Clearwater FL 33756 for 2 years. It is likely that William Campbell is married to 57 year old Kimberly Ann Evans , and they have lived together in at least 27 different locations. The following people are relatives or close associates of William: Christina Falakos (46), Danielle Johns (42), Derek Campbell (25), Diane Campbell (70), Dianelee Campbell (75), Harry Campbell (94), Kevin Campbell (43), Morais Campbell (92), Rebecca Campbell (41) and Robert Campbell (65). William&#x27;s current phone number is (727) 510-7321 . This Wireless number was issued by &#x27;Cellco Partnership dba Verizon Wireless - CA&#x27;, first reported in public records on August of 2010. Past phone numbers for William include (727) 849-1903 , (352) 464-5632 and (727) 848-9404 . The primary email address for William is outlaw11car@gmail.com . William has also used the following email accounts: bc1119racingdad@yahoo.com , outlaw11car@aol.com , outlawcar@centurytel.net , outlawcar@aol.com , wcbill@aol.com , wcbill11@aol.com .</div>
+        </div>
+      </div>
+    </div>
+    <div class="ss-wrap">
+                <img src="william_campbell_gmail_com_1_result_3.png" class="ss-thumb"
+                     onclick="openModal('william_campbell_gmail_com_1_result_3.png')"
+                     title="Click to view profile detail screenshot">
+                <div class="ss-lbl">📸 Profile Detail Screenshot — click to zoom</div>
+            </div>
+  </div>
+  
+  <div class="res-actions">
+    <button class="res-btn arch-btn" onclick="archiveResult(2)">🗃 Not This Person</button>
+    <button class="res-btn del-btn"  onclick="confirmDelete(2)">🗑 Delete Result</button>
+  </div>
+</details>
+<details class="rcard " id="rcard-3">
+  <summary class="rcard-hdr">
+    <div class="rcard-hdr-top">
+      <div style="display:flex;align-items:center;gap:8px;min-width:0">
+        <span class="rnum">#4</span>
+        <span class="rname-person">William Campbell</span>
+        
+      </div>
+      <span class="expand-indicator">▼ Expand</span>
+    </div>
+    <div class="rcard-hdr-meta">
+      <div class="rcard-meta-left">
+        <span class="rcard-meta-pill">🎂 Age 57</span>
+        <span class="rcard-meta-pill">📍 Morristown, TN</span>
+      </div>
+      <div class="badge-group">
+        <span class="badge-tag">📞 12</span>
+        <span class="badge-tag">✉️ 10</span>
+      </div>
+    </div>
+  </summary>
+  <div class="rcard-body">
+    <div class="rinfo">
+      <div class="frow"><span class="fl">Full Name:</span><span class="fv fname">William Campbell</span></div>
+      <div class="frow"><span class="fl">Age:</span><span class="fv">57</span></div>
+      <div class="frow"><span class="fl">City / State:</span><span class="fv">Morristown, TN</span></div>
+      <div class="frow"><span class="fl">Phone(s):</span><div class="addrs"><button class="copy-all-btn" onclick="copyList([&quot;(703) 798-4507&quot;, &quot;(423) 307-5061&quot;, &quot;(707) 943-1561&quot;, &quot;(612) 686-6275&quot;, &quot;(707) 223-1907&quot;, &quot;(707) 506-5036&quot;, &quot;(703) 499-9097&quot;, &quot;(941) 262-7758&quot;, &quot;(703) 599-3168&quot;, &quot;(517) 739-7126&quot;, &quot;(239) 262-7758&quot;, &quot;(239) 877-7185&quot;], 'Phones'); event.stopPropagation();">📋 Copy All Phones (12)</button><div class="addr-row">📞 <span>(703) 798-4507</span> <button class="copy-item-btn" onclick="copySingle('(703) 798-4507', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(423) 307-5061</span> <button class="copy-item-btn" onclick="copySingle('(423) 307-5061', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(707) 943-1561</span> <button class="copy-item-btn" onclick="copySingle('(707) 943-1561', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(612) 686-6275</span> <button class="copy-item-btn" onclick="copySingle('(612) 686-6275', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(707) 223-1907</span> <button class="copy-item-btn" onclick="copySingle('(707) 223-1907', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(707) 506-5036</span> <button class="copy-item-btn" onclick="copySingle('(707) 506-5036', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(703) 499-9097</span> <button class="copy-item-btn" onclick="copySingle('(703) 499-9097', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(941) 262-7758</span> <button class="copy-item-btn" onclick="copySingle('(941) 262-7758', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(703) 599-3168</span> <button class="copy-item-btn" onclick="copySingle('(703) 599-3168', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(517) 739-7126</span> <button class="copy-item-btn" onclick="copySingle('(517) 739-7126', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(239) 262-7758</span> <button class="copy-item-btn" onclick="copySingle('(239) 262-7758', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(239) 877-7185</span> <button class="copy-item-btn" onclick="copySingle('(239) 877-7185', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div></div></div>
+      <div class="frow"><span class="fl">Email(s):</span><div class="addrs"><button class="copy-all-btn" onclick="copyList([&quot;williamcampbell@musfiber.com&quot;, &quot;tracerbullet@juno.com&quot;, &quot;tracer_bullet@uswest.net&quot;, &quot;tracer_bullet2004@hotmail.com&quot;, &quot;william.campbell@pacbell.net&quot;, &quot;tracerbullet1@yahoo.com&quot;, &quot;tracer_bullet2004@uswest.net&quot;, &quot;tracer_bullet2004@comcast.net&quot;, &quot;tracer_bullet@hotmail.com&quot;, &quot;wcampbell@attglobal.net&quot;], 'Emails'); event.stopPropagation();">📋 Copy All Emails (10)</button><div class="addr-row">✉️ <span>williamcampbell@musfiber.com</span> <button class="copy-item-btn" onclick="copySingle('williamcampbell@musfiber.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>tracerbullet@juno.com</span> <button class="copy-item-btn" onclick="copySingle('tracerbullet@juno.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>tracer_bullet@uswest.net</span> <button class="copy-item-btn" onclick="copySingle('tracer_bullet@uswest.net', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>tracer_bullet2004@hotmail.com</span> <button class="copy-item-btn" onclick="copySingle('tracer_bullet2004@hotmail.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>william.campbell@pacbell.net</span> <button class="copy-item-btn" onclick="copySingle('william.campbell@pacbell.net', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>tracerbullet1@yahoo.com</span> <button class="copy-item-btn" onclick="copySingle('tracerbullet1@yahoo.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>tracer_bullet2004@uswest.net</span> <button class="copy-item-btn" onclick="copySingle('tracer_bullet2004@uswest.net', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>tracer_bullet2004@comcast.net</span> <button class="copy-item-btn" onclick="copySingle('tracer_bullet2004@comcast.net', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>tracer_bullet@hotmail.com</span> <button class="copy-item-btn" onclick="copySingle('tracer_bullet@hotmail.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>wcampbell@attglobal.net</span> <button class="copy-item-btn" onclick="copySingle('wcampbell@attglobal.net', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div></div></div>
+      <div class="frow"><span class="fl">Address(es):</span><div class="addrs"><div class="addr-row">📍 2293 Windswept Way Unit 106 · Morristown, TN</div><div class="addr-row">📍 583 Park Shore Dr Unit I~3 · Naples, FL</div><div class="addr-row">📍 876 Lakeland Ave · Naples, FL</div><div class="addr-row">📍 75 Pine Dr · Miranda, CA</div><div class="addr-row">📍 1594 Serrano Cir · Naples, FL</div><div class="addr-row">📍 5069 Cummings Rd · Eureka, CA</div><div class="addr-row">📍 104 Franklin Ave · Fortuna, CA</div><div class="addr-row">📍 1818 Road B · Redway, CA</div><div class="addr-row">📍 1818 Road A · Garberville, CA</div><div class="addr-row">📍 553 Pacific Ave · Rio Dell, CA</div></div></div>
+      <div class="frow"><span class="fl">Relatives:</span><span class="fv">Barbara Campbell, Barbara Campbell, Dorothea Campbell, Jean Campbell, Jean Fuller</span></div>
+      <div class="frow"><span class="fl">AKA / Aliases:</span><span class="fv">William H Campbell Jr, William Haddock Campbell, William H Col Campbell, William H 3 Campbell</span></div>
+      
+      <div class="frow bg-report-row">
+        <span class="fl">Background:</span>
+        <div class="bg-report-box">
+          <div class="bg-report-hdr">
+            <span class="bg-report-title">📄 FREE Background Report</span>
+            <button class="copy-all-btn" onclick="copyBgReport(3); event.stopPropagation();">📋 Copy Report Text</button>
+          </div>
+          <div class="bg-report-text" id="bg-report-3">William H Campbell 3RD is 57 years old and was born in November of 1968. Currently William lives at the address 2293 Windswept Way, Unit 106, Morristown TN 37814 . William has lived at this Morristown, TN address for about 15 years, after moving in around January of 2011. William previously lived at 583 Park Shore Dr, Unit I-3, Naples FL 34103 for 6 years, starting in January of 2016. Going further back, starting in June of 2020, William lived at 876 Lakeland AVE, Naples FL 34110 . It is likely that William Campbell is married to 81 year old Barbara Sue Campbell , and they have lived together in at least 41 different locations. The following people are relatives or close associates of William: Barbara Campbell (70), Dorothea Campbell (100), Jean Campbell (77), Jean Fuller (44), Laura Campbell (72), Phyllis Campbell (77), Richard Campbell (80), Sonja Creech (56), Todd Campbell (55) and Warren Campbell (82). William&#x27;s current phone number is (703) 798-4507 . This Wireless number was issued by &#x27;Cellco Partnership dba Verizon Wireless - CA&#x27;, first reported in public records on March of 2021. Past phone numbers for William include (423) 307-5061 , (707) 943-1561 and (612) 686-6275 . The primary email address for William is williamcampbell@musfiber.com . William has also used the following email accounts: tracerbullet@juno.com , tracer_bullet@uswest.net , tracer_bullet2004@hotmail.com , william.campbell@pacbell.net , tracerbullet1@yahoo.com , tracer_bullet2004@uswest.net .</div>
+        </div>
+      </div>
+    </div>
+    <div class="ss-wrap">
+                <img src="william_campbell_gmail_com_1_result_4.png" class="ss-thumb"
+                     onclick="openModal('william_campbell_gmail_com_1_result_4.png')"
+                     title="Click to view profile detail screenshot">
+                <div class="ss-lbl">📸 Profile Detail Screenshot — click to zoom</div>
+            </div>
+  </div>
+  
+  <div class="res-actions">
+    <button class="res-btn arch-btn" onclick="archiveResult(3)">🗃 Not This Person</button>
+    <button class="res-btn del-btn"  onclick="confirmDelete(3)">🗑 Delete Result</button>
+  </div>
+</details>
+<details class="rcard " id="rcard-4">
+  <summary class="rcard-hdr">
+    <div class="rcard-hdr-top">
+      <div style="display:flex;align-items:center;gap:8px;min-width:0">
+        <span class="rnum">#5</span>
+        <span class="rname-person">William Campbell</span>
+        
+      </div>
+      <span class="expand-indicator">▼ Expand</span>
+    </div>
+    <div class="rcard-hdr-meta">
+      <div class="rcard-meta-left">
+        <span class="rcard-meta-pill">🎂 Age 54</span>
+        <span class="rcard-meta-pill">📍 Philadelphia, PA</span>
+      </div>
+      <div class="badge-group">
+        <span class="badge-tag">📞 12</span>
+        <span class="badge-tag">✉️ 10</span>
+      </div>
+    </div>
+  </summary>
+  <div class="rcard-body">
+    <div class="rinfo">
+      <div class="frow"><span class="fl">Full Name:</span><span class="fv fname">William Campbell</span></div>
+      <div class="frow"><span class="fl">Age:</span><span class="fv">54</span></div>
+      <div class="frow"><span class="fl">City / State:</span><span class="fv">Philadelphia, PA</span></div>
+      <div class="frow"><span class="fl">Phone(s):</span><div class="addrs"><button class="copy-all-btn" onclick="copyList([&quot;(215) 307-3189&quot;, &quot;(215) 471-7464&quot;, &quot;(267) 253-4462&quot;, &quot;(215) 329-7057&quot;, &quot;(215) 896-2917&quot;, &quot;(724) 228-5527&quot;, &quot;(215) 329-0000&quot;, &quot;(215) 329-1855&quot;, &quot;(215) 329-1835&quot;, &quot;(215) 932-7705&quot;, &quot;(214) 755-9010&quot;, &quot;(215) 329-2389&quot;], 'Phones'); event.stopPropagation();">📋 Copy All Phones (12)</button><div class="addr-row">📞 <span>(215) 307-3189</span> <button class="copy-item-btn" onclick="copySingle('(215) 307-3189', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(215) 471-7464</span> <button class="copy-item-btn" onclick="copySingle('(215) 471-7464', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(267) 253-4462</span> <button class="copy-item-btn" onclick="copySingle('(267) 253-4462', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(215) 329-7057</span> <button class="copy-item-btn" onclick="copySingle('(215) 329-7057', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(215) 896-2917</span> <button class="copy-item-btn" onclick="copySingle('(215) 896-2917', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(724) 228-5527</span> <button class="copy-item-btn" onclick="copySingle('(724) 228-5527', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(215) 329-0000</span> <button class="copy-item-btn" onclick="copySingle('(215) 329-0000', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(215) 329-1855</span> <button class="copy-item-btn" onclick="copySingle('(215) 329-1855', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(215) 329-1835</span> <button class="copy-item-btn" onclick="copySingle('(215) 329-1835', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(215) 932-7705</span> <button class="copy-item-btn" onclick="copySingle('(215) 932-7705', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(214) 755-9010</span> <button class="copy-item-btn" onclick="copySingle('(214) 755-9010', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(215) 329-2389</span> <button class="copy-item-btn" onclick="copySingle('(215) 329-2389', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div></div></div>
+      <div class="frow"><span class="fl">Email(s):</span><div class="addrs"><button class="copy-all-btn" onclick="copyList([&quot;ricksanders@bellsouth.net&quot;, &quot;williamc838@aol.com&quot;, &quot;sput@cox-internet.com&quot;, &quot;csundaymorning52@mailcity.com&quot;, &quot;sput@myvzw.com&quot;, &quot;sput149@myvzw.com&quot;, &quot;csundaymorning@cs.com&quot;, &quot;csundaymorning52@aol.com&quot;, &quot;sput@msn.com&quot;, &quot;sput04@cox-internet.com&quot;], 'Emails'); event.stopPropagation();">📋 Copy All Emails (10)</button><div class="addr-row">✉️ <span>ricksanders@bellsouth.net</span> <button class="copy-item-btn" onclick="copySingle('ricksanders@bellsouth.net', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>williamc838@aol.com</span> <button class="copy-item-btn" onclick="copySingle('williamc838@aol.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>sput@cox-internet.com</span> <button class="copy-item-btn" onclick="copySingle('sput@cox-internet.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>csundaymorning52@mailcity.com</span> <button class="copy-item-btn" onclick="copySingle('csundaymorning52@mailcity.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>sput@myvzw.com</span> <button class="copy-item-btn" onclick="copySingle('sput@myvzw.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>sput149@myvzw.com</span> <button class="copy-item-btn" onclick="copySingle('sput149@myvzw.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>csundaymorning@cs.com</span> <button class="copy-item-btn" onclick="copySingle('csundaymorning@cs.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>csundaymorning52@aol.com</span> <button class="copy-item-btn" onclick="copySingle('csundaymorning52@aol.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>sput@msn.com</span> <button class="copy-item-btn" onclick="copySingle('sput@msn.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>sput04@cox-internet.com</span> <button class="copy-item-btn" onclick="copySingle('sput04@cox-internet.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div></div></div>
+      <div class="frow"><span class="fl">Address(es):</span><div class="addrs"><div class="addr-row">📍 149 W Albanus St · Philadelphia, PA</div><div class="addr-row">📍 538 N Wanamaker St · Philadelphia, PA</div><div class="addr-row">📍 408 Kent Rd · Upper Darby, PA</div><div class="addr-row">📍 1830 South Dr · Jacksonville, NC</div><div class="addr-row">📍 149 W Albanus St · Phila, PA</div><div class="addr-row">📍 853 Pleasant Hill Dr · Washington, PA</div><div class="addr-row">📍 60 N Maine Ave · Atlantic City, NJ</div><div class="addr-row">📍 146 W Albanus St · Philadelphia, PA</div><div class="addr-row">📍 54 Timber Ln · Eighty Four, PA</div></div></div>
+      <div class="frow"><span class="fl">Relatives:</span><span class="fv">Andrea Campbell, Benjamin Campbell, Brenda Campbell, Herbert Campbell, Jennifer Stith</span></div>
+      <div class="frow"><span class="fl">AKA / Aliases:</span><span class="fv">William H Campbell Jr, William 759160401 Campbell, William Harrison Campbell, William H Campbell</span></div>
+      
+      <div class="frow bg-report-row">
+        <span class="fl">Background:</span>
+        <div class="bg-report-box">
+          <div class="bg-report-hdr">
+            <span class="bg-report-title">📄 FREE Background Report</span>
+            <button class="copy-all-btn" onclick="copyBgReport(4); event.stopPropagation();">📋 Copy Report Text</button>
+          </div>
+          <div class="bg-report-text" id="bg-report-4">William H Campbell JR is 54 years old and was born in November of 1971. Currently William lives at the address 149 W Albanus St, Philadelphia PA 19120 . William has lived at this Philadelphia, PA address for about 41 years, after moving in around August of 1985. William previously lived at 538 N Wanamaker St, Philadelphia PA 19131 for 40 years, starting in July of 1983. Going further back, starting in November of 2003, William lived at 408 Kent RD, Upper Darby PA 19082 for 7 years. Public records do not indicate that William H Campbell JR is currently married. The following people are relatives or close associates of William: Andrea Campbell (62), Benjamin Campbell (52), Brenda Campbell (83), Herbert Campbell (79), Jennifer Stith (45), Jutland Medina (53), Laurie Campbell (35), Lettie Campbell (76), Marion Cooper (69), Taj Campbell (31) and Tokay Campbell (58). William&#x27;s current phone number is (215) 307-3189 . This Landline number was issued by &#x27;Comcast Phone LLC and Applicable Affiliates&#x27;, first reported in public records on July of 2012. Past phone numbers for William include (215) 471-7464 , (267) 253-4462 and (215) 329-7057 . The primary email address for William is ricksanders@bellsouth.net . William has also used the following email accounts: williamc838@aol.com , sput@cox-internet.com , csundaymorning52@mailcity.com , sput@myvzw.com , sput149@myvzw.com , csundaymorning@cs.com .</div>
+        </div>
+      </div>
+    </div>
+    <div class="ss-wrap">
+                <img src="william_campbell_gmail_com_1_result_5.png" class="ss-thumb"
+                     onclick="openModal('william_campbell_gmail_com_1_result_5.png')"
+                     title="Click to view profile detail screenshot">
+                <div class="ss-lbl">📸 Profile Detail Screenshot — click to zoom</div>
+            </div>
+  </div>
+  
+  <div class="res-actions">
+    <button class="res-btn arch-btn" onclick="archiveResult(4)">🗃 Not This Person</button>
+    <button class="res-btn del-btn"  onclick="confirmDelete(4)">🗑 Delete Result</button>
+  </div>
+</details>
+<details class="rcard " id="rcard-5">
+  <summary class="rcard-hdr">
+    <div class="rcard-hdr-top">
+      <div style="display:flex;align-items:center;gap:8px;min-width:0">
+        <span class="rnum">#6</span>
+        <span class="rname-person">William Campbell</span>
+        
+      </div>
+      <span class="expand-indicator">▼ Expand</span>
+    </div>
+    <div class="rcard-hdr-meta">
+      <div class="rcard-meta-left">
+        <span class="rcard-meta-pill">🎂 Age 73</span>
+        <span class="rcard-meta-pill">📍 Jacksonville, FL</span>
+      </div>
+      <div class="badge-group">
+        <span class="badge-tag">📞 6</span>
+        <span class="badge-tag">✉️ 6</span>
+      </div>
+    </div>
+  </summary>
+  <div class="rcard-body">
+    <div class="rinfo">
+      <div class="frow"><span class="fl">Full Name:</span><span class="fv fname">William Campbell</span></div>
+      <div class="frow"><span class="fl">Age:</span><span class="fv">73</span></div>
+      <div class="frow"><span class="fl">City / State:</span><span class="fv">Jacksonville, FL</span></div>
+      <div class="frow"><span class="fl">Phone(s):</span><div class="addrs"><button class="copy-all-btn" onclick="copyList([&quot;(386) 264-6582&quot;, &quot;(904) 880-7744&quot;, &quot;(904) 635-0055&quot;, &quot;(813) 684-5615&quot;, &quot;(386) 447-5387&quot;, &quot;(813) 296-0561&quot;], 'Phones'); event.stopPropagation();">📋 Copy All Phones (6)</button><div class="addr-row">📞 <span>(386) 264-6582</span> <button class="copy-item-btn" onclick="copySingle('(386) 264-6582', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(904) 880-7744</span> <button class="copy-item-btn" onclick="copySingle('(904) 880-7744', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(904) 635-0055</span> <button class="copy-item-btn" onclick="copySingle('(904) 635-0055', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(813) 684-5615</span> <button class="copy-item-btn" onclick="copySingle('(813) 684-5615', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(386) 447-5387</span> <button class="copy-item-btn" onclick="copySingle('(386) 447-5387', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(813) 296-0561</span> <button class="copy-item-btn" onclick="copySingle('(813) 296-0561', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div></div></div>
+      <div class="frow"><span class="fl">Email(s):</span><div class="addrs"><button class="copy-all-btn" onclick="copyList([&quot;d_sephiroth@hotmail.com&quot;, &quot;campbellwhjr@gmail.com&quot;, &quot;jcsportsart@aol.com&quot;, &quot;bdcamp@aol.com&quot;, &quot;beedeecamp@comcast.net&quot;, &quot;kimacampbell@hotmail.com&quot;], 'Emails'); event.stopPropagation();">📋 Copy All Emails (6)</button><div class="addr-row">✉️ <span>d_sephiroth@hotmail.com</span> <button class="copy-item-btn" onclick="copySingle('d_sephiroth@hotmail.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>campbellwhjr@gmail.com</span> <button class="copy-item-btn" onclick="copySingle('campbellwhjr@gmail.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>jcsportsart@aol.com</span> <button class="copy-item-btn" onclick="copySingle('jcsportsart@aol.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>bdcamp@aol.com</span> <button class="copy-item-btn" onclick="copySingle('bdcamp@aol.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>beedeecamp@comcast.net</span> <button class="copy-item-btn" onclick="copySingle('beedeecamp@comcast.net', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>kimacampbell@hotmail.com</span> <button class="copy-item-btn" onclick="copySingle('kimacampbell@hotmail.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div></div></div>
+      <div class="frow"><span class="fl">Address(es):</span><div class="addrs"><div class="addr-row">📍 11734 Magnolia Falls Dr · Jacksonville, FL</div><div class="addr-row">📍 11247 San Jose Blvd Unit 415 · Jacksonville, FL</div><div class="addr-row">📍 6091 Beechwood Dr · Ridge Manor, FL</div><div class="addr-row">📍 11883 Magnolia Falls Dr · Jacksonville, FL</div><div class="addr-row">📍 5115 Twin Creeks Dr · Valrico, FL</div><div class="addr-row">📍 3608 E 2Nd St · Panama City, FL</div><div class="addr-row">📍 1754 Fulton Ave · Clearwater, FL</div><div class="addr-row">📍 2095 E Bay Dr · Largo, FL</div><div class="addr-row">📍 52 21St Ter Se · Largo, FL</div><div class="addr-row">📍 2075 E Bay Dr · Largo, FL</div></div></div>
+      <div class="frow"><span class="fl">Relatives:</span><span class="fv">Dedie Campbell, Anna Campbell, Daniel Campbell, David Campbell, Dillon Campbell</span></div>
+      <div class="frow"><span class="fl">AKA / Aliases:</span><span class="fv">William Henry Campbell, William H Campbell Jr, William H Campbell, William B Campbell</span></div>
+      
+      <div class="frow bg-report-row">
+        <span class="fl">Background:</span>
+        <div class="bg-report-box">
+          <div class="bg-report-hdr">
+            <span class="bg-report-title">📄 FREE Background Report</span>
+            <button class="copy-all-btn" onclick="copyBgReport(5); event.stopPropagation();">📋 Copy Report Text</button>
+          </div>
+          <div class="bg-report-text" id="bg-report-5">William Henry Campbell JR is 73 years old and was born in April of 1953. Currently William lives at the address 11734 Magnolia Falls Dr, Jacksonville FL 32258 . William has lived at this Jacksonville, FL address for about 25 years, after moving in around December of 2000. William previously lived at 11247 San Jose Blvd, Unit 415, Jacksonville FL 32223 for 4 months, starting in August of 2002. Going further back, starting in February of 1989, William lived at 6091 Beechwood DR, Ridge Manor FL 33523 for 1 week. It is likely that William Campbell is married to 60 year old Dedie Jones Campbell , and they have lived together in at least 27 different locations. The following people are relatives or close associates of William: Anna Campbell (94), Daniel Campbell (69), David Campbell (68), Dillon Campbell (32), Evelyn Campbell (105), Gloria Campbell (76), James Campbell (35), James Campbell (57), Kimberly Brown (47) and Krystal Campbell (38). William&#x27;s current phone number is (386) 264-6582 . This Landline number was issued by &#x27;Bright House Networks Information Services (Florida) LLC - FL&#x27;, first reported in public records on May of 2024. Past phone numbers for William include (904) 880-7744 , (904) 635-0055 and (813) 684-5615 . The primary email address for William is d_sephiroth@hotmail.com . William has also used the following email accounts: campbellwhjr@gmail.com , jcsportsart@aol.com , bdcamp@aol.com , beedeecamp@comcast.net and kimacampbell@hotmail.com .</div>
+        </div>
+      </div>
+    </div>
+    <div class="ss-wrap">
+                <img src="william_campbell_gmail_com_1_result_6.png" class="ss-thumb"
+                     onclick="openModal('william_campbell_gmail_com_1_result_6.png')"
+                     title="Click to view profile detail screenshot">
+                <div class="ss-lbl">📸 Profile Detail Screenshot — click to zoom</div>
+            </div>
+  </div>
+  
+  <div class="res-actions">
+    <button class="res-btn arch-btn" onclick="archiveResult(5)">🗃 Not This Person</button>
+    <button class="res-btn del-btn"  onclick="confirmDelete(5)">🗑 Delete Result</button>
+  </div>
+</details>
+<details class="rcard " id="rcard-6">
+  <summary class="rcard-hdr">
+    <div class="rcard-hdr-top">
+      <div style="display:flex;align-items:center;gap:8px;min-width:0">
+        <span class="rnum">#7</span>
+        <span class="rname-person">William Campbell</span>
+        
+      </div>
+      <span class="expand-indicator">▼ Expand</span>
+    </div>
+    <div class="rcard-hdr-meta">
+      <div class="rcard-meta-left">
+        <span class="rcard-meta-pill">🎂 Age 48</span>
+        <span class="rcard-meta-pill">📍 Oil City, PA</span>
+      </div>
+      <div class="badge-group">
+        <span class="badge-tag">📞 12</span>
+        <span class="badge-tag">✉️ 2</span>
+      </div>
+    </div>
+  </summary>
+  <div class="rcard-body">
+    <div class="rinfo">
+      <div class="frow"><span class="fl">Full Name:</span><span class="fv fname">William Campbell</span></div>
+      <div class="frow"><span class="fl">Age:</span><span class="fv">48</span></div>
+      <div class="frow"><span class="fl">City / State:</span><span class="fv">Oil City, PA</span></div>
+      <div class="frow"><span class="fl">Phone(s):</span><div class="addrs"><button class="copy-all-btn" onclick="copyList([&quot;(716) 281-0374&quot;, &quot;(814) 671-3493&quot;, &quot;(814) 671-4528&quot;, &quot;(814) 676-0232&quot;, &quot;(814) 271-9144&quot;, &quot;(419) 616-3162&quot;, &quot;(419) 433-9214&quot;, &quot;(814) 653-2175&quot;, &quot;(912) 467-1294&quot;, &quot;(912) 576-7831&quot;, &quot;(419) 616-3366&quot;, &quot;(814) 437-7321&quot;], 'Phones'); event.stopPropagation();">📋 Copy All Phones (12)</button><div class="addr-row">📞 <span>(716) 281-0374</span> <button class="copy-item-btn" onclick="copySingle('(716) 281-0374', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(814) 671-3493</span> <button class="copy-item-btn" onclick="copySingle('(814) 671-3493', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(814) 671-4528</span> <button class="copy-item-btn" onclick="copySingle('(814) 671-4528', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(814) 676-0232</span> <button class="copy-item-btn" onclick="copySingle('(814) 676-0232', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(814) 271-9144</span> <button class="copy-item-btn" onclick="copySingle('(814) 271-9144', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(419) 616-3162</span> <button class="copy-item-btn" onclick="copySingle('(419) 616-3162', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(419) 433-9214</span> <button class="copy-item-btn" onclick="copySingle('(419) 433-9214', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(814) 653-2175</span> <button class="copy-item-btn" onclick="copySingle('(814) 653-2175', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(912) 467-1294</span> <button class="copy-item-btn" onclick="copySingle('(912) 467-1294', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(912) 576-7831</span> <button class="copy-item-btn" onclick="copySingle('(912) 576-7831', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(419) 616-3366</span> <button class="copy-item-btn" onclick="copySingle('(419) 616-3366', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(814) 437-7321</span> <button class="copy-item-btn" onclick="copySingle('(814) 437-7321', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div></div></div>
+      <div class="frow"><span class="fl">Email(s):</span><div class="addrs"><button class="copy-all-btn" onclick="copyList([&quot;spk22@netzero.net&quot;, &quot;mtcmcmc@yahoo.com&quot;], 'Emails'); event.stopPropagation();">📋 Copy All Emails (2)</button><div class="addr-row">✉️ <span>spk22@netzero.net</span> <button class="copy-item-btn" onclick="copySingle('spk22@netzero.net', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>mtcmcmc@yahoo.com</span> <button class="copy-item-btn" onclick="copySingle('mtcmcmc@yahoo.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div></div></div>
+      <div class="frow"><span class="fl">Address(es):</span><div class="addrs"><div class="addr-row">📍 86 Spruce St · Oil City, PA</div><div class="addr-row">📍 306 Miller St · Saint Marys, GA</div><div class="addr-row">📍 20 Alcorn Ave · Oil City, PA</div><div class="addr-row">📍 14 E Bissell Ave Unit 3 · Oil City, PA</div><div class="addr-row">📍 1007 Grant Street Ext · Reynoldsville, PA</div><div class="addr-row">📍 318 N Kerr St · Titusville, PA</div><div class="addr-row">📍 407 North St Unit C · Oil City, PA</div><div class="addr-row">📍 841 Cmr 414 Unit 841 · Apo, AE</div><div class="addr-row">📍 144 Fairfield Dr Unit 2C · Saint Marys, GA</div><div class="addr-row">📍 507 Hoffman Ave Unit 1 · Oil City, PA</div></div></div>
+      <div class="frow"><span class="fl">Relatives:</span><span class="fv">Aaron Campbell, Adam Campbell, Anna Campbell, Brian Campbell, Caitlin Campbell</span></div>
+      <div class="frow"><span class="fl">AKA / Aliases:</span><span class="fv">William J Campbell, William Campbell Campbell, William R Campbell, William Campbell Jr</span></div>
+      
+      <div class="frow bg-report-row">
+        <span class="fl">Background:</span>
+        <div class="bg-report-box">
+          <div class="bg-report-hdr">
+            <span class="bg-report-title">📄 FREE Background Report</span>
+            <button class="copy-all-btn" onclick="copyBgReport(6); event.stopPropagation();">📋 Copy Report Text</button>
+          </div>
+          <div class="bg-report-text" id="bg-report-6">William Joseph Campbell is 48 years old and was born in January of 1978. Currently William lives at the address 86 Spruce St, Oil City PA 16301 . William has lived at this Oil City, PA address for about 6 years, after moving in around January of 2020. William previously lived at 306 Miller St, Saint Marys GA 31558 for 1 year, starting in October of 2006. Going further back, starting in December of 2021, William lived at 20 Alcorn AVE, Oil City PA 16301 for 8 months. Public records do not indicate that William Joseph Campbell is currently married. The following people are relatives or close associates of William: Aaron Campbell (43), Adam Campbell (42), Anna Campbell (20), Brian Campbell (37), Caitlin Campbell (40), Charles Campbell (65), Darnell Campbell (43), David Campbell (47), Donna Campbell (86), Donna Campbell (59) and Donna Campbell (67). William&#x27;s current phone number is (716) 281-0374 . This Landline number was issued by &#x27;Bandwidth.com CLEC LLC&#x27;, first reported in public records on September of 2022. Past phone numbers for William include (814) 671-3493 , (814) 671-4528 and (814) 676-0232 . The primary email address for William is spk22@netzero.net . William has also used the following email accounts: and mtcmcmc@yahoo.com .</div>
+        </div>
+      </div>
+    </div>
+    <div class="ss-wrap">
+                <img src="william_campbell_gmail_com_1_result_7.png" class="ss-thumb"
+                     onclick="openModal('william_campbell_gmail_com_1_result_7.png')"
+                     title="Click to view profile detail screenshot">
+                <div class="ss-lbl">📸 Profile Detail Screenshot — click to zoom</div>
+            </div>
+  </div>
+  
+  <div class="res-actions">
+    <button class="res-btn arch-btn" onclick="archiveResult(6)">🗃 Not This Person</button>
+    <button class="res-btn del-btn"  onclick="confirmDelete(6)">🗑 Delete Result</button>
+  </div>
+</details>
+<details class="rcard " id="rcard-7">
+  <summary class="rcard-hdr">
+    <div class="rcard-hdr-top">
+      <div style="display:flex;align-items:center;gap:8px;min-width:0">
+        <span class="rnum">#8</span>
+        <span class="rname-person">William Campbell</span>
+        
+      </div>
+      <span class="expand-indicator">▼ Expand</span>
+    </div>
+    <div class="rcard-hdr-meta">
+      <div class="rcard-meta-left">
+        <span class="rcard-meta-pill">🎂 Age 44</span>
+        <span class="rcard-meta-pill">📍 Naples, FL</span>
+      </div>
+      <div class="badge-group">
+        <span class="badge-tag">📞 7</span>
+        <span class="badge-tag">✉️ 7</span>
+      </div>
+    </div>
+  </summary>
+  <div class="rcard-body">
+    <div class="rinfo">
+      <div class="frow"><span class="fl">Full Name:</span><span class="fv fname">William Campbell</span></div>
+      <div class="frow"><span class="fl">Age:</span><span class="fv">44</span></div>
+      <div class="frow"><span class="fl">City / State:</span><span class="fv">Naples, FL</span></div>
+      <div class="frow"><span class="fl">Phone(s):</span><div class="addrs"><button class="copy-all-btn" onclick="copyList([&quot;(954) 448-2882&quot;, &quot;(239) 676-9256&quot;, &quot;(954) 434-7630&quot;, &quot;(863) 496-0069&quot;, &quot;(954) 442-4057&quot;, &quot;(941) 739-3524&quot;, &quot;(941) 456-5717&quot;], 'Phones'); event.stopPropagation();">📋 Copy All Phones (7)</button><div class="addr-row">📞 <span>(954) 448-2882</span> <button class="copy-item-btn" onclick="copySingle('(954) 448-2882', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(239) 676-9256</span> <button class="copy-item-btn" onclick="copySingle('(239) 676-9256', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(954) 434-7630</span> <button class="copy-item-btn" onclick="copySingle('(954) 434-7630', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(863) 496-0069</span> <button class="copy-item-btn" onclick="copySingle('(863) 496-0069', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(954) 442-4057</span> <button class="copy-item-btn" onclick="copySingle('(954) 442-4057', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(941) 739-3524</span> <button class="copy-item-btn" onclick="copySingle('(941) 739-3524', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(941) 456-5717</span> <button class="copy-item-btn" onclick="copySingle('(941) 456-5717', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div></div></div>
+      <div class="frow"><span class="fl">Email(s):</span><div class="addrs"><button class="copy-all-btn" onclick="copyList([&quot;useyrbrain@aol.com&quot;, &quot;stthomas1928@aol.com&quot;, &quot;williamcampbell1950@yahoo.com&quot;, &quot;katieann07@cfl.rr.com&quot;, &quot;katieann07@verizon.net&quot;, &quot;awilliam.campbelln18@msn.com&quot;, &quot;william.campbell@gte.net&quot;], 'Emails'); event.stopPropagation();">📋 Copy All Emails (7)</button><div class="addr-row">✉️ <span>useyrbrain@aol.com</span> <button class="copy-item-btn" onclick="copySingle('useyrbrain@aol.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>stthomas1928@aol.com</span> <button class="copy-item-btn" onclick="copySingle('stthomas1928@aol.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>williamcampbell1950@yahoo.com</span> <button class="copy-item-btn" onclick="copySingle('williamcampbell1950@yahoo.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>katieann07@cfl.rr.com</span> <button class="copy-item-btn" onclick="copySingle('katieann07@cfl.rr.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>katieann07@verizon.net</span> <button class="copy-item-btn" onclick="copySingle('katieann07@verizon.net', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>awilliam.campbelln18@msn.com</span> <button class="copy-item-btn" onclick="copySingle('awilliam.campbelln18@msn.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>william.campbell@gte.net</span> <button class="copy-item-btn" onclick="copySingle('william.campbell@gte.net', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div></div></div>
+      <div class="frow"><span class="fl">Address(es):</span><div class="addrs"><div class="addr-row">📍 262 16Th Ave Ne · Naples, FL</div><div class="addr-row">📍 28281 Jeneva Way · Bonita Springs, FL</div><div class="addr-row">📍 9167 Brendan Preserve Ct · Bonita Springs, FL</div><div class="addr-row">📍 19934 Estero Verde Dr Unit R · Fort Myers, FL</div><div class="addr-row">📍 521 Dove Ct · Kissimmee, FL</div><div class="addr-row">📍 5661 Whitehead St · Bradenton, FL</div><div class="addr-row">📍 4617 Summer Oak Ave E Unit 837 · Sarasota, FL</div><div class="addr-row">📍 1920 Sabal Palm Dr Unit 305 · Davie, FL</div><div class="addr-row">📍 14571 Mustang Trl · Southwest Ranches, FL</div><div class="addr-row">📍 14621 Mustang Trl · Southwest Ranches, FL</div></div></div>
+      <div class="frow"><span class="fl">Relatives:</span><span class="fv">Alissa Spice, Cathy Campbell, John Campbell, Kathryn Campbell, Rita Macrini</span></div>
+      <div class="frow"><span class="fl">AKA / Aliases:</span><span class="fv">William P Campbell Jr, William Patrick Campbell, William Campbell Jr, William P Campbell</span></div>
+      
+      <div class="frow bg-report-row">
+        <span class="fl">Background:</span>
+        <div class="bg-report-box">
+          <div class="bg-report-hdr">
+            <span class="bg-report-title">📄 FREE Background Report</span>
+            <button class="copy-all-btn" onclick="copyBgReport(7); event.stopPropagation();">📋 Copy Report Text</button>
+          </div>
+          <div class="bg-report-text" id="bg-report-7">William Patrick Campbell JR is 44 years old and was born in February of 1982. Currently William lives at the address 262 16th Ave NE, Naples FL 34120 . William has lived at this Naples, FL address for about 3 years, after moving in around March of 2023. William previously lived at 28281 Jeneva Way, Bonita Springs FL 34135 for 8 years, starting in September of 2014. Going further back, starting in December of 2012, William lived at 9167 Brendan Preserve CT, Bonita Springs FL 34135 for 4 months. Public records do not indicate that William Patrick Campbell JR is currently married. The following people are relatives or close associates of William: Alissa Spice (42), Cathy Campbell (68), John Campbell (46), Kathryn Campbell (39), Rita Macrini (82), Rochelle Lopez (64), William Campbell (68), Andrew Dedona (68), Andrew Holmes (46), Barbara Campbell (73) and Camila Lopez (24). William&#x27;s current phone number is (954) 448-2882 . This Wireless number was issued by &#x27;Cellco Partnership dba Verizon Wireless - CA&#x27;, first reported in public records on August of 2010. Past phone numbers for William include (239) 676-9256 , (954) 434-7630 and (863) 496-0069 . The primary email address for William is useyrbrain@aol.com . William has also used the following email accounts: stthomas1928@aol.com , williamcampbell1950@yahoo.com , katieann07@cfl.rr.com , katieann07@verizon.net , awilliam.campbelln18@msn.com and william.campbell@gte.net .</div>
+        </div>
+      </div>
+    </div>
+    <div class="ss-wrap">
+                <img src="william_campbell_gmail_com_1_result_8.png" class="ss-thumb"
+                     onclick="openModal('william_campbell_gmail_com_1_result_8.png')"
+                     title="Click to view profile detail screenshot">
+                <div class="ss-lbl">📸 Profile Detail Screenshot — click to zoom</div>
+            </div>
+  </div>
+  
+  <div class="res-actions">
+    <button class="res-btn arch-btn" onclick="archiveResult(7)">🗃 Not This Person</button>
+    <button class="res-btn del-btn"  onclick="confirmDelete(7)">🗑 Delete Result</button>
+  </div>
+</details>
+<details class="rcard " id="rcard-8">
+  <summary class="rcard-hdr">
+    <div class="rcard-hdr-top">
+      <div style="display:flex;align-items:center;gap:8px;min-width:0">
+        <span class="rnum">#9</span>
+        <span class="rname-person">William Campbell</span>
+        
+      </div>
+      <span class="expand-indicator">▼ Expand</span>
+    </div>
+    <div class="rcard-hdr-meta">
+      <div class="rcard-meta-left">
+        <span class="rcard-meta-pill">🎂 Age 62</span>
+        <span class="rcard-meta-pill">📍 Daytona Beach, FL</span>
+      </div>
+      <div class="badge-group">
+        <span class="badge-tag">📞 11</span>
+        <span class="badge-tag">✉️ 6</span>
+      </div>
+    </div>
+  </summary>
+  <div class="rcard-body">
+    <div class="rinfo">
+      <div class="frow"><span class="fl">Full Name:</span><span class="fv fname">William Campbell</span></div>
+      <div class="frow"><span class="fl">Age:</span><span class="fv">62</span></div>
+      <div class="frow"><span class="fl">City / State:</span><span class="fv">Daytona Beach, FL</span></div>
+      <div class="frow"><span class="fl">Phone(s):</span><div class="addrs"><button class="copy-all-btn" onclick="copyList([&quot;(850) 206-2311&quot;, &quot;(904) 741-4939&quot;, &quot;(813) 242-6018&quot;, &quot;(813) 917-9694&quot;, &quot;(881) 378-4584&quot;, &quot;(850) 433-9512&quot;, &quot;(850) 982-1422&quot;, &quot;(518) 584-9012&quot;, &quot;(904) 277-8155&quot;, &quot;(727) 398-4793&quot;, &quot;(904) 398-4793&quot;], 'Phones'); event.stopPropagation();">📋 Copy All Phones (11)</button><div class="addr-row">📞 <span>(850) 206-2311</span> <button class="copy-item-btn" onclick="copySingle('(850) 206-2311', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(904) 741-4939</span> <button class="copy-item-btn" onclick="copySingle('(904) 741-4939', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(813) 242-6018</span> <button class="copy-item-btn" onclick="copySingle('(813) 242-6018', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(813) 917-9694</span> <button class="copy-item-btn" onclick="copySingle('(813) 917-9694', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(881) 378-4584</span> <button class="copy-item-btn" onclick="copySingle('(881) 378-4584', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(850) 433-9512</span> <button class="copy-item-btn" onclick="copySingle('(850) 433-9512', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(850) 982-1422</span> <button class="copy-item-btn" onclick="copySingle('(850) 982-1422', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(518) 584-9012</span> <button class="copy-item-btn" onclick="copySingle('(518) 584-9012', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(904) 277-8155</span> <button class="copy-item-btn" onclick="copySingle('(904) 277-8155', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(727) 398-4793</span> <button class="copy-item-btn" onclick="copySingle('(727) 398-4793', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(904) 398-4793</span> <button class="copy-item-btn" onclick="copySingle('(904) 398-4793', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div></div></div>
+      <div class="frow"><span class="fl">Email(s):</span><div class="addrs"><button class="copy-all-btn" onclick="copyList([&quot;wmcb5@aol.com&quot;, &quot;wcampbellii1@earthlink.net&quot;, &quot;wm.campbell@yahoo.com&quot;, &quot;wcampbellii1@yahoo.com&quot;, &quot;antoniocasorelli@libero.it&quot;, &quot;wcampbellii2@yahoo.com&quot;], 'Emails'); event.stopPropagation();">📋 Copy All Emails (6)</button><div class="addr-row">✉️ <span>wmcb5@aol.com</span> <button class="copy-item-btn" onclick="copySingle('wmcb5@aol.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>wcampbellii1@earthlink.net</span> <button class="copy-item-btn" onclick="copySingle('wcampbellii1@earthlink.net', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>wm.campbell@yahoo.com</span> <button class="copy-item-btn" onclick="copySingle('wm.campbell@yahoo.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>wcampbellii1@yahoo.com</span> <button class="copy-item-btn" onclick="copySingle('wcampbellii1@yahoo.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>antoniocasorelli@libero.it</span> <button class="copy-item-btn" onclick="copySingle('antoniocasorelli@libero.it', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>wcampbellii2@yahoo.com</span> <button class="copy-item-btn" onclick="copySingle('wcampbellii2@yahoo.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div></div></div>
+      <div class="frow"><span class="fl">Address(es):</span><div class="addrs"><div class="addr-row">📍 1381 N Clyde Morris Blvd Unit 9407 · Daytona Beach, FL</div><div class="addr-row">📍 85771 Haddock Rd · Yulee, FL</div><div class="addr-row">📍 85061 Tinya Rd · Yulee, FL</div><div class="addr-row">📍 85338 Wesley Rd · Yulee, FL</div><div class="addr-row">📍 1316 E Jackson St · Pensacola, FL</div><div class="addr-row">📍 325 Mehlenbacher Rd · Belleair Bluffs, FL</div><div class="addr-row">📍 2299 Scenic Hwy Unit O1 · Pensacola, FL</div><div class="addr-row">📍 14459 Duval Rd · Jacksonville, FL</div><div class="addr-row">📍 14465 Duval Rd W · Jacksonville, FL</div><div class="addr-row">📍 1810 E Palm Ave Unit 5320 · Tampa, FL</div></div></div>
+      <div class="frow"><span class="fl">Relatives:</span><span class="fv">Sandra Campbell, Sandra Campbell, William Campbell, Aaron Campbell, Billy Campbell</span></div>
+      <div class="frow"><span class="fl">AKA / Aliases:</span><span class="fv">William R Campbell Jr, William Richard Campbell Jr, William Richard Campbell, William Campbell Jr</span></div>
+      
+      <div class="frow bg-report-row">
+        <span class="fl">Background:</span>
+        <div class="bg-report-box">
+          <div class="bg-report-hdr">
+            <span class="bg-report-title">📄 FREE Background Report</span>
+            <button class="copy-all-btn" onclick="copyBgReport(8); event.stopPropagation();">📋 Copy Report Text</button>
+          </div>
+          <div class="bg-report-text" id="bg-report-8">William Richard 2 Campbell is 62 years old and was born in April of 1964. Currently William lives at the address 1381 N Clyde Morris Blvd, Unit 9407, Daytona Beach FL 32117 . William has lived at this Daytona Beach, FL address for about 4 years, after moving in around April of 2022. William previously lived at 85771 Haddock RD, Yulee FL 32097 for 1 month, starting in April of 2021. Going further back, starting in July of 2014, William lived at 85061 Tinya RD, Yulee FL 32097 for 5 years. Public records do not indicate that William Richard 2 Campbell is currently married. The following people are relatives or close associates of William: Sandra Campbell (75), Sandra Campbell (75), William Campbell (81), Aaron Campbell (85), Billy Campbell (75), Christopher Kelley (64), Clara Campbell (99), Clem Campbell (99), Courtney Campbell (50), David Campbell (46) and Diane Campbell (70). William&#x27;s current phone number is (850) 206-2311 . This Wireless number was issued by &#x27;New Cingular Wireless PCS LLC - GA&#x27;, first reported in public records on August of 2010. Past phone numbers for William include (904) 741-4939 , (813) 242-6018 and (813) 917-9694 . The primary email address for William is wmcb5@aol.com . William has also used the following email accounts: wcampbellii1@earthlink.net , wm.campbell@yahoo.com , wcampbellii1@yahoo.com , antoniocasorelli@libero.it and wcampbellii2@yahoo.com .</div>
+        </div>
+      </div>
+    </div>
+    <div class="ss-wrap">
+                <img src="william_campbell_gmail_com_1_result_9.png" class="ss-thumb"
+                     onclick="openModal('william_campbell_gmail_com_1_result_9.png')"
+                     title="Click to view profile detail screenshot">
+                <div class="ss-lbl">📸 Profile Detail Screenshot — click to zoom</div>
+            </div>
+  </div>
+  
+  <div class="res-actions">
+    <button class="res-btn arch-btn" onclick="archiveResult(8)">🗃 Not This Person</button>
+    <button class="res-btn del-btn"  onclick="confirmDelete(8)">🗑 Delete Result</button>
+  </div>
+</details>
+</div>
+<div class="toast" id="toast"></div>
+<div class="modal" id="modal" onclick="if(event.target===this||event.target.classList.contains('modal-wrap'))closeModal()">
+  <div class="modal-bar">
+    <div class="modal-bar-ttl">📸 <span>Verified Public Record Intelligence Screenshot</span></div>
+    <div class="modal-bar-actions">
+      <a id="modal-dl-btn" href="#" download="screenshot.png" class="modal-bar-btn" target="_blank">⬇ Download Original</a>
+      <button class="modal-bar-btn" onclick="closeModal()" style="background:#dc2626;border-color:#ef4444;color:#fff">✕ Close</button>
+    </div>
+  </div>
+  <div class="modal-wrap">
+    <div id="modal-loading" class="modal-loading">⏳ Loading authentic screenshot...</div>
+    <img id="modal-img" src="" class="modal-img" onclick="event.stopPropagation()">
+  </div>
+</div>
+<div class="confirm-overlay" id="confirm-overlay">
+  <div class="confirm-box">
+    <h3>🗑 Delete This Result?</h3>
+    <p>This will permanently remove the result and its screenshot.<br>This <strong>cannot be undone</strong>.</p>
+    <div class="confirm-btns">
+      <button class="cb-cancel" onclick="closeConfirm()">Cancel</button>
+      <button class="cb-delete" id="cb-confirm-btn" onclick="doDelete()">Delete Permanently</button>
+    </div>
+  </div>
+</div>
+
+
+
+<div class="share-modal" id="share-modal" onclick="if(event.target===this)closeShareModal()">
+  <div class="share-box">
+    <div class="share-hdr">
+      <h3>🔗 Share Result Link</h3>
+      <span class="share-close" onclick="closeShareModal()">✕</span>
+    </div>
+    <p>Anyone with this direct link can view these results in read-only mode.<br><strong style="color:var(--ac)">⚡ Active while account is in good standing. Automatically freezes if account is paused or leads are depleted.</strong></p>
+    <div class="share-input-wrap">
+      <input type="text" id="share-url-input" readonly value="">
+      <button class="share-copy-btn" onclick="copyShareLink()">Copy</button>
+    </div>
+    <div class="share-socials">
+      <a id="share-wa" href="#" target="_blank" class="soc-btn soc-wa">📱 WhatsApp</a>
+      <a id="share-tg" href="#" target="_blank" class="soc-btn soc-tg">✈️ Telegram</a>
+    </div>
+  </div>
+</div>
+
+<script>
+const JOB_ID   = '7C2AF930';
+const LEAD_IDX = 0;
+const API      = (window.location.protocol.startsWith('http') ? window.location.origin : 'http://localhost:5050');
+let _pendingDeleteIdx = null;
+
+window.addEventListener('scroll', () => {
+  const b = document.getElementById('back-to-top-btn');
+  if (b) {
+    if (window.scrollY > 280) b.classList.add('visible');
+    else b.classList.remove('visible');
+  }
+});
+
+function openShareModal() {
+  const url = window.location.href;
+  document.getElementById('share-url-input').value = url;
+  const encodedUrl = encodeURIComponent(url);
+  const text = encodeURIComponent('LeadsOSINT Report: william.campbell@gmail.com');
+  document.getElementById('share-wa').href = 'https://api.whatsapp.com/send?text=' + text + '%20' + encodedUrl;
+  document.getElementById('share-tg').href = 'https://t.me/share/url?url=' + encodedUrl + '&text=' + text;
+  document.getElementById('share-modal').classList.add('open');
+}
+function closeShareModal() {
+  document.getElementById('share-modal').classList.remove('open');
+}
+function copyShareLink() {
+  const input = document.getElementById('share-url-input');
+  copySingle(input.value, 'Share Link');
+}
+
+function copySingle(val, label) {
+  navigator.clipboard.writeText(val).then(() => {
+    showToast(label + ' copied to clipboard!', 'ok');
+  }).catch(() => {
+    const ta = document.createElement('textarea');
+    ta.value = val;
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    showToast(label + ' copied!', 'ok');
+  });
+}
+
+function copyList(arr, label) {
+  if (!arr || !arr.length) return;
+  const text = arr.join('\\n');
+  navigator.clipboard.writeText(text).then(() => {
+    showToast(arr.length + ' ' + label + ' copied to clipboard!', 'ok');
+  }).catch(() => {
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    showToast(arr.length + ' ' + label + ' copied!', 'ok');
+  });
+}
+
+function copyBgReport(idx) {
+  const el = document.getElementById('bg-report-' + idx);
+  if (el) {
+    copySingle(el.innerText || el.textContent, 'Free Background Report');
+  }
+}
+
+function openModal(src){
+  const m = document.getElementById('modal');
+  const img = document.getElementById('modal-img');
+  const loader = document.getElementById('modal-loading');
+  const dl = document.getElementById('modal-dl-btn');
+  
+  if (dl) dl.href = src;
+  loader.textContent = '⏳ Loading authentic screenshot...';
+  loader.style.display = 'block';
+  img.style.display = 'none';
+  m.classList.add('open');
+  document.body.style.overflow = 'hidden';
+  
+  img.onload = () => {
+    loader.style.display = 'none';
+    img.style.display = 'block';
+  };
+  img.onerror = () => {
+    loader.textContent = '⚠️ Screenshot could not be loaded.';
+  };
+  img.src = src;
+}
+
+function closeModal(){
+  const m = document.getElementById('modal');
+  if (m) m.classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape'){
+    closeModal();
+    closeConfirm();
+  }
+});
+
+function showToast(msg, type='ok'){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast ' + type + ' show';
+  setTimeout(()=>t.classList.remove('show'), 3500);
+}
+
+function confirmDelete(idx){
+  _pendingDeleteIdx = idx;
+  document.getElementById('confirm-overlay').classList.add('open');
+}
+function closeConfirm(){
+  document.getElementById('confirm-overlay').classList.remove('open');
+  _pendingDeleteIdx = null;
+}
+async function doDelete(){
+  const idx = _pendingDeleteIdx;
+  closeConfirm();
+  if (idx === null || !JOB_ID) return;
+  await deleteResult(idx);
+}
+async function deleteResult(idx){
+  if (!JOB_ID) { showToast('No job ID — open via dashboard', 'err'); return; }
+  const card = document.getElementById('rcard-' + idx);
+  if (card) card.classList.add('removing');
+  try {
+    const r = await fetch(`${API}/api/jobs/${JOB_ID}/leads/${LEAD_IDX}/results/${idx}/delete`,
+                          {method:'POST'});
+    const d = await r.json();
+    if (r.ok) {
+      setTimeout(()=>{ if(card) card.remove(); updateCount(-1); }, 250);
+      showToast('Result deleted permanently', 'ok');
+    } else {
+      if (card) card.classList.remove('removing');
+      showToast(d.error || 'Delete failed', 'err');
+    }
+  } catch(e) {
+    if (card) card.classList.remove('removing');
+    showToast('Network error: ' + (e.message || e), 'err');
+  }
+}
+async function archiveResult(idx){
+  if (!JOB_ID) { showToast('No job ID — open via dashboard', 'err'); return; }
+  const card = document.getElementById('rcard-' + idx);
+  if (card) {
+    card.style.transition = '0.25s all';
+    card.style.opacity = '0.3';
+    card.style.transform = 'scale(0.98)';
+  }
+  showToast('Updating status...', 'ok');
+  try {
+    const r = await fetch(`${API}/api/jobs/${JOB_ID}/leads/${LEAD_IDX}/results/${idx}/archive`,
+                          {method:'POST'});
+    const d = await r.json();
+    if (r.ok) {
+      showToast('Marked as Not This Person', 'ok');
+      setTimeout(()=>{
+        const u = new URL(window.location.href);
+        u.searchParams.set('_t', Date.now());
+        window.location.replace(u.href);
+      }, 300);
+    } else {
+      if (card) { card.style.opacity = '1'; card.style.transform = 'none'; }
+      showToast(d.error || 'Archive failed', 'err');
+    }
+  } catch(e) {
+    if (card) { card.style.opacity = '1'; card.style.transform = 'none'; }
+    showToast('Network error: ' + (e.message || e), 'err');
+  }
+}
+async function unarchiveResult(idx){
+  if (!JOB_ID) return;
+  const card = document.getElementById('rcard-' + idx);
+  if (card) {
+    card.style.transition = '0.25s all';
+    card.style.opacity = '0.3';
+  }
+  showToast('Restoring result...', 'ok');
+  try {
+    const r = await fetch(`${API}/api/jobs/${JOB_ID}/leads/${LEAD_IDX}/results/${idx}/unarchive`,
+                          {method:'POST'});
+    const d = await r.json();
+    if (r.ok) {
+      showToast('Result restored', 'ok');
+      setTimeout(()=>{
+        const u = new URL(window.location.href);
+        u.searchParams.set('_t', Date.now());
+        window.location.replace(u.href);
+      }, 300);
+    } else {
+      if (card) { card.style.opacity = '1'; card.style.transform = 'none'; }
+      showToast(d.error || 'Restore failed', 'err');
+    }
+  } catch(e) {
+    if (card) { card.style.opacity = '1'; card.style.transform = 'none'; }
+    showToast('Network error: ' + (e.message || e), 'err');
+  }
+}
+function setAllCards(expanded) {
+  document.querySelectorAll('details.rcard:not(.archived-card)').forEach(d => d.open = expanded);
+}
+function setDefaultPref(pref) {
+  localStorage.setItem('leadsosint_default_view', pref);
+  showToast('Default view saved: ' + (pref === 'expanded' ? 'Expanded' : 'Collapsed'), 'ok');
+  setAllCards(pref === 'expanded');
+}
+(function() {
+  const pref = localStorage.getItem('leadsosint_default_view') || 'collapsed';
+  if (pref === 'expanded') {
+    const el = document.getElementById('pref-expanded');
+    if (el) el.checked = true;
+    setAllCards(true);
+  } else {
+    const el = document.getElementById('pref-collapsed');
+    if (el) el.checked = true;
+    setAllCards(false);
+  }
+})();
+function updateCount(delta){
+  const el = document.getElementById('active-count');
+  if (el) el.textContent = Math.max(0, parseInt(el.textContent||'0') + delta);
+}
+async function redoReportLead(jobId, idx){
+  if (!confirm('Re-run search for this lead now?')) return;
+  try {
+    const r = await fetch(`${API}/api/jobs/${jobId}/leads/${idx}/retry`, {method:'POST'});
+    if (r.ok) {
+      showToast('Re-starting search...', 'ok');
+      setTimeout(()=>location.reload(), 2000);
+    } else {
+      const d = await r.json().catch(()=>({}));
+      showToast(d.error || 'Retry error', 'err');
+    }
+  } catch(e) {
+    showToast('Network error: ' + (e.message || e), 'err');
+  }
+}
+window.addEventListener('scroll', () => {
+  const b = document.getElementById('btt-btn');
+  if (b) b.style.display = (window.scrollY > 200) ? 'inline-flex' : 'none';
+});
+</script>
+<button id="btt-btn" style="position:fixed;bottom:24px;right:24px;z-index:999;background:rgba(30,41,59,.92);border:1px solid var(--ac);color:#fff;padding:9px 16px;border-radius:30px;font-size:.8rem;font-weight:700;display:none;align-items:center;gap:6px;cursor:pointer;box-shadow:0 8px 24px rgba(0,0,0,.6);backdrop-filter:blur(8px);transition:.2s" onclick="window.scrollTo({top:0,behavior:'smooth'})" title="Back to top">↑ Back to Top</button>
+</body></html>

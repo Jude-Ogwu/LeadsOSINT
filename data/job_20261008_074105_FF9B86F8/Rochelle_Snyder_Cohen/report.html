@@ -1,0 +1,764 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Rochelle Snyder Cohen — LeadsOSINT</title>
+<style>
+:root{--bg:#0d0f1a;--s:#1a1d3a;--s2:#22264a;--bd:#3a3f7a;--ac:#a78bfa;--ac2:#6d28d9;
+      --tx:#e0e6ff;--mt:#8b95c4;--gn:#34d399;--rd:#f87171;--bl:#60a5fa;--yw:#fbbf24}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:"Segoe UI",system-ui,sans-serif;background:var(--bg);color:var(--tx);min-height:100vh}
+.topbar{background:linear-gradient(135deg,#1a1d3a,#0d0f1a);border-bottom:1px solid var(--bd);
+         padding:18px 40px;display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.back{background:var(--s2);border:1px solid var(--bd);color:var(--ac);padding:9px 18px;
+       border-radius:9px;font-size:.85rem;text-decoration:none;transition:.2s}
+.back:hover{border-color:var(--ac);background:var(--ac2);color:#fff}
+.ttl h1{font-size:1.5rem;color:#fff;font-weight:700}
+.ttl p{color:var(--mt);font-size:.8rem;margin-top:3px}
+.social-top-btn{background:linear-gradient(135deg,#2563eb,#60a5fa);color:#fff;padding:8px 16px;border-radius:9px;font-size:.82rem;font-weight:700;text-decoration:none;transition:.2s;box-shadow:0 4px 14px rgba(37,99,235,.3)}
+.social-top-btn:hover{transform:translateY(-1px);color:#fff;box-shadow:0 6px 20px rgba(96,165,250,.4)}
+.stats{display:flex;gap:14px;padding:20px 40px;background:var(--s);border-bottom:1px solid var(--bd);flex-wrap:wrap}
+.sp{background:var(--bg);border:1px solid var(--bd);border-radius:10px;
+     padding:12px 20px;text-align:center}
+.sp.hi{border-color:var(--ac);background:rgba(167,139,250,.07)}
+.sv{font-size:1.4rem;font-weight:800;color:var(--ac)}
+.sl{font-size:.7rem;color:var(--mt);text-transform:uppercase;letter-spacing:.5px;margin-top:2px}
+.content{padding:28px 40px;max-width:1400px;margin:0 auto}
+.rcard{background:var(--s);border:1px solid var(--bd);border-radius:16px;
+        margin-bottom:24px;overflow:hidden;transition:.4s all}
+.rcard:hover{border-color:var(--ac);transform:translateY(-2px);
+              box-shadow:0 10px 36px rgba(109,40,217,.2)}
+.rcard.removing{opacity:0;transform:translateY(-12px) scale(.97);pointer-events:none}
+.archived-card{opacity:.55;border-style:dashed;filter:grayscale(.3)}
+.rcard-hdr{background:linear-gradient(135deg,var(--s2),var(--s));padding:16px 24px;
+            display:flex;align-items:center;gap:14px;border-bottom:1px solid var(--bd);flex-wrap:wrap;cursor:pointer;list-style:none}
+.rcard-hdr::-webkit-details-marker{display:none}
+.rnum{background:linear-gradient(135deg,var(--ac2),var(--ac));color:#fff;
+       font-size:.78rem;font-weight:700;padding:4px 12px;border-radius:16px;flex-shrink:0}
+.rname{font-size:1.15rem;font-weight:700;color:#fff;flex:1}
+.badge-group{display:flex;gap:6px;align-items:center}
+.badge-tag{background:rgba(167,139,250,.15);border:1px solid rgba(167,139,250,.3);color:var(--ac);font-size:.75rem;padding:3px 8px;border-radius:6px;font-weight:600}
+.expand-indicator{color:var(--ac);font-size:.8rem;font-weight:700;margin-left:8px}
+.arch-tag{background:rgba(251,191,36,.15);border:1px solid rgba(251,191,36,.3);
+           color:var(--yw);font-size:.72rem;padding:3px 10px;border-radius:10px;flex-shrink:0}
+.profile-btn{background:linear-gradient(135deg,#4c3d8f,var(--ac2));color:#fff;
+              padding:8px 16px;border-radius:9px;font-size:.8rem;
+              font-weight:600;text-decoration:none;transition:.2s;flex-shrink:0}
+.profile-btn:hover{background:linear-gradient(135deg,var(--ac2),var(--ac));
+                    transform:translateY(-1px);color:#fff}
+.copy-all-btn{background:linear-gradient(135deg,var(--ac2),var(--ac3));color:#fff;border:none;padding:5px 12px;border-radius:6px;font-size:.75rem;font-weight:600;cursor:pointer;margin-bottom:6px;display:inline-block}
+.copy-all-btn:hover{background:var(--ac2)}
+.copy-item-btn{background:transparent;border:none;color:var(--mt);cursor:pointer;font-size:.8rem;padding:0 4px;margin-left:auto}
+.copy-item-btn:hover{color:var(--ac)}
+.addr-row{color:#c4caf0;font-size:.88rem;padding:6px 12px;
+           background:rgba(255,255,255,.03);border-radius:7px;border:1px solid var(--bd);display:flex;align-items:center;gap:8px}
+.url-link{color:var(--bl);font-size:.82rem;word-break:break-all;text-decoration:underline}
+.url-link:hover{color:var(--ac)}
+.rcard-body{padding:24px 28px;display:flex;gap:24px;align-items:flex-start;flex-wrap:wrap}
+.rinfo{flex:1;min-width:320px;display:flex;flex-direction:column;gap:14px}
+.frow{display:grid;grid-template-columns:140px 1fr;gap:12px;align-items:start;font-size:.92rem}
+.fl{font-weight:700;color:var(--mt);font-size:.85rem;letter-spacing:.3px;padding-top:4px}
+.fv{color:#fff;font-weight:600;line-height:1.5}
+.fname{font-size:1.15rem;color:var(--ac);font-weight:700}
+.ss-wrap{flex:0 0 320px;display:flex;flex-direction:column;align-items:center}
+.ss-thumb{width:100%;border-radius:10px;border:2px solid var(--bd);cursor:pointer;
+           transition:.2s;display:block}
+.ss-thumb:hover{border-color:var(--ac);transform:scale(1.02);
+                 box-shadow:0 6px 24px rgba(167,139,250,.3)}
+.ss-lbl{color:var(--mt);font-size:.78rem;margin-top:8px;text-align:center}
+.ss-missing{color:var(--mt);font-size:.82rem;padding:20px;text-align:center;
+             background:var(--s2);border-radius:10px;border:1px dashed var(--bd)}
+.res-actions{padding:14px 24px;border-top:1px solid var(--bd);
+              display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.res-actions.arch-mode{background:rgba(251,191,36,.04)}
+.res-btn{padding:8px 16px;border-radius:8px;font-size:.8rem;font-weight:600;
+          cursor:pointer;transition:.2s;border:1px solid;background:transparent}
+.arch-btn{border-color:rgba(251,191,36,.5);color:var(--yw);}
+.arch-btn:hover{background:rgba(251,191,36,.1)}
+.del-btn{border-color:rgba(248,113,113,.5);color:var(--rd);}
+.del-btn:hover{background:rgba(248,113,113,.1)}
+.unarch-btn{border-color:rgba(96,165,250,.5);color:var(--bl);}
+.unarch-btn:hover{background:rgba(96,165,250,.1)}
+.arch-label{font-size:.8rem;color:var(--yw);flex:1}
+.arch-section{margin-top:10px;border-radius:14px;border:1px dashed var(--bd);overflow:hidden}
+.arch-section summary{padding:14px 20px;cursor:pointer;color:var(--mt);font-size:.9rem;
+                       font-weight:600;list-style:none;background:var(--s2);
+                       display:flex;align-items:center;gap:8px}
+.arch-section summary:hover{color:var(--tx)}
+.arch-section summary span{font-size:.75rem;font-weight:400;margin-left:auto;color:var(--mt)}
+.arch-inner{padding:16px}
+.empty{background:var(--s);border:2px dashed var(--bd);border-radius:14px;
+        padding:50px;text-align:center;color:var(--mt);font-size:1rem}
+.search-ss-card{background:var(--s);border:1px solid var(--bd);border-radius:16px;margin-bottom:28px;overflow:hidden;box-shadow:0 4px 20px rgba(0,0,0,0.3)}
+.search-ss-hdr{background:linear-gradient(135deg,var(--s2),var(--s));padding:16px 24px;border-bottom:1px solid var(--bd);display:flex;justify-content:space-between;align-items:center}
+.search-ss-title{font-weight:700;color:#fff;font-size:1.05rem}
+.search-ss-sub{font-size:.78rem;color:var(--mt);margin-top:2px}
+.search-ss-body{position:relative;cursor:pointer;max-height:380px;overflow:hidden;background:#0d0f1a}
+.search-ss-img{width:100%;display:block;opacity:.88;transition:.3s all}
+.search-ss-body:hover .search-ss-img{opacity:1;transform:scale(1.005)}
+.search-ss-overlay{position:absolute;bottom:16px;left:50%;transform:translateX(-50%);background:rgba(13,15,26,.88);border:1px solid var(--ac);color:var(--ac);padding:8px 20px;border-radius:20px;font-size:.8rem;font-weight:700;backdrop-filter:blur(6px);pointer-events:none;box-shadow:0 4px 14px rgba(109,40,217,.3)}
+.toast{position:fixed;bottom:24px;right:24px;background:var(--s);
+        border:1px solid var(--bd);border-radius:12px;padding:12px 20px;
+        font-size:.85rem;z-index:999;transform:translateY(60px);opacity:0;
+        transition:.3s;max-width:280px}
+.toast.show{transform:translateY(0);opacity:1}
+.toast.ok{border-color:rgba(52,211,153,.4);color:var(--gn)}
+.toast.err{border-color:rgba(248,113,113,.4);color:var(--rd)}
+.modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.96);z-index:9999;
+        justify-content:center;align-items:center;padding:20px}
+.modal.open{display:flex}
+.modal-img{max-width:95vw;max-height:90vh;border-radius:12px;border:2px solid var(--ac)}
+.modal-x{position:fixed;top:18px;right:28px;color:var(--ac);font-size:2.2rem;
+          cursor:pointer;z-index:10000;transition:.2s}
+.modal-x:hover{color:#fff;transform:scale(1.1)}
+.confirm-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.8);
+                  z-index:8888;justify-content:center;align-items:center}
+.confirm-overlay.open{display:flex}
+.confirm-box{background:var(--s);border:1px solid var(--rd);border-radius:18px;
+              padding:32px 36px;max-width:380px;text-align:center}
+.confirm-box h3{color:#fff;margin-bottom:10px;font-size:1.1rem}
+.confirm-box p{color:var(--mt);font-size:.88rem;margin-bottom:24px;line-height:1.6}
+.confirm-btns{display:flex;gap:12px;justify-content:center}
+.cb-cancel{padding:10px 24px;border-radius:9px;border:1px solid var(--bd);
+            background:var(--s2);color:var(--tx);cursor:pointer;font-size:.9rem}
+.cb-delete{padding:10px 24px;border-radius:9px;border:none;
+            background:linear-gradient(135deg,#b91c1c,var(--rd));color:#fff;
+            cursor:pointer;font-size:.9rem;font-weight:700}
+.collapse-toolbar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:18px;flex-wrap:wrap;background:var(--s);padding:12px 20px;border-radius:12px;border:1px solid var(--bd)}
+.tool-btn{background:var(--s2);border:1px solid var(--bd);color:var(--ac);padding:7px 15px;border-radius:8px;font-size:.82rem;font-weight:700;cursor:pointer;transition:.2s}
+.tool-btn:hover{background:var(--ac2);color:#fff;border-color:var(--ac)}
+.view-pref{display:flex;align-items:center;gap:12px;font-size:.82rem;color:var(--mt)}
+.view-pref label{display:inline-flex;align-items:center;gap:6px;cursor:pointer;color:var(--tx);font-weight:600}
+.view-pref input[type="radio"]{accent-color:var(--ac);cursor:pointer}
+</style></head><body>
+<div class="topbar">
+  <a href="/results/FF9B86F8" class="back" onclick="if(window.location.protocol==='file:'){this.href='../index.html'}">← Back to Job</a>
+  <div class="ttl"><h1>🔍 Rochelle Snyder Cohen</h1>
+    <p>Location: Not specified · October 10, 2026 · 07:40 AM</p></div>
+  <div style="display:flex;gap:8px;margin-left:auto;flex-wrap:wrap">
+    <button class="social-top-btn" style="background:linear-gradient(135deg,#6d28d9,#a78bfa);color:#fff;cursor:pointer;border:none" onclick="redoReportLead('FF9B86F8', 9)" title="Re-run search for this lead">🔄 Re-do Search</button>
+    <a href="https://web.facebook.com/rochelle.s.cohen" target="_blank" rel="noopener noreferrer" class="social-top-btn" title="https://web.facebook.com/rochelle.s.cohen" onclick="event.stopPropagation()">🔗 Open Facebook</a>
+    
+    
+  </div>
+</div>
+<div class="stats">
+  <div class="sp hi"><div class="sv" id="active-count">10</div><div class="sl">Active Results</div></div>
+  <div class="sp"><div class="sv" style="color:var(--gn)">
+    ✓ Found</div><div class="sl">Status</div></div>
+  <div class="sp"><div class="sv" style="font-size:.9rem">N/A</div>
+    <div class="sl">Location</div></div>
+  <div class="sp"><div class="sv" style="font-size:.85rem"><a href="https://web.facebook.com/rochelle.s.cohen" target="_blank" rel="noopener noreferrer" class="url-link" title="https://web.facebook.com/rochelle.s.cohen" style="display:inline-block;max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;vertical-align:bottom">🔗 Facebook</a></div>
+    <div class="sl">Social Link</div></div>
+  <div class="sp"><div class="sv" style="font-size:.85rem"><span style="color:var(--mt)">N/A</span></div>
+    <div class="sl">Input Email</div></div>
+  <div class="sp"><div class="sv" style="font-size:.85rem"><span style="color:var(--mt)">N/A</span></div>
+    <div class="sl">Input Phone</div></div>
+</div>
+<div class="content">
+
+<div class="search-ss-card">
+  <div class="search-ss-hdr">
+    <div>
+      <div class="search-ss-title">🌐 FastPeopleSearch — Full Search Page Overview</div>
+      <div class="search-ss-sub">Live search results overview for "Rochelle Snyder Cohen" (US)</div>
+    </div>
+  </div>
+  <div class="search-ss-body" onclick="openModal('Rochelle_Snyder_Cohen_search_page.png')">
+    <img src="Rochelle_Snyder_Cohen_search_page.png" class="search-ss-img" title="Click to view full search page screenshot">
+    <div class="search-ss-overlay">🔍 Click to View Full Search Page Screenshot</div>
+  </div>
+</div>
+<div class="collapse-toolbar">
+  <div style="display:flex;align-items:center;gap:10px">
+    <button class="tool-btn" onclick="setAllCards(false)">▸ Collapse All</button>
+    <button class="tool-btn" onclick="setAllCards(true)">▾ Expand All</button>
+  </div>
+  <div class="view-pref">
+    <span>Default View:</span>
+    <label><input type="radio" name="default_view_pref" value="collapsed" id="pref-collapsed" onchange="setDefaultPref('collapsed')"> Collapsed</label>
+    <label><input type="radio" name="default_view_pref" value="expanded" id="pref-expanded" onchange="setDefaultPref('expanded')"> Expanded</label>
+  </div>
+</div>
+
+<details class="rcard " id="rcard-0">
+  <summary class="rcard-hdr">
+    <span class="rnum">#1</span>
+    <span class="rname">Rochelle Cohen · Age 39 · Sharon, PA</span>
+    <span class="badge-group">
+      <span class="badge-tag">📞 12</span>
+      <span class="badge-tag">✉️ 10</span>
+    </span>
+    
+    <a href="https://www.fastpeoplesearch.com/rochelle-cohen_id_G-594117354706325322" target="_blank" class="profile-btn" onclick="event.stopPropagation()">🔗 View Profile</a>
+    <span class="expand-indicator">▼ Expand</span>
+  </summary>
+  <div class="rcard-body">
+    <div class="rinfo">
+      <div class="frow"><span class="fl">Full Name:</span><span class="fv fname">Rochelle Cohen</span></div>
+      <div class="frow"><span class="fl">Age:</span><span class="fv">39</span></div>
+      <div class="frow"><span class="fl">City / State:</span><span class="fv">Sharon, PA</span></div>
+      <div class="frow"><span class="fl">Phone(s):</span><div class="addrs"><button class="copy-all-btn" onclick="copyList([&quot;(724) 734-6503&quot;, &quot;(330) 856-3674&quot;, &quot;(330) 856-9781&quot;, &quot;(330) 307-3024&quot;, &quot;(724) 877-4547&quot;, &quot;(330) 904-2210&quot;, &quot;(608) 296-3269&quot;, &quot;(724) 983-0837&quot;, &quot;(724) 734-3499&quot;, &quot;(724) 734-4399&quot;, &quot;(724) 699-9281&quot;, &quot;(724) 931-0781&quot;], 'Phones'); event.stopPropagation();">📋 Copy All Phones (12)</button><div class="addr-row">📞 <span>(724) 734-6503</span> <button class="copy-item-btn" onclick="copySingle('(724) 734-6503', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(330) 856-3674</span> <button class="copy-item-btn" onclick="copySingle('(330) 856-3674', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(330) 856-9781</span> <button class="copy-item-btn" onclick="copySingle('(330) 856-9781', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(330) 307-3024</span> <button class="copy-item-btn" onclick="copySingle('(330) 307-3024', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(724) 877-4547</span> <button class="copy-item-btn" onclick="copySingle('(724) 877-4547', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(330) 904-2210</span> <button class="copy-item-btn" onclick="copySingle('(330) 904-2210', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(608) 296-3269</span> <button class="copy-item-btn" onclick="copySingle('(608) 296-3269', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(724) 983-0837</span> <button class="copy-item-btn" onclick="copySingle('(724) 983-0837', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(724) 734-3499</span> <button class="copy-item-btn" onclick="copySingle('(724) 734-3499', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(724) 734-4399</span> <button class="copy-item-btn" onclick="copySingle('(724) 734-4399', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(724) 699-9281</span> <button class="copy-item-btn" onclick="copySingle('(724) 699-9281', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(724) 931-0781</span> <button class="copy-item-btn" onclick="copySingle('(724) 931-0781', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div></div></div>
+      <div class="frow"><span class="fl">Email(s):</span><div class="addrs"><button class="copy-all-btn" onclick="copyList([&quot;cohenrochelle@ymail.com&quot;, &quot;hottiefrompennsylvania@gmail.com&quot;, &quot;rochelle.cohen@cox.net&quot;, &quot;rc0820ds@yahoo.com&quot;, &quot;shellyann_98_2000@yahoo.com&quot;, &quot;rochelle.cohen@msn.com&quot;, &quot;mkcohen@mail.com&quot;, &quot;shrochelle.cohen30@cox.net&quot;, &quot;rochelle44484@yahoo.com&quot;, &quot;arochelle.cohenf82@cox.net&quot;], 'Emails'); event.stopPropagation();">📋 Copy All Emails (10)</button><div class="addr-row">✉️ <span>cohenrochelle@ymail.com</span> <button class="copy-item-btn" onclick="copySingle('cohenrochelle@ymail.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>hottiefrompennsylvania@gmail.com</span> <button class="copy-item-btn" onclick="copySingle('hottiefrompennsylvania@gmail.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>rochelle.cohen@cox.net</span> <button class="copy-item-btn" onclick="copySingle('rochelle.cohen@cox.net', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>rc0820ds@yahoo.com</span> <button class="copy-item-btn" onclick="copySingle('rc0820ds@yahoo.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>shellyann_98_2000@yahoo.com</span> <button class="copy-item-btn" onclick="copySingle('shellyann_98_2000@yahoo.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>rochelle.cohen@msn.com</span> <button class="copy-item-btn" onclick="copySingle('rochelle.cohen@msn.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>mkcohen@mail.com</span> <button class="copy-item-btn" onclick="copySingle('mkcohen@mail.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>shrochelle.cohen30@cox.net</span> <button class="copy-item-btn" onclick="copySingle('shrochelle.cohen30@cox.net', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>rochelle44484@yahoo.com</span> <button class="copy-item-btn" onclick="copySingle('rochelle44484@yahoo.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>arochelle.cohenf82@cox.net</span> <button class="copy-item-btn" onclick="copySingle('arochelle.cohenf82@cox.net', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div></div></div>
+      <div class="frow"><span class="fl">Address(es):</span><div class="addrs"><div class="addr-row">📍 470 1 2 Edgewood Rd · Sharon, PA</div><div class="addr-row">📍 1479 Cranbrook Dr · Hermitage, PA</div><div class="addr-row">📍 6431 Columbiana New Castle Rd · New Middletown, OH</div><div class="addr-row">📍 470 Edgewood Rd Unit 12 · Sharon, PA</div><div class="addr-row">📍 7508 Anderson Ave Ne · Warren, OH</div><div class="addr-row">📍 2746 Morefield Rd · Hermitage, PA</div><div class="addr-row">📍 6431 Columbiana New Castle Rd · New Middletwn, OH</div><div class="addr-row">📍 470 Edgewood Rd Unit 1 · Sharon, PA</div></div></div>
+      <div class="frow"><span class="fl">Relatives:</span><span class="fv">Carol Cohen, Geoffrey Cohen, Heidi Cohen, Jay Cohen, Jennifer Cohen</span></div>
+      <div class="frow"><span class="fl">AKA / Aliases:</span><span class="fv">Rochelle A Cohen, Rochelle R Cohen, Rochellea Cohen</span></div>
+      <div class="frow"><span class="fl">Profile URL:</span>
+        <a href="https://www.fastpeoplesearch.com/rochelle-cohen_id_G-594117354706325322" target="_blank" class="url-link">https://www.fastpeoplesearch.com/rochelle-cohen_id_G-594117354706325322</a></div>
+    </div>
+    <div class="ss-wrap">
+                <img src="Rochelle_Snyder_Cohen_result_1.png" class="ss-thumb"
+                     onclick="openModal('Rochelle_Snyder_Cohen_result_1.png')"
+                     title="Click to view profile detail screenshot">
+                <div class="ss-lbl">📸 Profile Detail Screenshot — click to zoom</div>
+            </div>
+  </div>
+  
+  <div class="res-actions">
+    <button class="res-btn arch-btn" onclick="archiveResult(0)">🗃 Not This Person</button>
+    <button class="res-btn del-btn"  onclick="confirmDelete(0)">🗑 Delete Result</button>
+  </div>
+</details>
+<details class="rcard " id="rcard-1">
+  <summary class="rcard-hdr">
+    <span class="rnum">#2</span>
+    <span class="rname">Rochelle Cohen · Age 58 · Silver Spring, MD</span>
+    <span class="badge-group">
+      <span class="badge-tag">📞 12</span>
+      <span class="badge-tag">✉️ 10</span>
+    </span>
+    
+    <a href="https://www.fastpeoplesearch.com/rochelle-cohen_id_G6869625567835077076" target="_blank" class="profile-btn" onclick="event.stopPropagation()">🔗 View Profile</a>
+    <span class="expand-indicator">▼ Expand</span>
+  </summary>
+  <div class="rcard-body">
+    <div class="rinfo">
+      <div class="frow"><span class="fl">Full Name:</span><span class="fv fname">Rochelle Cohen</span></div>
+      <div class="frow"><span class="fl">Age:</span><span class="fv">58</span></div>
+      <div class="frow"><span class="fl">City / State:</span><span class="fv">Silver Spring, MD</span></div>
+      <div class="frow"><span class="fl">Phone(s):</span><div class="addrs"><button class="copy-all-btn" onclick="copyList([&quot;(301) 565-0019&quot;, &quot;(973) 615-8135&quot;, &quot;(201) 488-2383&quot;, &quot;(703) 204-0909&quot;, &quot;(301) 588-5224&quot;, &quot;(703) 725-6253&quot;, &quot;(202) 341-5967&quot;, &quot;(703) 641-8002&quot;, &quot;(973) 267-9722&quot;, &quot;(703) 641-0521&quot;, &quot;(703) 274-0909&quot;, &quot;(703) 963-4119&quot;], 'Phones'); event.stopPropagation();">📋 Copy All Phones (12)</button><div class="addr-row">📞 <span>(301) 565-0019</span> <button class="copy-item-btn" onclick="copySingle('(301) 565-0019', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(973) 615-8135</span> <button class="copy-item-btn" onclick="copySingle('(973) 615-8135', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(201) 488-2383</span> <button class="copy-item-btn" onclick="copySingle('(201) 488-2383', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(703) 204-0909</span> <button class="copy-item-btn" onclick="copySingle('(703) 204-0909', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(301) 588-5224</span> <button class="copy-item-btn" onclick="copySingle('(301) 588-5224', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(703) 725-6253</span> <button class="copy-item-btn" onclick="copySingle('(703) 725-6253', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(202) 341-5967</span> <button class="copy-item-btn" onclick="copySingle('(202) 341-5967', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(703) 641-8002</span> <button class="copy-item-btn" onclick="copySingle('(703) 641-8002', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(973) 267-9722</span> <button class="copy-item-btn" onclick="copySingle('(973) 267-9722', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(703) 641-0521</span> <button class="copy-item-btn" onclick="copySingle('(703) 641-0521', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(703) 274-0909</span> <button class="copy-item-btn" onclick="copySingle('(703) 274-0909', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(703) 963-4119</span> <button class="copy-item-btn" onclick="copySingle('(703) 963-4119', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div></div></div>
+      <div class="frow"><span class="fl">Email(s):</span><div class="addrs"><button class="copy-all-btn" onclick="copyList([&quot;cohenrochelle@hotmail.com&quot;, &quot;rochelle.cohen@comcast.net&quot;, &quot;cohenrochelle@centurytel.net&quot;, &quot;cohenrochelle@yahoo.com&quot;, &quot;proche49lle.cohen@comcast.net&quot;, &quot;rochelle.cohen@yahoo.com&quot;, &quot;brobchelle.cohen@comcast.net&quot;, &quot;irochelle.cohenq34@comcast.net&quot;, &quot;ybrochelle.cohen26@comcast.net&quot;, &quot;ochelle.cohen@comcast.net&quot;], 'Emails'); event.stopPropagation();">📋 Copy All Emails (10)</button><div class="addr-row">✉️ <span>cohenrochelle@hotmail.com</span> <button class="copy-item-btn" onclick="copySingle('cohenrochelle@hotmail.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>rochelle.cohen@comcast.net</span> <button class="copy-item-btn" onclick="copySingle('rochelle.cohen@comcast.net', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>cohenrochelle@centurytel.net</span> <button class="copy-item-btn" onclick="copySingle('cohenrochelle@centurytel.net', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>cohenrochelle@yahoo.com</span> <button class="copy-item-btn" onclick="copySingle('cohenrochelle@yahoo.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>proche49lle.cohen@comcast.net</span> <button class="copy-item-btn" onclick="copySingle('proche49lle.cohen@comcast.net', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>rochelle.cohen@yahoo.com</span> <button class="copy-item-btn" onclick="copySingle('rochelle.cohen@yahoo.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>brobchelle.cohen@comcast.net</span> <button class="copy-item-btn" onclick="copySingle('brobchelle.cohen@comcast.net', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>irochelle.cohenq34@comcast.net</span> <button class="copy-item-btn" onclick="copySingle('irochelle.cohenq34@comcast.net', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>ybrochelle.cohen26@comcast.net</span> <button class="copy-item-btn" onclick="copySingle('ybrochelle.cohen26@comcast.net', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>ochelle.cohen@comcast.net</span> <button class="copy-item-btn" onclick="copySingle('ochelle.cohen@comcast.net', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div></div></div>
+      <div class="frow"><span class="fl">Address(es):</span><div class="addrs"><div class="addr-row">📍 10020 Menlo Ave · Silver Spring, MD</div><div class="addr-row">📍 212 Vista Dr · Cedar Knolls, NJ</div><div class="addr-row">📍 2230 George C Marshall Dr Unit 824D · Falls Church, VA</div><div class="addr-row">📍 2950 Van Ness St Nw Unit 311 · Washington, DC</div><div class="addr-row">📍 703 Gist Ave · Silver Spring, MD</div><div class="addr-row">📍 150 Mount Airy Rd · Basking Ridge, NJ</div><div class="addr-row">📍 4236 Reno Rd Nw · Washington, DC</div><div class="addr-row">📍 9009 Samoset Rd · Randallstown, MD</div><div class="addr-row">📍 2230 George C Marshall Dr Unit 824 · Falls Church, VA</div><div class="addr-row">📍 60 Elm Ave Unit 3 · Takoma Park, MD</div></div></div>
+      <div class="frow"><span class="fl">Relatives:</span><span class="fv">Alan Cohen, Annalise Cohen, Ariel Cohen, Brenda Cohen, Donna Cohen</span></div>
+      <div class="frow"><span class="fl">AKA / Aliases:</span><span class="fv">Rochelle A Cohen, Rochell A Cohen, Rochellea Cohen, Cohen A Rochelle</span></div>
+      <div class="frow"><span class="fl">Profile URL:</span>
+        <a href="https://www.fastpeoplesearch.com/rochelle-cohen_id_G6869625567835077076" target="_blank" class="url-link">https://www.fastpeoplesearch.com/rochelle-cohen_id_G6869625567835077076</a></div>
+    </div>
+    <div class="ss-wrap">
+                <img src="Rochelle_Snyder_Cohen_result_2.png" class="ss-thumb"
+                     onclick="openModal('Rochelle_Snyder_Cohen_result_2.png')"
+                     title="Click to view profile detail screenshot">
+                <div class="ss-lbl">📸 Profile Detail Screenshot — click to zoom</div>
+            </div>
+  </div>
+  
+  <div class="res-actions">
+    <button class="res-btn arch-btn" onclick="archiveResult(1)">🗃 Not This Person</button>
+    <button class="res-btn del-btn"  onclick="confirmDelete(1)">🗑 Delete Result</button>
+  </div>
+</details>
+<details class="rcard " id="rcard-2">
+  <summary class="rcard-hdr">
+    <span class="rnum">#3</span>
+    <span class="rname">Rochelle Cohen · Age 77 · Denver, CO</span>
+    <span class="badge-group">
+      <span class="badge-tag">📞 10</span>
+      <span class="badge-tag">✉️ 7</span>
+    </span>
+    
+    <a href="https://www.fastpeoplesearch.com/rochelle-cohen_id_G7662419663273450149" target="_blank" class="profile-btn" onclick="event.stopPropagation()">🔗 View Profile</a>
+    <span class="expand-indicator">▼ Expand</span>
+  </summary>
+  <div class="rcard-body">
+    <div class="rinfo">
+      <div class="frow"><span class="fl">Full Name:</span><span class="fv fname">Rochelle Cohen</span></div>
+      <div class="frow"><span class="fl">Age:</span><span class="fv">77</span></div>
+      <div class="frow"><span class="fl">City / State:</span><span class="fv">Denver, CO</span></div>
+      <div class="frow"><span class="fl">Phone(s):</span><div class="addrs"><button class="copy-all-btn" onclick="copyList([&quot;(303) 337-3050&quot;, &quot;(720) 748-2569&quot;, &quot;(215) 970-5479&quot;, &quot;(720) 608-0180&quot;, &quot;(303) 750-7750&quot;, &quot;(254) 771-5040&quot;, &quot;(450) 436-1296&quot;, &quot;(303) 750-3660&quot;, &quot;(303) 770-4336&quot;, &quot;(303) 985-1655&quot;], 'Phones'); event.stopPropagation();">📋 Copy All Phones (10)</button><div class="addr-row">📞 <span>(303) 337-3050</span> <button class="copy-item-btn" onclick="copySingle('(303) 337-3050', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(720) 748-2569</span> <button class="copy-item-btn" onclick="copySingle('(720) 748-2569', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(215) 970-5479</span> <button class="copy-item-btn" onclick="copySingle('(215) 970-5479', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(720) 608-0180</span> <button class="copy-item-btn" onclick="copySingle('(720) 608-0180', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(303) 750-7750</span> <button class="copy-item-btn" onclick="copySingle('(303) 750-7750', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(254) 771-5040</span> <button class="copy-item-btn" onclick="copySingle('(254) 771-5040', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(450) 436-1296</span> <button class="copy-item-btn" onclick="copySingle('(450) 436-1296', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(303) 750-3660</span> <button class="copy-item-btn" onclick="copySingle('(303) 750-3660', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(303) 770-4336</span> <button class="copy-item-btn" onclick="copySingle('(303) 770-4336', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(303) 985-1655</span> <button class="copy-item-btn" onclick="copySingle('(303) 985-1655', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div></div></div>
+      <div class="frow"><span class="fl">Email(s):</span><div class="addrs"><button class="copy-all-btn" onclick="copyList([&quot;rlcohen123@yahoo.com&quot;, &quot;rdworet@aol.com&quot;, &quot;irwin.cohen@flash.net&quot;, &quot;rdworet@address.com&quot;, &quot;rdworet@hotmail.com&quot;, &quot;drdebcohen@hotmail.com&quot;, &quot;kidsmile@solucian.com&quot;], 'Emails'); event.stopPropagation();">📋 Copy All Emails (7)</button><div class="addr-row">✉️ <span>rlcohen123@yahoo.com</span> <button class="copy-item-btn" onclick="copySingle('rlcohen123@yahoo.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>rdworet@aol.com</span> <button class="copy-item-btn" onclick="copySingle('rdworet@aol.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>irwin.cohen@flash.net</span> <button class="copy-item-btn" onclick="copySingle('irwin.cohen@flash.net', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>rdworet@address.com</span> <button class="copy-item-btn" onclick="copySingle('rdworet@address.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>rdworet@hotmail.com</span> <button class="copy-item-btn" onclick="copySingle('rdworet@hotmail.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>drdebcohen@hotmail.com</span> <button class="copy-item-btn" onclick="copySingle('drdebcohen@hotmail.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>kidsmile@solucian.com</span> <button class="copy-item-btn" onclick="copySingle('kidsmile@solucian.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div></div></div>
+      <div class="frow"><span class="fl">Address(es):</span><div class="addrs"><div class="addr-row">📍 1849 S Xenia Ct · Denver, CO</div><div class="addr-row">📍 14729 Bethlehem Rd · Paonia, CO</div><div class="addr-row">📍 1446 Dahlia St · Denver, CO</div><div class="addr-row">📍 1839 S Xenia Ct Unit 1849 · Denver, CO</div><div class="addr-row">📍 12402 E Pacific Cir Unit A · Aurora, CO</div><div class="addr-row">📍 330 Emily Ln Unit B · Frisco, CO</div><div class="addr-row">📍 2900 S Peoria St Unit B · Aurora, CO</div><div class="addr-row">📍 2102 Massachusetts Ave Unit 3B · Troy, NY</div><div class="addr-row">📍 12402 E Pacific Cir Unit B · Aurora, CO</div><div class="addr-row">📍 1849 Vine St · Denver, CO</div></div></div>
+      <div class="frow"><span class="fl">Relatives:</span><span class="fv">Debra Cohen, Aaron Cohen, David Cohen, Jordan Cohen, Minnie Cohen</span></div>
+      <div class="frow"><span class="fl">AKA / Aliases:</span><span class="fv">Irwin M Cohen, Rochelle D Cohen, Irwin Milton Cohen, Irwin Cohen</span></div>
+      <div class="frow"><span class="fl">Profile URL:</span>
+        <a href="https://www.fastpeoplesearch.com/rochelle-cohen_id_G7662419663273450149" target="_blank" class="url-link">https://www.fastpeoplesearch.com/rochelle-cohen_id_G7662419663273450149</a></div>
+    </div>
+    <div class="ss-wrap">
+                <img src="Rochelle_Snyder_Cohen_result_3.png" class="ss-thumb"
+                     onclick="openModal('Rochelle_Snyder_Cohen_result_3.png')"
+                     title="Click to view profile detail screenshot">
+                <div class="ss-lbl">📸 Profile Detail Screenshot — click to zoom</div>
+            </div>
+  </div>
+  
+  <div class="res-actions">
+    <button class="res-btn arch-btn" onclick="archiveResult(2)">🗃 Not This Person</button>
+    <button class="res-btn del-btn"  onclick="confirmDelete(2)">🗑 Delete Result</button>
+  </div>
+</details>
+<details class="rcard " id="rcard-3">
+  <summary class="rcard-hdr">
+    <span class="rnum">#4</span>
+    <span class="rname">Rochelle Cohen · Age 78 · Boca Raton, FL</span>
+    <span class="badge-group">
+      <span class="badge-tag">📞 12</span>
+      <span class="badge-tag">✉️ 7</span>
+    </span>
+    
+    <a href="https://www.fastpeoplesearch.com/rochelle-cohen_id_G6268525923022900616" target="_blank" class="profile-btn" onclick="event.stopPropagation()">🔗 View Profile</a>
+    <span class="expand-indicator">▼ Expand</span>
+  </summary>
+  <div class="rcard-body">
+    <div class="rinfo">
+      <div class="frow"><span class="fl">Full Name:</span><span class="fv fname">Rochelle Cohen</span></div>
+      <div class="frow"><span class="fl">Age:</span><span class="fv">78</span></div>
+      <div class="frow"><span class="fl">City / State:</span><span class="fv">Boca Raton, FL</span></div>
+      <div class="frow"><span class="fl">Phone(s):</span><div class="addrs"><button class="copy-all-btn" onclick="copyList([&quot;(347) 733-8789&quot;, &quot;(718) 490-3504&quot;, &quot;(718) 258-1744&quot;, &quot;(646) 249-8711&quot;, &quot;(718) 382-1377&quot;, &quot;(718) 998-0485&quot;, &quot;(315) 664-6669&quot;, &quot;(646) 249-1845&quot;, &quot;(718) 377-0687&quot;, &quot;(718) 253-1684&quot;, &quot;(718) 758-4801&quot;, &quot;(708) 268-2384&quot;], 'Phones'); event.stopPropagation();">📋 Copy All Phones (12)</button><div class="addr-row">📞 <span>(347) 733-8789</span> <button class="copy-item-btn" onclick="copySingle('(347) 733-8789', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(718) 490-3504</span> <button class="copy-item-btn" onclick="copySingle('(718) 490-3504', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(718) 258-1744</span> <button class="copy-item-btn" onclick="copySingle('(718) 258-1744', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(646) 249-8711</span> <button class="copy-item-btn" onclick="copySingle('(646) 249-8711', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(718) 382-1377</span> <button class="copy-item-btn" onclick="copySingle('(718) 382-1377', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(718) 998-0485</span> <button class="copy-item-btn" onclick="copySingle('(718) 998-0485', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(315) 664-6669</span> <button class="copy-item-btn" onclick="copySingle('(315) 664-6669', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(646) 249-1845</span> <button class="copy-item-btn" onclick="copySingle('(646) 249-1845', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(718) 377-0687</span> <button class="copy-item-btn" onclick="copySingle('(718) 377-0687', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(718) 253-1684</span> <button class="copy-item-btn" onclick="copySingle('(718) 253-1684', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(718) 758-4801</span> <button class="copy-item-btn" onclick="copySingle('(718) 758-4801', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(708) 268-2384</span> <button class="copy-item-btn" onclick="copySingle('(708) 268-2384', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div></div></div>
+      <div class="frow"><span class="fl">Email(s):</span><div class="addrs"><button class="copy-all-btn" onclick="copyList([&quot;jasmine19992011@live.com&quot;, &quot;rochelle.cohen@juno.com&quot;, &quot;rochellec3587@aol.com&quot;, &quot;jasmine1999@optimum.com&quot;, &quot;jasmine1161@verizon.net&quot;, &quot;jasmine1999@optimum.net&quot;, &quot;cuba1244@aol.com&quot;], 'Emails'); event.stopPropagation();">📋 Copy All Emails (7)</button><div class="addr-row">✉️ <span>jasmine19992011@live.com</span> <button class="copy-item-btn" onclick="copySingle('jasmine19992011@live.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>rochelle.cohen@juno.com</span> <button class="copy-item-btn" onclick="copySingle('rochelle.cohen@juno.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>rochellec3587@aol.com</span> <button class="copy-item-btn" onclick="copySingle('rochellec3587@aol.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>jasmine1999@optimum.com</span> <button class="copy-item-btn" onclick="copySingle('jasmine1999@optimum.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>jasmine1161@verizon.net</span> <button class="copy-item-btn" onclick="copySingle('jasmine1161@verizon.net', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>jasmine1999@optimum.net</span> <button class="copy-item-btn" onclick="copySingle('jasmine1999@optimum.net', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>cuba1244@aol.com</span> <button class="copy-item-btn" onclick="copySingle('cuba1244@aol.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div></div></div>
+      <div class="frow"><span class="fl">Address(es):</span><div class="addrs"><div class="addr-row">📍 258 Preston G · Boca Raton, FL</div><div class="addr-row">📍 464 Central Ave Unit C8 · Jersey City, NJ</div><div class="addr-row">📍 1270 E 18Th St Unit 6H · Brooklyn, NY</div><div class="addr-row">📍 1641 Ocean Ave Unit A12 · Brooklyn, NY</div><div class="addr-row">📍 2075 E 16Th St Unit 2B · Brooklyn, NY</div><div class="addr-row">📍 2004 E Elkhart St Unit 1 · Philadelphia, PA</div><div class="addr-row">📍 4309 Benner St · Philadelphia, PA</div><div class="addr-row">📍 2760 Coral St · Philadelphia, PA</div><div class="addr-row">📍 1270 E 18Th St Unit 1B · Brooklyn, NY</div><div class="addr-row">📍 1854 Ocean Ave Unit 10D · Brooklyn, NY</div></div></div>
+      <div class="frow"><span class="fl">Relatives:</span><span class="fv">Benny Cohen, Brunilda Santiago, Flor Santiago, Francine Cohen, Iraida Ocasio</span></div>
+      <div class="frow"><span class="fl">AKA / Aliases:</span><span class="fv">Rochelle L Cohen, Rochelle M Cohen, Rochelle Santiago, Rochelle Cohensantiago</span></div>
+      <div class="frow"><span class="fl">Profile URL:</span>
+        <a href="https://www.fastpeoplesearch.com/rochelle-cohen_id_G6268525923022900616" target="_blank" class="url-link">https://www.fastpeoplesearch.com/rochelle-cohen_id_G6268525923022900616</a></div>
+    </div>
+    <div class="ss-wrap">
+                <img src="Rochelle_Snyder_Cohen_result_4.png" class="ss-thumb"
+                     onclick="openModal('Rochelle_Snyder_Cohen_result_4.png')"
+                     title="Click to view profile detail screenshot">
+                <div class="ss-lbl">📸 Profile Detail Screenshot — click to zoom</div>
+            </div>
+  </div>
+  
+  <div class="res-actions">
+    <button class="res-btn arch-btn" onclick="archiveResult(3)">🗃 Not This Person</button>
+    <button class="res-btn del-btn"  onclick="confirmDelete(3)">🗑 Delete Result</button>
+  </div>
+</details>
+<details class="rcard " id="rcard-4">
+  <summary class="rcard-hdr">
+    <span class="rnum">#5</span>
+    <span class="rname">Rochelle Cohen · Age 79 · Indianapolis, IN</span>
+    <span class="badge-group">
+      <span class="badge-tag">📞 12</span>
+      <span class="badge-tag">✉️ 10</span>
+    </span>
+    
+    <a href="https://www.fastpeoplesearch.com/rochelle-cohen_id_G6409475531215407956" target="_blank" class="profile-btn" onclick="event.stopPropagation()">🔗 View Profile</a>
+    <span class="expand-indicator">▼ Expand</span>
+  </summary>
+  <div class="rcard-body">
+    <div class="rinfo">
+      <div class="frow"><span class="fl">Full Name:</span><span class="fv fname">Rochelle Cohen</span></div>
+      <div class="frow"><span class="fl">Age:</span><span class="fv">79</span></div>
+      <div class="frow"><span class="fl">City / State:</span><span class="fv">Indianapolis, IN</span></div>
+      <div class="frow"><span class="fl">Phone(s):</span><div class="addrs"><button class="copy-all-btn" onclick="copyList([&quot;(317) 490-5086&quot;, &quot;(317) 255-7073&quot;, &quot;(818) 519-4848&quot;, &quot;(949) 219-2020&quot;, &quot;(818) 346-8422&quot;, &quot;(818) 703-7000&quot;, &quot;(317) 251-0510&quot;, &quot;(317) 257-4857&quot;, &quot;(949) 219-2055&quot;, &quot;(818) 784-2444&quot;, &quot;(317) 631-4011&quot;, &quot;(714) 400-6182&quot;], 'Phones'); event.stopPropagation();">📋 Copy All Phones (12)</button><div class="addr-row">📞 <span>(317) 490-5086</span> <button class="copy-item-btn" onclick="copySingle('(317) 490-5086', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(317) 255-7073</span> <button class="copy-item-btn" onclick="copySingle('(317) 255-7073', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(818) 519-4848</span> <button class="copy-item-btn" onclick="copySingle('(818) 519-4848', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(949) 219-2020</span> <button class="copy-item-btn" onclick="copySingle('(949) 219-2020', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(818) 346-8422</span> <button class="copy-item-btn" onclick="copySingle('(818) 346-8422', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(818) 703-7000</span> <button class="copy-item-btn" onclick="copySingle('(818) 703-7000', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(317) 251-0510</span> <button class="copy-item-btn" onclick="copySingle('(317) 251-0510', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(317) 257-4857</span> <button class="copy-item-btn" onclick="copySingle('(317) 257-4857', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(949) 219-2055</span> <button class="copy-item-btn" onclick="copySingle('(949) 219-2055', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(818) 784-2444</span> <button class="copy-item-btn" onclick="copySingle('(818) 784-2444', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(317) 631-4011</span> <button class="copy-item-btn" onclick="copySingle('(317) 631-4011', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(714) 400-6182</span> <button class="copy-item-btn" onclick="copySingle('(714) 400-6182', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div></div></div>
+      <div class="frow"><span class="fl">Email(s):</span><div class="addrs"><button class="copy-all-btn" onclick="copyList([&quot;muggsyco@msn.com&quot;, &quot;cgolding@adelphia.net&quot;, &quot;jodi.cohen@att.net&quot;, &quot;shelleyofc@gmail.com&quot;, &quot;cgolding@mac.com&quot;, &quot;jodi.cohen@worldnet.att.net&quot;, &quot;cgolding@cox.net&quot;, &quot;cgolding@bellsouth.net&quot;, &quot;cgolding@earthlink.net&quot;, &quot;cgolding@netscape.net&quot;], 'Emails'); event.stopPropagation();">📋 Copy All Emails (10)</button><div class="addr-row">✉️ <span>muggsyco@msn.com</span> <button class="copy-item-btn" onclick="copySingle('muggsyco@msn.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>cgolding@adelphia.net</span> <button class="copy-item-btn" onclick="copySingle('cgolding@adelphia.net', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>jodi.cohen@att.net</span> <button class="copy-item-btn" onclick="copySingle('jodi.cohen@att.net', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>shelleyofc@gmail.com</span> <button class="copy-item-btn" onclick="copySingle('shelleyofc@gmail.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>cgolding@mac.com</span> <button class="copy-item-btn" onclick="copySingle('cgolding@mac.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>jodi.cohen@worldnet.att.net</span> <button class="copy-item-btn" onclick="copySingle('jodi.cohen@worldnet.att.net', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>cgolding@cox.net</span> <button class="copy-item-btn" onclick="copySingle('cgolding@cox.net', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>cgolding@bellsouth.net</span> <button class="copy-item-btn" onclick="copySingle('cgolding@bellsouth.net', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>cgolding@earthlink.net</span> <button class="copy-item-btn" onclick="copySingle('cgolding@earthlink.net', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>cgolding@netscape.net</span> <button class="copy-item-btn" onclick="copySingle('cgolding@netscape.net', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div></div></div>
+      <div class="frow"><span class="fl">Address(es):</span><div class="addrs"><div class="addr-row">📍 8408 Swans Way Unit 2 · Indianapolis, IN</div><div class="addr-row">📍 1048 Irvine Ave Unit 371 · Newport Beach, CA</div><div class="addr-row">📍 1009 Bayside Cv Unit 306 · Newport Beach, CA</div><div class="addr-row">📍 41820 Big Bear Blvd · Big Bear Lake, CA</div><div class="addr-row">📍 605 Summit Blvd · Big Bear Lake, CA</div><div class="addr-row">📍 4168 Green Meadow Ct · Encino, CA</div><div class="addr-row">📍 165 Bayside Dr · Big Bear Lake, CA</div><div class="addr-row">📍 185 W Brangus Way · Queen Creek, AZ</div><div class="addr-row">📍 13650 N 57Th Pl · Scottsdale, AZ</div><div class="addr-row">📍 185 W Brangus Way · San Tan Valley, AZ</div></div></div>
+      <div class="frow"><span class="fl">Relatives:</span><span class="fv">Louis Cohen, Alejandra Mockler, Anne Miller, Basil Cohen, Brad Cohen</span></div>
+      <div class="frow"><span class="fl">AKA / Aliases:</span><span class="fv">Rochelle M Cohen, Rochelle Louis Cohen, Rachelle M Cohen, Rochelle K Cohen</span></div>
+      <div class="frow"><span class="fl">Profile URL:</span>
+        <a href="https://www.fastpeoplesearch.com/rochelle-cohen_id_G6409475531215407956" target="_blank" class="url-link">https://www.fastpeoplesearch.com/rochelle-cohen_id_G6409475531215407956</a></div>
+    </div>
+    <div class="ss-wrap">
+                <img src="Rochelle_Snyder_Cohen_result_5.png" class="ss-thumb"
+                     onclick="openModal('Rochelle_Snyder_Cohen_result_5.png')"
+                     title="Click to view profile detail screenshot">
+                <div class="ss-lbl">📸 Profile Detail Screenshot — click to zoom</div>
+            </div>
+  </div>
+  
+  <div class="res-actions">
+    <button class="res-btn arch-btn" onclick="archiveResult(4)">🗃 Not This Person</button>
+    <button class="res-btn del-btn"  onclick="confirmDelete(4)">🗑 Delete Result</button>
+  </div>
+</details>
+<details class="rcard " id="rcard-5">
+  <summary class="rcard-hdr">
+    <span class="rnum">#6</span>
+    <span class="rname">Rochelle Cohen · Age 76 · New York, NY</span>
+    <span class="badge-group">
+      <span class="badge-tag">📞 12</span>
+      <span class="badge-tag">✉️ 4</span>
+    </span>
+    
+    <a href="https://www.fastpeoplesearch.com/rochelle-cohen_id_G8547396617368631606" target="_blank" class="profile-btn" onclick="event.stopPropagation()">🔗 View Profile</a>
+    <span class="expand-indicator">▼ Expand</span>
+  </summary>
+  <div class="rcard-body">
+    <div class="rinfo">
+      <div class="frow"><span class="fl">Full Name:</span><span class="fv fname">Rochelle Cohen</span></div>
+      <div class="frow"><span class="fl">Age:</span><span class="fv">76</span></div>
+      <div class="frow"><span class="fl">City / State:</span><span class="fv">New York, NY</span></div>
+      <div class="frow"><span class="fl">Phone(s):</span><div class="addrs"><button class="copy-all-btn" onclick="copyList([&quot;(212) 535-9794&quot;, &quot;(212) 988-4275&quot;, &quot;(212) 535-3192&quot;, &quot;(212) 988-0937&quot;, &quot;(212) 535-6177&quot;, &quot;(212) 452-1426&quot;, &quot;(212) 874-0513&quot;, &quot;(212) 988-4747&quot;, &quot;(845) 256-9512&quot;, &quot;(912) 865-3611&quot;, &quot;(212) 861-1214&quot;, &quot;(212) 517-4542&quot;], 'Phones'); event.stopPropagation();">📋 Copy All Phones (12)</button><div class="addr-row">📞 <span>(212) 535-9794</span> <button class="copy-item-btn" onclick="copySingle('(212) 535-9794', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(212) 988-4275</span> <button class="copy-item-btn" onclick="copySingle('(212) 988-4275', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(212) 535-3192</span> <button class="copy-item-btn" onclick="copySingle('(212) 535-3192', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(212) 988-0937</span> <button class="copy-item-btn" onclick="copySingle('(212) 988-0937', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(212) 535-6177</span> <button class="copy-item-btn" onclick="copySingle('(212) 535-6177', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(212) 452-1426</span> <button class="copy-item-btn" onclick="copySingle('(212) 452-1426', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(212) 874-0513</span> <button class="copy-item-btn" onclick="copySingle('(212) 874-0513', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(212) 988-4747</span> <button class="copy-item-btn" onclick="copySingle('(212) 988-4747', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(845) 256-9512</span> <button class="copy-item-btn" onclick="copySingle('(845) 256-9512', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(912) 865-3611</span> <button class="copy-item-btn" onclick="copySingle('(912) 865-3611', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(212) 861-1214</span> <button class="copy-item-btn" onclick="copySingle('(212) 861-1214', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(212) 517-4542</span> <button class="copy-item-btn" onclick="copySingle('(212) 517-4542', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div></div></div>
+      <div class="frow"><span class="fl">Email(s):</span><div class="addrs"><button class="copy-all-btn" onclick="copyList([&quot;rochelle.cohen@dowjones.com&quot;, &quot;jlcohen@gmail.com&quot;, &quot;ma629lisa@gmail.com&quot;, &quot;richard@mr-ohare.com&quot;], 'Emails'); event.stopPropagation();">📋 Copy All Emails (4)</button><div class="addr-row">✉️ <span>rochelle.cohen@dowjones.com</span> <button class="copy-item-btn" onclick="copySingle('rochelle.cohen@dowjones.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>jlcohen@gmail.com</span> <button class="copy-item-btn" onclick="copySingle('jlcohen@gmail.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>ma629lisa@gmail.com</span> <button class="copy-item-btn" onclick="copySingle('ma629lisa@gmail.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>richard@mr-ohare.com</span> <button class="copy-item-btn" onclick="copySingle('richard@mr-ohare.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div></div></div>
+      <div class="frow"><span class="fl">Address(es):</span><div class="addrs"><div class="addr-row">📍 215 E 68Th St Unit 16C · New York, NY</div><div class="addr-row">📍 181 Horsenden Rd · New Paltz, NY</div><div class="addr-row">📍 366 Madison Ave Unit 1 · New York, NY</div><div class="addr-row">📍 215 E 68Th St Unit 27H · New York, NY</div><div class="addr-row">📍 215 E 68Th St Unit 23I · New York, NY</div><div class="addr-row">📍 215 E 68Th St Unit 6C · New York, NY</div><div class="addr-row">📍 215 E 68Th St Unit 4X · New York, NY</div><div class="addr-row">📍 215 E 68Th St Unit 29G · New York, NY</div><div class="addr-row">📍 215 E 68Th St Unit 25F · New York, NY</div><div class="addr-row">📍 215 E 68Th St Unit 3X · New York, NY</div></div></div>
+      <div class="frow"><span class="fl">Relatives:</span><span class="fv">Allison Berns, Andrea Cohen, Andrea Koutsares, Ari Cohen, Ari Cohen</span></div>
+      <div class="frow"><span class="fl">AKA / Aliases:</span><span class="fv">Rochelle W Cohen, Rochelle Weisbard Bonne, Rochelle W Bonne, Rochelle Weisba Weisbardbonne</span></div>
+      <div class="frow"><span class="fl">Profile URL:</span>
+        <a href="https://www.fastpeoplesearch.com/rochelle-cohen_id_G8547396617368631606" target="_blank" class="url-link">https://www.fastpeoplesearch.com/rochelle-cohen_id_G8547396617368631606</a></div>
+    </div>
+    <div class="ss-wrap">
+                <img src="Rochelle_Snyder_Cohen_result_6.png" class="ss-thumb"
+                     onclick="openModal('Rochelle_Snyder_Cohen_result_6.png')"
+                     title="Click to view profile detail screenshot">
+                <div class="ss-lbl">📸 Profile Detail Screenshot — click to zoom</div>
+            </div>
+  </div>
+  
+  <div class="res-actions">
+    <button class="res-btn arch-btn" onclick="archiveResult(5)">🗃 Not This Person</button>
+    <button class="res-btn del-btn"  onclick="confirmDelete(5)">🗑 Delete Result</button>
+  </div>
+</details>
+<details class="rcard " id="rcard-6">
+  <summary class="rcard-hdr">
+    <span class="rnum">#7</span>
+    <span class="rname">Rochelle Lipshutz · Age 66 · New York, NY</span>
+    <span class="badge-group">
+      <span class="badge-tag">📞 6</span>
+      <span class="badge-tag">✉️ 7</span>
+    </span>
+    
+    <a href="https://www.fastpeoplesearch.com/rochelle-lipshutz_id_G-7299231812686852338" target="_blank" class="profile-btn" onclick="event.stopPropagation()">🔗 View Profile</a>
+    <span class="expand-indicator">▼ Expand</span>
+  </summary>
+  <div class="rcard-body">
+    <div class="rinfo">
+      <div class="frow"><span class="fl">Full Name:</span><span class="fv fname">Rochelle Lipshutz</span></div>
+      <div class="frow"><span class="fl">Age:</span><span class="fv">66</span></div>
+      <div class="frow"><span class="fl">City / State:</span><span class="fv">New York, NY</span></div>
+      <div class="frow"><span class="fl">Phone(s):</span><div class="addrs"><button class="copy-all-btn" onclick="copyList([&quot;(646) 339-9416&quot;, &quot;(212) 663-1236&quot;, &quot;(917) 593-6128&quot;, &quot;(212) 663-0247&quot;, &quot;(708) 268-8768&quot;, &quot;(718) 444-3965&quot;], 'Phones'); event.stopPropagation();">📋 Copy All Phones (6)</button><div class="addr-row">📞 <span>(646) 339-9416</span> <button class="copy-item-btn" onclick="copySingle('(646) 339-9416', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(212) 663-1236</span> <button class="copy-item-btn" onclick="copySingle('(212) 663-1236', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(917) 593-6128</span> <button class="copy-item-btn" onclick="copySingle('(917) 593-6128', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(212) 663-0247</span> <button class="copy-item-btn" onclick="copySingle('(212) 663-0247', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(708) 268-8768</span> <button class="copy-item-btn" onclick="copySingle('(708) 268-8768', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(718) 444-3965</span> <button class="copy-item-btn" onclick="copySingle('(718) 444-3965', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div></div></div>
+      <div class="frow"><span class="fl">Email(s):</span><div class="addrs"><button class="copy-all-btn" onclick="copyList([&quot;roche560@gmail.com&quot;, &quot;giannonem@gmail.com&quot;, &quot;dann1112@live.com&quot;, &quot;rlipshutz@juno.com&quot;, &quot;rlipshutz@peoplepc.com&quot;, &quot;erlipshutzu0@juno.com&quot;, &quot;sims@cyberramp.com&quot;], 'Emails'); event.stopPropagation();">📋 Copy All Emails (7)</button><div class="addr-row">✉️ <span>roche560@gmail.com</span> <button class="copy-item-btn" onclick="copySingle('roche560@gmail.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>giannonem@gmail.com</span> <button class="copy-item-btn" onclick="copySingle('giannonem@gmail.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>dann1112@live.com</span> <button class="copy-item-btn" onclick="copySingle('dann1112@live.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>rlipshutz@juno.com</span> <button class="copy-item-btn" onclick="copySingle('rlipshutz@juno.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>rlipshutz@peoplepc.com</span> <button class="copy-item-btn" onclick="copySingle('rlipshutz@peoplepc.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>erlipshutzu0@juno.com</span> <button class="copy-item-btn" onclick="copySingle('erlipshutzu0@juno.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>sims@cyberramp.com</span> <button class="copy-item-btn" onclick="copySingle('sims@cyberramp.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div></div></div>
+      <div class="frow"><span class="fl">Address(es):</span><div class="addrs"><div class="addr-row">📍 395 Riverside Dr Unit 8D · New York, NY</div><div class="addr-row">📍 395 Riverside Dr Unit 15F · New York, NY</div><div class="addr-row">📍 2773 E 63Rd St · Brooklyn, NY</div><div class="addr-row">📍 395 Riverside Dr Unit 12G · New York, NY</div><div class="addr-row">📍 395 Riverside Dr Unit 3A · New York, NY</div><div class="addr-row">📍 395 Riverside Dr Unit 12Ad · New York, NY</div></div></div>
+      <div class="frow"><span class="fl">Relatives:</span><span class="fv">Julian Cohen, Carl Lipshutz, Diane Cohen, Geraldine Lipshutz, Harvey Cohen</span></div>
+      <div class="frow"><span class="fl">AKA / Aliases:</span><span class="fv">Rochelle Cohen, Lipshutz S Rochelle, Rochel Lipshutz, Rochelle Lipshur</span></div>
+      <div class="frow"><span class="fl">Profile URL:</span>
+        <a href="https://www.fastpeoplesearch.com/rochelle-lipshutz_id_G-7299231812686852338" target="_blank" class="url-link">https://www.fastpeoplesearch.com/rochelle-lipshutz_id_G-7299231812686852338</a></div>
+    </div>
+    <div class="ss-wrap">
+                <img src="Rochelle_Snyder_Cohen_result_7.png" class="ss-thumb"
+                     onclick="openModal('Rochelle_Snyder_Cohen_result_7.png')"
+                     title="Click to view profile detail screenshot">
+                <div class="ss-lbl">📸 Profile Detail Screenshot — click to zoom</div>
+            </div>
+  </div>
+  
+  <div class="res-actions">
+    <button class="res-btn arch-btn" onclick="archiveResult(6)">🗃 Not This Person</button>
+    <button class="res-btn del-btn"  onclick="confirmDelete(6)">🗑 Delete Result</button>
+  </div>
+</details>
+<details class="rcard " id="rcard-7">
+  <summary class="rcard-hdr">
+    <span class="rnum">#8</span>
+    <span class="rname">Rochelle Slebrch · Age 57 · Sterling, VA</span>
+    <span class="badge-group">
+      <span class="badge-tag">📞 10</span>
+      <span class="badge-tag">✉️ 7</span>
+    </span>
+    
+    <a href="https://www.fastpeoplesearch.com/rochelle-slebrch_id_G3735287804331218717" target="_blank" class="profile-btn" onclick="event.stopPropagation()">🔗 View Profile</a>
+    <span class="expand-indicator">▼ Expand</span>
+  </summary>
+  <div class="rcard-body">
+    <div class="rinfo">
+      <div class="frow"><span class="fl">Full Name:</span><span class="fv fname">Rochelle Slebrch</span></div>
+      <div class="frow"><span class="fl">Age:</span><span class="fv">57</span></div>
+      <div class="frow"><span class="fl">City / State:</span><span class="fv">Sterling, VA</span></div>
+      <div class="frow"><span class="fl">Phone(s):</span><div class="addrs"><button class="copy-all-btn" onclick="copyList([&quot;(703) 909-0004&quot;, &quot;(703) 450-4054&quot;, &quot;(703) 608-6282&quot;, &quot;(703) 217-2656&quot;, &quot;(202) 308-9443&quot;, &quot;(540) 429-8473&quot;, &quot;(703) 505-1200&quot;, &quot;(301) 978-0337&quot;, &quot;(304) 599-8631&quot;, &quot;(703) 978-0337&quot;], 'Phones'); event.stopPropagation();">📋 Copy All Phones (10)</button><div class="addr-row">📞 <span>(703) 909-0004</span> <button class="copy-item-btn" onclick="copySingle('(703) 909-0004', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(703) 450-4054</span> <button class="copy-item-btn" onclick="copySingle('(703) 450-4054', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(703) 608-6282</span> <button class="copy-item-btn" onclick="copySingle('(703) 608-6282', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(703) 217-2656</span> <button class="copy-item-btn" onclick="copySingle('(703) 217-2656', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(202) 308-9443</span> <button class="copy-item-btn" onclick="copySingle('(202) 308-9443', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(540) 429-8473</span> <button class="copy-item-btn" onclick="copySingle('(540) 429-8473', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(703) 505-1200</span> <button class="copy-item-btn" onclick="copySingle('(703) 505-1200', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(301) 978-0337</span> <button class="copy-item-btn" onclick="copySingle('(301) 978-0337', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(304) 599-8631</span> <button class="copy-item-btn" onclick="copySingle('(304) 599-8631', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(703) 978-0337</span> <button class="copy-item-btn" onclick="copySingle('(703) 978-0337', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div></div></div>
+      <div class="frow"><span class="fl">Email(s):</span><div class="addrs"><button class="copy-all-btn" onclick="copyList([&quot;sslebrch@hotmail.com&quot;, &quot;eandisolutions@hotmail.com&quot;, &quot;chef_shelly@hotmail.com&quot;, &quot;sslebrch@instpm.com&quot;, &quot;sslegrch@hotmail.com&quot;, &quot;sslebrch@lbgroup.com&quot;, &quot;sslebrch@yahoo.com&quot;], 'Emails'); event.stopPropagation();">📋 Copy All Emails (7)</button><div class="addr-row">✉️ <span>sslebrch@hotmail.com</span> <button class="copy-item-btn" onclick="copySingle('sslebrch@hotmail.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>eandisolutions@hotmail.com</span> <button class="copy-item-btn" onclick="copySingle('eandisolutions@hotmail.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>chef_shelly@hotmail.com</span> <button class="copy-item-btn" onclick="copySingle('chef_shelly@hotmail.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>sslebrch@instpm.com</span> <button class="copy-item-btn" onclick="copySingle('sslebrch@instpm.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>sslegrch@hotmail.com</span> <button class="copy-item-btn" onclick="copySingle('sslegrch@hotmail.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>sslebrch@lbgroup.com</span> <button class="copy-item-btn" onclick="copySingle('sslebrch@lbgroup.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>sslebrch@yahoo.com</span> <button class="copy-item-btn" onclick="copySingle('sslebrch@yahoo.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div></div></div>
+      <div class="frow"><span class="fl">Address(es):</span><div class="addrs"><div class="addr-row">📍 47354 Westwood Pl Unit A702 · Sterling, VA</div><div class="addr-row">📍 2100 M St Nw Unit 170 · Washington, DC</div><div class="addr-row">📍 47354 Westwood Pl Unit 702 · Sterling, VA</div><div class="addr-row">📍 3620 Bell Flower Pl · Waldorf, MD</div><div class="addr-row">📍 10219 Commonwealth Blvd · Fairfax, VA</div><div class="addr-row">📍 2801 Park Center Dr Unit A702 · Alexandria, VA</div><div class="addr-row">📍 2801 Park Center Dr Unit 702 · Alexandria, VA</div><div class="addr-row">📍 17709 Lisa Dr · Derwood, MD</div><div class="addr-row">📍 248 Fife St · Morgantown, WV</div><div class="addr-row">📍 15378 Lakes Of Delray Blvd Unit 7 · Delray Beach, FL</div></div></div>
+      <div class="frow"><span class="fl">Relatives:</span><span class="fv">Gary Slebrch, Burt Cohen, Craig Slebrch, Debra Christiano, Eugene Slebrch</span></div>
+      <div class="frow"><span class="fl">AKA / Aliases:</span><span class="fv">Rochelle S Slebrch, Rochelle K Slebrch, Rochelle C Slebrch, Shelly Slebrch</span></div>
+      <div class="frow"><span class="fl">Profile URL:</span>
+        <a href="https://www.fastpeoplesearch.com/rochelle-slebrch_id_G3735287804331218717" target="_blank" class="url-link">https://www.fastpeoplesearch.com/rochelle-slebrch_id_G3735287804331218717</a></div>
+    </div>
+    <div class="ss-wrap">
+                <img src="Rochelle_Snyder_Cohen_result_8.png" class="ss-thumb"
+                     onclick="openModal('Rochelle_Snyder_Cohen_result_8.png')"
+                     title="Click to view profile detail screenshot">
+                <div class="ss-lbl">📸 Profile Detail Screenshot — click to zoom</div>
+            </div>
+  </div>
+  
+  <div class="res-actions">
+    <button class="res-btn arch-btn" onclick="archiveResult(7)">🗃 Not This Person</button>
+    <button class="res-btn del-btn"  onclick="confirmDelete(7)">🗑 Delete Result</button>
+  </div>
+</details>
+<details class="rcard " id="rcard-8">
+  <summary class="rcard-hdr">
+    <span class="rnum">#9</span>
+    <span class="rname">Robert Cohen · Age 68 · Media, PA</span>
+    <span class="badge-group">
+      <span class="badge-tag">📞 9</span>
+      <span class="badge-tag">✉️ 4</span>
+    </span>
+    
+    <a href="https://www.fastpeoplesearch.com/robert-cohen_id_G-8376473726809745060" target="_blank" class="profile-btn" onclick="event.stopPropagation()">🔗 View Profile</a>
+    <span class="expand-indicator">▼ Expand</span>
+  </summary>
+  <div class="rcard-body">
+    <div class="rinfo">
+      <div class="frow"><span class="fl">Full Name:</span><span class="fv fname">Robert Cohen</span></div>
+      <div class="frow"><span class="fl">Age:</span><span class="fv">68</span></div>
+      <div class="frow"><span class="fl">City / State:</span><span class="fv">Media, PA</span></div>
+      <div class="frow"><span class="fl">Phone(s):</span><div class="addrs"><button class="copy-all-btn" onclick="copyList([&quot;(215) 990-8696&quot;, &quot;(610) 565-1326&quot;, &quot;(610) 347-1818&quot;, &quot;(610) 357-5540&quot;, &quot;(610) 444-0752&quot;, &quot;(916) 392-6425&quot;, &quot;(302) 395-3182&quot;, &quot;(916) 395-3182&quot;, &quot;(916) 424-8454&quot;], 'Phones'); event.stopPropagation();">📋 Copy All Phones (9)</button><div class="addr-row">📞 <span>(215) 990-8696</span> <button class="copy-item-btn" onclick="copySingle('(215) 990-8696', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(610) 565-1326</span> <button class="copy-item-btn" onclick="copySingle('(610) 565-1326', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(610) 347-1818</span> <button class="copy-item-btn" onclick="copySingle('(610) 347-1818', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(610) 357-5540</span> <button class="copy-item-btn" onclick="copySingle('(610) 357-5540', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(610) 444-0752</span> <button class="copy-item-btn" onclick="copySingle('(610) 444-0752', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(916) 392-6425</span> <button class="copy-item-btn" onclick="copySingle('(916) 392-6425', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(302) 395-3182</span> <button class="copy-item-btn" onclick="copySingle('(302) 395-3182', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(916) 395-3182</span> <button class="copy-item-btn" onclick="copySingle('(916) 395-3182', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(916) 424-8454</span> <button class="copy-item-btn" onclick="copySingle('(916) 424-8454', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div></div></div>
+      <div class="frow"><span class="fl">Email(s):</span><div class="addrs"><button class="copy-all-btn" onclick="copyList([&quot;robtjcohen@gmail.com&quot;, &quot;robert.cohen@localnet.com&quot;, &quot;rcohen@cscinfo.com&quot;, &quot;rcohen4125@yahoo.com&quot;], 'Emails'); event.stopPropagation();">📋 Copy All Emails (4)</button><div class="addr-row">✉️ <span>robtjcohen@gmail.com</span> <button class="copy-item-btn" onclick="copySingle('robtjcohen@gmail.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>robert.cohen@localnet.com</span> <button class="copy-item-btn" onclick="copySingle('robert.cohen@localnet.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>rcohen@cscinfo.com</span> <button class="copy-item-btn" onclick="copySingle('rcohen@cscinfo.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>rcohen4125@yahoo.com</span> <button class="copy-item-btn" onclick="copySingle('rcohen4125@yahoo.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div></div></div>
+      <div class="frow"><span class="fl">Address(es):</span><div class="addrs"><div class="addr-row">📍 624 W Saint Andrews Dr · Media, PA</div><div class="addr-row">📍 224 Valley View Rd · Media, PA</div><div class="addr-row">📍 Po Box 745 · Kennett Square, PA</div><div class="addr-row">📍 Po Box 664 · Unionville, PA</div><div class="addr-row">📍 1 Honeysuckle Ln · Kennett Square, PA</div><div class="addr-row">📍 2711 Centerville Rd · Wilmington, DE</div><div class="addr-row">📍 1455 Response Rd Unit 250 · Sacramento, CA</div><div class="addr-row">📍 1321 La Cueva Way · Sacramento, CA</div><div class="addr-row">📍 6734 Riptide Way · Sacramento, CA</div><div class="addr-row">📍 8220 Se 59Th St · Mercer Island, WA</div></div></div>
+      <div class="frow"><span class="fl">Relatives:</span><span class="fv">Jennifer Cohen, Aaron Cohen, Aaron Cohen, Daniel Cohen, Eric Cohen</span></div>
+      <div class="frow"><span class="fl">AKA / Aliases:</span><span class="fv">Robert K Cohen, Robert M Cohen, Jeffrey Lee Cohen, Rob J Cohen</span></div>
+      <div class="frow"><span class="fl">Profile URL:</span>
+        <a href="https://www.fastpeoplesearch.com/robert-cohen_id_G-8376473726809745060" target="_blank" class="url-link">https://www.fastpeoplesearch.com/robert-cohen_id_G-8376473726809745060</a></div>
+    </div>
+    <div class="ss-wrap">
+                <img src="Rochelle_Snyder_Cohen_result_9.png" class="ss-thumb"
+                     onclick="openModal('Rochelle_Snyder_Cohen_result_9.png')"
+                     title="Click to view profile detail screenshot">
+                <div class="ss-lbl">📸 Profile Detail Screenshot — click to zoom</div>
+            </div>
+  </div>
+  
+  <div class="res-actions">
+    <button class="res-btn arch-btn" onclick="archiveResult(8)">🗃 Not This Person</button>
+    <button class="res-btn del-btn"  onclick="confirmDelete(8)">🗑 Delete Result</button>
+  </div>
+</details>
+<details class="rcard " id="rcard-9">
+  <summary class="rcard-hdr">
+    <span class="rnum">#10</span>
+    <span class="rname">Sagi Cohen · Age N/A · San Antonio, TX</span>
+    <span class="badge-group">
+      <span class="badge-tag">📞 7</span>
+      <span class="badge-tag">✉️ 10</span>
+    </span>
+    
+    <a href="https://www.fastpeoplesearch.com/sagi-cohen_id_G917371869493501794" target="_blank" class="profile-btn" onclick="event.stopPropagation()">🔗 View Profile</a>
+    <span class="expand-indicator">▼ Expand</span>
+  </summary>
+  <div class="rcard-body">
+    <div class="rinfo">
+      <div class="frow"><span class="fl">Full Name:</span><span class="fv fname">Sagi Cohen</span></div>
+      <div class="frow"><span class="fl">Age:</span><span class="fv">N/A</span></div>
+      <div class="frow"><span class="fl">City / State:</span><span class="fv">San Antonio, TX</span></div>
+      <div class="frow"><span class="fl">Phone(s):</span><div class="addrs"><button class="copy-all-btn" onclick="copyList([&quot;(210) 697-9746&quot;, &quot;(210) 896-3336&quot;, &quot;(210) 342-1615&quot;, &quot;(210) 415-3443&quot;, &quot;(210) 691-0812&quot;, &quot;(210) 732-4335&quot;, &quot;(210) 734-9458&quot;], 'Phones'); event.stopPropagation();">📋 Copy All Phones (7)</button><div class="addr-row">📞 <span>(210) 697-9746</span> <button class="copy-item-btn" onclick="copySingle('(210) 697-9746', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(210) 896-3336</span> <button class="copy-item-btn" onclick="copySingle('(210) 896-3336', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(210) 342-1615</span> <button class="copy-item-btn" onclick="copySingle('(210) 342-1615', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(210) 415-3443</span> <button class="copy-item-btn" onclick="copySingle('(210) 415-3443', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(210) 691-0812</span> <button class="copy-item-btn" onclick="copySingle('(210) 691-0812', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(210) 732-4335</span> <button class="copy-item-btn" onclick="copySingle('(210) 732-4335', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(210) 734-9458</span> <button class="copy-item-btn" onclick="copySingle('(210) 734-9458', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div></div></div>
+      <div class="frow"><span class="fl">Email(s):</span><div class="addrs"><button class="copy-all-btn" onclick="copyList([&quot;shly108@yahoo.com&quot;, &quot;shly@hotmail.com&quot;, &quot;shly1@yahoo.com&quot;, &quot;mcohensagi@aol.com&quot;, &quot;rochellecohensagi@gmail.com&quot;, &quot;shly108@cs.com&quot;, &quot;shly108@onebox.com&quot;, &quot;shly108@hotmail.com&quot;, &quot;shly@yahoo.com&quot;, &quot;shly@onebox.com&quot;], 'Emails'); event.stopPropagation();">📋 Copy All Emails (10)</button><div class="addr-row">✉️ <span>shly108@yahoo.com</span> <button class="copy-item-btn" onclick="copySingle('shly108@yahoo.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>shly@hotmail.com</span> <button class="copy-item-btn" onclick="copySingle('shly@hotmail.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>shly1@yahoo.com</span> <button class="copy-item-btn" onclick="copySingle('shly1@yahoo.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>mcohensagi@aol.com</span> <button class="copy-item-btn" onclick="copySingle('mcohensagi@aol.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>rochellecohensagi@gmail.com</span> <button class="copy-item-btn" onclick="copySingle('rochellecohensagi@gmail.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>shly108@cs.com</span> <button class="copy-item-btn" onclick="copySingle('shly108@cs.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>shly108@onebox.com</span> <button class="copy-item-btn" onclick="copySingle('shly108@onebox.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>shly108@hotmail.com</span> <button class="copy-item-btn" onclick="copySingle('shly108@hotmail.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>shly@yahoo.com</span> <button class="copy-item-btn" onclick="copySingle('shly@yahoo.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>shly@onebox.com</span> <button class="copy-item-btn" onclick="copySingle('shly@onebox.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div></div></div>
+      <div class="frow"><span class="fl">Address(es):</span><div class="addrs"><div class="addr-row">📍 9115 Old Mill Rd · San Antonio, TX</div><div class="addr-row">📍 Po Box 16669 · San Francisco, CA</div><div class="addr-row">📍 4760 21St Ave Ne Unit E104 · Seattle, WA</div><div class="addr-row">📍 3546 Wellsprings Dr · San Antonio, TX</div><div class="addr-row">📍 7475 Callaghan Rd Unit 111 · San Antonio, TX</div><div class="addr-row">📍 267 Gettysburg Rd · San Antonio, TX</div><div class="addr-row">📍 1919 Burton Dr Unit 213B · Austin, TX</div><div class="addr-row">📍 9901 W Interstate 10 Unit 800 · San Antonio, TX</div><div class="addr-row">📍 9901 W Interstate 10 Unit S800 · San Antonio, TX</div><div class="addr-row">📍 1919 Burton Dr Unit 213 · Austin, TX</div></div></div>
+      <div class="frow"><span class="fl">Relatives:</span><span class="fv">Aurelia Lazar, Itay Levin, Maya Sagi, Sagi Cohen, Uri Cohen-Sagi</span></div>
+      <div class="frow"><span class="fl">AKA / Aliases:</span><span class="fv">Sagi M Cohen, Sagi Rochelle Lazar Cohen, Rochelle Sagi Cohen, Rochelle Cohen Sagi</span></div>
+      <div class="frow"><span class="fl">Profile URL:</span>
+        <a href="https://www.fastpeoplesearch.com/sagi-cohen_id_G917371869493501794" target="_blank" class="url-link">https://www.fastpeoplesearch.com/sagi-cohen_id_G917371869493501794</a></div>
+    </div>
+    <div class="ss-wrap">
+                <img src="Rochelle_Snyder_Cohen_result_10.png" class="ss-thumb"
+                     onclick="openModal('Rochelle_Snyder_Cohen_result_10.png')"
+                     title="Click to view profile detail screenshot">
+                <div class="ss-lbl">📸 Profile Detail Screenshot — click to zoom</div>
+            </div>
+  </div>
+  
+  <div class="res-actions">
+    <button class="res-btn arch-btn" onclick="archiveResult(9)">🗃 Not This Person</button>
+    <button class="res-btn del-btn"  onclick="confirmDelete(9)">🗑 Delete Result</button>
+  </div>
+</details>
+</div>
+<div class="toast" id="toast"></div>
+<div class="modal" id="modal" onclick="if(event.target===this)this.classList.remove('open')">
+  <span class="modal-x" onclick="document.getElementById('modal').classList.remove('open')">✕</span>
+  <img id="modal-img" src="" class="modal-img" onclick="event.stopPropagation()">
+</div>
+<div class="confirm-overlay" id="confirm-overlay">
+  <div class="confirm-box">
+    <h3>🗑 Delete This Result?</h3>
+    <p>This will permanently remove the result and its screenshot.<br>This <strong>cannot be undone</strong>.</p>
+    <div class="confirm-btns">
+      <button class="cb-cancel" onclick="closeConfirm()">Cancel</button>
+      <button class="cb-delete" id="cb-confirm-btn" onclick="doDelete()">Delete Permanently</button>
+    </div>
+  </div>
+</div>
+<script>
+const JOB_ID   = 'FF9B86F8';
+const LEAD_IDX = 9;
+const API      = (window.location.protocol.startsWith('http') ? window.location.origin : 'http://localhost:5050');
+let _pendingDeleteIdx = null;
+
+function copySingle(val, label) {
+  navigator.clipboard.writeText(val).then(() => {
+    showToast(label + ' copied to clipboard!', 'ok');
+  }).catch(() => {
+    const ta = document.createElement('textarea');
+    ta.value = val;
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    showToast(label + ' copied!', 'ok');
+  });
+}
+
+function copyList(arr, label) {
+  if (!arr || !arr.length) return;
+  const text = arr.join('\\n');
+  navigator.clipboard.writeText(text).then(() => {
+    showToast(arr.length + ' ' + label + ' copied to clipboard!', 'ok');
+  }).catch(() => {
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    showToast(arr.length + ' ' + label + ' copied!', 'ok');
+  });
+}
+
+function openModal(src){
+  document.getElementById('modal-img').src=src;
+  document.getElementById('modal').classList.add('open');
+}
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape'){
+    document.getElementById('modal').classList.remove('open');
+    closeConfirm();
+  }
+});
+
+function showToast(msg, type='ok'){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast ' + type + ' show';
+  setTimeout(()=>t.classList.remove('show'), 3500);
+}
+
+function confirmDelete(idx){
+  _pendingDeleteIdx = idx;
+  document.getElementById('confirm-overlay').classList.add('open');
+}
+function closeConfirm(){
+  document.getElementById('confirm-overlay').classList.remove('open');
+  _pendingDeleteIdx = null;
+}
+async function doDelete(){
+  const idx = _pendingDeleteIdx;
+  closeConfirm();
+  if (idx === null || !JOB_ID) return;
+  await deleteResult(idx);
+}
+async function deleteResult(idx){
+  if (!JOB_ID) { showToast('No job ID — open via dashboard', 'err'); return; }
+  const card = document.getElementById('rcard-' + idx);
+  if (card) card.classList.add('removing');
+  try {
+    const r = await fetch(`${API}/api/jobs/${JOB_ID}/leads/${LEAD_IDX}/results/${idx}/delete`,
+                          {method:'POST'});
+    const d = await r.json();
+    if (r.ok) {
+      setTimeout(()=>{ if(card) card.remove(); updateCount(-1); }, 250);
+      showToast('Result deleted permanently', 'ok');
+    } else {
+      if (card) card.classList.remove('removing');
+      showToast(d.error || 'Delete failed', 'err');
+    }
+  } catch(e) {
+    if (card) card.classList.remove('removing');
+    showToast('Network error: ' + (e.message || e), 'err');
+  }
+}
+async function archiveResult(idx){
+  if (!JOB_ID) { showToast('No job ID — open via dashboard', 'err'); return; }
+  const card = document.getElementById('rcard-' + idx);
+  if (card) {
+    card.style.transition = '0.25s all';
+    card.style.opacity = '0.3';
+    card.style.transform = 'scale(0.98)';
+  }
+  showToast('Updating status...', 'ok');
+  try {
+    const r = await fetch(`${API}/api/jobs/${JOB_ID}/leads/${LEAD_IDX}/results/${idx}/archive`,
+                          {method:'POST'});
+    const d = await r.json();
+    if (r.ok) {
+      showToast('Marked as Not This Person', 'ok');
+      setTimeout(()=>{
+        const u = new URL(window.location.href);
+        u.searchParams.set('_t', Date.now());
+        window.location.replace(u.href);
+      }, 300);
+    } else {
+      if (card) { card.style.opacity = '1'; card.style.transform = 'none'; }
+      showToast(d.error || 'Archive failed', 'err');
+    }
+  } catch(e) {
+    if (card) { card.style.opacity = '1'; card.style.transform = 'none'; }
+    showToast('Network error: ' + (e.message || e), 'err');
+  }
+}
+async function unarchiveResult(idx){
+  if (!JOB_ID) return;
+  const card = document.getElementById('rcard-' + idx);
+  if (card) {
+    card.style.transition = '0.25s all';
+    card.style.opacity = '0.3';
+  }
+  showToast('Restoring result...', 'ok');
+  try {
+    const r = await fetch(`${API}/api/jobs/${JOB_ID}/leads/${LEAD_IDX}/results/${idx}/unarchive`,
+                          {method:'POST'});
+    const d = await r.json();
+    if (r.ok) {
+      showToast('Result restored', 'ok');
+      setTimeout(()=>{
+        const u = new URL(window.location.href);
+        u.searchParams.set('_t', Date.now());
+        window.location.replace(u.href);
+      }, 300);
+    } else {
+      if (card) { card.style.opacity = '1'; card.style.transform = 'none'; }
+      showToast(d.error || 'Restore failed', 'err');
+    }
+  } catch(e) {
+    if (card) { card.style.opacity = '1'; card.style.transform = 'none'; }
+    showToast('Network error: ' + (e.message || e), 'err');
+  }
+}
+function setAllCards(expanded) {
+  document.querySelectorAll('details.rcard:not(.archived-card)').forEach(d => d.open = expanded);
+}
+function setDefaultPref(pref) {
+  localStorage.setItem('leadsosint_default_view', pref);
+  showToast('Default view saved: ' + (pref === 'expanded' ? 'Expanded' : 'Collapsed'), 'ok');
+  setAllCards(pref === 'expanded');
+}
+(function() {
+  const pref = localStorage.getItem('leadsosint_default_view') || 'collapsed';
+  if (pref === 'expanded') {
+    const el = document.getElementById('pref-expanded');
+    if (el) el.checked = true;
+    setAllCards(true);
+  } else {
+    const el = document.getElementById('pref-collapsed');
+    if (el) el.checked = true;
+    setAllCards(false);
+  }
+})();
+function updateCount(delta){
+  const el = document.getElementById('active-count');
+  if (el) el.textContent = Math.max(0, parseInt(el.textContent||'0') + delta);
+}
+async function redoReportLead(jobId, idx){
+  if (!confirm('Re-run search for this lead now?')) return;
+  try {
+    const r = await fetch(`${API}/api/jobs/${jobId}/leads/${idx}/retry`, {method:'POST'});
+    if (r.ok) {
+      showToast('Re-starting search...', 'ok');
+      setTimeout(()=>location.reload(), 2000);
+    } else {
+      const d = await r.json().catch(()=>({}));
+      showToast(d.error || 'Retry error', 'err');
+    }
+  } catch(e) {
+    showToast('Network error: ' + (e.message || e), 'err');
+  }
+}
+</script>
+</body></html>

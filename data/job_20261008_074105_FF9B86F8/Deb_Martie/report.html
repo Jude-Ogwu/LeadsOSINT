@@ -1,0 +1,726 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Deb Martie — LeadsOSINT</title>
+<style>
+:root{--bg:#0d0f1a;--s:#1a1d3a;--s2:#22264a;--bd:#3a3f7a;--ac:#a78bfa;--ac2:#6d28d9;
+      --tx:#e0e6ff;--mt:#8b95c4;--gn:#34d399;--rd:#f87171;--bl:#60a5fa;--yw:#fbbf24}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:"Segoe UI",system-ui,sans-serif;background:var(--bg);color:var(--tx);min-height:100vh}
+.topbar{background:linear-gradient(135deg,#1a1d3a,#0d0f1a);border-bottom:1px solid var(--bd);
+         padding:18px 40px;display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.back{background:var(--s2);border:1px solid var(--bd);color:var(--ac);padding:9px 18px;
+       border-radius:9px;font-size:.85rem;text-decoration:none;transition:.2s}
+.back:hover{border-color:var(--ac);background:var(--ac2);color:#fff}
+.ttl h1{font-size:1.5rem;color:#fff;font-weight:700}
+.ttl p{color:var(--mt);font-size:.8rem;margin-top:3px}
+.social-top-btn{background:linear-gradient(135deg,#2563eb,#60a5fa);color:#fff;padding:8px 16px;border-radius:9px;font-size:.82rem;font-weight:700;text-decoration:none;transition:.2s;box-shadow:0 4px 14px rgba(37,99,235,.3)}
+.social-top-btn:hover{transform:translateY(-1px);color:#fff;box-shadow:0 6px 20px rgba(96,165,250,.4)}
+.stats{display:flex;gap:14px;padding:20px 40px;background:var(--s);border-bottom:1px solid var(--bd);flex-wrap:wrap}
+.sp{background:var(--bg);border:1px solid var(--bd);border-radius:10px;
+     padding:12px 20px;text-align:center}
+.sp.hi{border-color:var(--ac);background:rgba(167,139,250,.07)}
+.sv{font-size:1.4rem;font-weight:800;color:var(--ac)}
+.sl{font-size:.7rem;color:var(--mt);text-transform:uppercase;letter-spacing:.5px;margin-top:2px}
+.content{padding:28px 40px;max-width:1400px;margin:0 auto}
+.rcard{background:var(--s);border:1px solid var(--bd);border-radius:16px;
+        margin-bottom:24px;overflow:hidden;transition:.4s all}
+.rcard:hover{border-color:var(--ac);transform:translateY(-2px);
+              box-shadow:0 10px 36px rgba(109,40,217,.2)}
+.rcard.removing{opacity:0;transform:translateY(-12px) scale(.97);pointer-events:none}
+.archived-card{opacity:.55;border-style:dashed;filter:grayscale(.3)}
+.rcard-hdr{background:linear-gradient(135deg,var(--s2),var(--s));padding:16px 24px;
+            display:flex;align-items:center;gap:14px;border-bottom:1px solid var(--bd);flex-wrap:wrap;cursor:pointer;list-style:none}
+.rcard-hdr::-webkit-details-marker{display:none}
+.rnum{background:linear-gradient(135deg,var(--ac2),var(--ac));color:#fff;
+       font-size:.78rem;font-weight:700;padding:4px 12px;border-radius:16px;flex-shrink:0}
+.rname{font-size:1.15rem;font-weight:700;color:#fff;flex:1}
+.badge-group{display:flex;gap:6px;align-items:center}
+.badge-tag{background:rgba(167,139,250,.15);border:1px solid rgba(167,139,250,.3);color:var(--ac);font-size:.75rem;padding:3px 8px;border-radius:6px;font-weight:600}
+.expand-indicator{color:var(--ac);font-size:.8rem;font-weight:700;margin-left:8px}
+.arch-tag{background:rgba(251,191,36,.15);border:1px solid rgba(251,191,36,.3);
+           color:var(--yw);font-size:.72rem;padding:3px 10px;border-radius:10px;flex-shrink:0}
+.profile-btn{background:linear-gradient(135deg,#4c3d8f,var(--ac2));color:#fff;
+              padding:8px 16px;border-radius:9px;font-size:.8rem;
+              font-weight:600;text-decoration:none;transition:.2s;flex-shrink:0}
+.profile-btn:hover{background:linear-gradient(135deg,var(--ac2),var(--ac));
+                    transform:translateY(-1px);color:#fff}
+.copy-all-btn{background:linear-gradient(135deg,var(--ac2),var(--ac3));color:#fff;border:none;padding:5px 12px;border-radius:6px;font-size:.75rem;font-weight:600;cursor:pointer;margin-bottom:6px;display:inline-block}
+.copy-all-btn:hover{background:var(--ac2)}
+.copy-item-btn{background:transparent;border:none;color:var(--mt);cursor:pointer;font-size:.8rem;padding:0 4px;margin-left:auto}
+.copy-item-btn:hover{color:var(--ac)}
+.addr-row{color:#c4caf0;font-size:.88rem;padding:6px 12px;
+           background:rgba(255,255,255,.03);border-radius:7px;border:1px solid var(--bd);display:flex;align-items:center;gap:8px}
+.url-link{color:var(--bl);font-size:.82rem;word-break:break-all;text-decoration:underline}
+.url-link:hover{color:var(--ac)}
+.rcard-body{padding:24px 28px;display:flex;gap:24px;align-items:flex-start;flex-wrap:wrap}
+.rinfo{flex:1;min-width:320px;display:flex;flex-direction:column;gap:14px}
+.frow{display:grid;grid-template-columns:140px 1fr;gap:12px;align-items:start;font-size:.92rem}
+.fl{font-weight:700;color:var(--mt);font-size:.85rem;letter-spacing:.3px;padding-top:4px}
+.fv{color:#fff;font-weight:600;line-height:1.5}
+.fname{font-size:1.15rem;color:var(--ac);font-weight:700}
+.ss-wrap{flex:0 0 320px;display:flex;flex-direction:column;align-items:center}
+.ss-thumb{width:100%;border-radius:10px;border:2px solid var(--bd);cursor:pointer;
+           transition:.2s;display:block}
+.ss-thumb:hover{border-color:var(--ac);transform:scale(1.02);
+                 box-shadow:0 6px 24px rgba(167,139,250,.3)}
+.ss-lbl{color:var(--mt);font-size:.78rem;margin-top:8px;text-align:center}
+.ss-missing{color:var(--mt);font-size:.82rem;padding:20px;text-align:center;
+             background:var(--s2);border-radius:10px;border:1px dashed var(--bd)}
+.res-actions{padding:14px 24px;border-top:1px solid var(--bd);
+              display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.res-actions.arch-mode{background:rgba(251,191,36,.04)}
+.res-btn{padding:8px 16px;border-radius:8px;font-size:.8rem;font-weight:600;
+          cursor:pointer;transition:.2s;border:1px solid;background:transparent}
+.arch-btn{border-color:rgba(251,191,36,.5);color:var(--yw);}
+.arch-btn:hover{background:rgba(251,191,36,.1)}
+.del-btn{border-color:rgba(248,113,113,.5);color:var(--rd);}
+.del-btn:hover{background:rgba(248,113,113,.1)}
+.unarch-btn{border-color:rgba(96,165,250,.5);color:var(--bl);}
+.unarch-btn:hover{background:rgba(96,165,250,.1)}
+.arch-label{font-size:.8rem;color:var(--yw);flex:1}
+.arch-section{margin-top:10px;border-radius:14px;border:1px dashed var(--bd);overflow:hidden}
+.arch-section summary{padding:14px 20px;cursor:pointer;color:var(--mt);font-size:.9rem;
+                       font-weight:600;list-style:none;background:var(--s2);
+                       display:flex;align-items:center;gap:8px}
+.arch-section summary:hover{color:var(--tx)}
+.arch-section summary span{font-size:.75rem;font-weight:400;margin-left:auto;color:var(--mt)}
+.arch-inner{padding:16px}
+.empty{background:var(--s);border:2px dashed var(--bd);border-radius:14px;
+        padding:50px;text-align:center;color:var(--mt);font-size:1rem}
+.search-ss-card{background:var(--s);border:1px solid var(--bd);border-radius:16px;margin-bottom:28px;overflow:hidden;box-shadow:0 4px 20px rgba(0,0,0,0.3)}
+.search-ss-hdr{background:linear-gradient(135deg,var(--s2),var(--s));padding:16px 24px;border-bottom:1px solid var(--bd);display:flex;justify-content:space-between;align-items:center}
+.search-ss-title{font-weight:700;color:#fff;font-size:1.05rem}
+.search-ss-sub{font-size:.78rem;color:var(--mt);margin-top:2px}
+.search-ss-body{position:relative;cursor:pointer;max-height:380px;overflow:hidden;background:#0d0f1a}
+.search-ss-img{width:100%;display:block;opacity:.88;transition:.3s all}
+.search-ss-body:hover .search-ss-img{opacity:1;transform:scale(1.005)}
+.search-ss-overlay{position:absolute;bottom:16px;left:50%;transform:translateX(-50%);background:rgba(13,15,26,.88);border:1px solid var(--ac);color:var(--ac);padding:8px 20px;border-radius:20px;font-size:.8rem;font-weight:700;backdrop-filter:blur(6px);pointer-events:none;box-shadow:0 4px 14px rgba(109,40,217,.3)}
+.toast{position:fixed;bottom:24px;right:24px;background:var(--s);
+        border:1px solid var(--bd);border-radius:12px;padding:12px 20px;
+        font-size:.85rem;z-index:999;transform:translateY(60px);opacity:0;
+        transition:.3s;max-width:280px}
+.toast.show{transform:translateY(0);opacity:1}
+.toast.ok{border-color:rgba(52,211,153,.4);color:var(--gn)}
+.toast.err{border-color:rgba(248,113,113,.4);color:var(--rd)}
+.modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.96);z-index:9999;
+        justify-content:center;align-items:center;padding:20px}
+.modal.open{display:flex}
+.modal-img{max-width:95vw;max-height:90vh;border-radius:12px;border:2px solid var(--ac)}
+.modal-x{position:fixed;top:18px;right:28px;color:var(--ac);font-size:2.2rem;
+          cursor:pointer;z-index:10000;transition:.2s}
+.modal-x:hover{color:#fff;transform:scale(1.1)}
+.confirm-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.8);
+                  z-index:8888;justify-content:center;align-items:center}
+.confirm-overlay.open{display:flex}
+.confirm-box{background:var(--s);border:1px solid var(--rd);border-radius:18px;
+              padding:32px 36px;max-width:380px;text-align:center}
+.confirm-box h3{color:#fff;margin-bottom:10px;font-size:1.1rem}
+.confirm-box p{color:var(--mt);font-size:.88rem;margin-bottom:24px;line-height:1.6}
+.confirm-btns{display:flex;gap:12px;justify-content:center}
+.cb-cancel{padding:10px 24px;border-radius:9px;border:1px solid var(--bd);
+            background:var(--s2);color:var(--tx);cursor:pointer;font-size:.9rem}
+.cb-delete{padding:10px 24px;border-radius:9px;border:none;
+            background:linear-gradient(135deg,#b91c1c,var(--rd));color:#fff;
+            cursor:pointer;font-size:.9rem;font-weight:700}
+.collapse-toolbar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:18px;flex-wrap:wrap;background:var(--s);padding:12px 20px;border-radius:12px;border:1px solid var(--bd)}
+.tool-btn{background:var(--s2);border:1px solid var(--bd);color:var(--ac);padding:7px 15px;border-radius:8px;font-size:.82rem;font-weight:700;cursor:pointer;transition:.2s}
+.tool-btn:hover{background:var(--ac2);color:#fff;border-color:var(--ac)}
+.view-pref{display:flex;align-items:center;gap:12px;font-size:.82rem;color:var(--mt)}
+.view-pref label{display:inline-flex;align-items:center;gap:6px;cursor:pointer;color:var(--tx);font-weight:600}
+.view-pref input[type="radio"]{accent-color:var(--ac);cursor:pointer}
+</style></head><body>
+<div class="topbar">
+  <a href="/results/FF9B86F8" class="back" onclick="if(window.location.protocol==='file:'){this.href='../index.html'}">← Back to Job</a>
+  <div class="ttl"><h1>🔍 Deb Martie</h1>
+    <p>Location: Not specified · October 10, 2026 · 07:40 AM</p></div>
+  <div style="display:flex;gap:8px;margin-left:auto;flex-wrap:wrap">
+    <button class="social-top-btn" style="background:linear-gradient(135deg,#6d28d9,#a78bfa);color:#fff;cursor:pointer;border:none" onclick="redoReportLead('FF9B86F8', 6)" title="Re-run search for this lead">🔄 Re-do Search</button>
+    <a href="https://www.facebook.com/pfbid0Fwzf1a7uDarKJVaN6uQdaNDqw3cCeMroTf18zezmghUntqX1zTSbp7BqK3pK7mEQl" target="_blank" rel="noopener noreferrer" class="social-top-btn" title="https://www.facebook.com/pfbid0Fwzf1a7uDarKJVaN6uQdaNDqw3cCeMroTf18zezmghUntqX1zTSbp7BqK3pK7mEQl" onclick="event.stopPropagation()">🔗 Open Facebook</a>
+    
+    
+  </div>
+</div>
+<div class="stats">
+  <div class="sp hi"><div class="sv" id="active-count">9</div><div class="sl">Active Results</div></div>
+  <div class="sp"><div class="sv" style="color:var(--gn)">
+    ✓ Found</div><div class="sl">Status</div></div>
+  <div class="sp"><div class="sv" style="font-size:.9rem">N/A</div>
+    <div class="sl">Location</div></div>
+  <div class="sp"><div class="sv" style="font-size:.85rem"><a href="https://www.facebook.com/pfbid0Fwzf1a7uDarKJVaN6uQdaNDqw3cCeMroTf18zezmghUntqX1zTSbp7BqK3pK7mEQl" target="_blank" rel="noopener noreferrer" class="url-link" title="https://www.facebook.com/pfbid0Fwzf1a7uDarKJVaN6uQdaNDqw3cCeMroTf18zezmghUntqX1zTSbp7BqK3pK7mEQl" style="display:inline-block;max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;vertical-align:bottom">🔗 Facebook</a></div>
+    <div class="sl">Social Link</div></div>
+  <div class="sp"><div class="sv" style="font-size:.85rem"><span style="color:var(--mt)">N/A</span></div>
+    <div class="sl">Input Email</div></div>
+  <div class="sp"><div class="sv" style="font-size:.85rem"><span style="color:var(--mt)">N/A</span></div>
+    <div class="sl">Input Phone</div></div>
+</div>
+<div class="content">
+
+<div class="search-ss-card">
+  <div class="search-ss-hdr">
+    <div>
+      <div class="search-ss-title">🌐 FastPeopleSearch — Full Search Page Overview</div>
+      <div class="search-ss-sub">Live search results overview for "Deb Martie" (US)</div>
+    </div>
+  </div>
+  <div class="search-ss-body" onclick="openModal('Deb_Martie_search_page.png')">
+    <img src="Deb_Martie_search_page.png" class="search-ss-img" title="Click to view full search page screenshot">
+    <div class="search-ss-overlay">🔍 Click to View Full Search Page Screenshot</div>
+  </div>
+</div>
+<div class="collapse-toolbar">
+  <div style="display:flex;align-items:center;gap:10px">
+    <button class="tool-btn" onclick="setAllCards(false)">▸ Collapse All</button>
+    <button class="tool-btn" onclick="setAllCards(true)">▾ Expand All</button>
+  </div>
+  <div class="view-pref">
+    <span>Default View:</span>
+    <label><input type="radio" name="default_view_pref" value="collapsed" id="pref-collapsed" onchange="setDefaultPref('collapsed')"> Collapsed</label>
+    <label><input type="radio" name="default_view_pref" value="expanded" id="pref-expanded" onchange="setDefaultPref('expanded')"> Expanded</label>
+  </div>
+</div>
+
+<details class="rcard " id="rcard-0">
+  <summary class="rcard-hdr">
+    <span class="rnum">#1</span>
+    <span class="rname">Deborah Martie · Age 63 · Sistersville, WV</span>
+    <span class="badge-group">
+      <span class="badge-tag">📞 3</span>
+      <span class="badge-tag">✉️ 0</span>
+    </span>
+    
+    <a href="https://www.fastpeoplesearch.com/deborah-martie_id_G4859154609011786771" target="_blank" class="profile-btn" onclick="event.stopPropagation()">🔗 View Profile</a>
+    <span class="expand-indicator">▼ Expand</span>
+  </summary>
+  <div class="rcard-body">
+    <div class="rinfo">
+      <div class="frow"><span class="fl">Full Name:</span><span class="fv fname">Deborah Martie</span></div>
+      <div class="frow"><span class="fl">Age:</span><span class="fv">63</span></div>
+      <div class="frow"><span class="fl">City / State:</span><span class="fv">Sistersville, WV</span></div>
+      <div class="frow"><span class="fl">Phone(s):</span><div class="addrs"><button class="copy-all-btn" onclick="copyList([&quot;(304) 652-9973&quot;, &quot;(304) 455-5458&quot;, &quot;(304) 455-5736&quot;], 'Phones'); event.stopPropagation();">📋 Copy All Phones (3)</button><div class="addr-row">📞 <span>(304) 652-9973</span> <button class="copy-item-btn" onclick="copySingle('(304) 652-9973', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(304) 455-5458</span> <button class="copy-item-btn" onclick="copySingle('(304) 455-5458', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(304) 455-5736</span> <button class="copy-item-btn" onclick="copySingle('(304) 455-5736', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div></div></div>
+      <div class="frow"><span class="fl">Email(s):</span><div class="addrs"><div class="addr-row" style="color:#6b7280">✉️ N/A — no emails listed</div></div></div>
+      <div class="frow"><span class="fl">Address(es):</span><div class="addrs"><div class="addr-row">📍 310 Bancroft St · Sistersville, WV</div><div class="addr-row">📍 126 Miller St · Paden City, WV</div><div class="addr-row">📍 1030 3Rd St Unit 2 · New Martinsville, WV</div></div></div>
+      <div class="frow"><span class="fl">Relatives:</span><span class="fv">Nora Hood, Robert Martie, Edwin Hood, Iva Martie, John Parsons</span></div>
+      <div class="frow"><span class="fl">AKA / Aliases:</span><span class="fv">Deborah A Martie, Deborah D Martie, Debbie A Martie, Debbie Martie</span></div>
+      <div class="frow"><span class="fl">Profile URL:</span>
+        <a href="https://www.fastpeoplesearch.com/deborah-martie_id_G4859154609011786771" target="_blank" class="url-link">https://www.fastpeoplesearch.com/deborah-martie_id_G4859154609011786771</a></div>
+    </div>
+    <div class="ss-wrap">
+                <img src="Deb_Martie_result_1.png" class="ss-thumb"
+                     onclick="openModal('Deb_Martie_result_1.png')"
+                     title="Click to view profile detail screenshot">
+                <div class="ss-lbl">📸 Profile Detail Screenshot — click to zoom</div>
+            </div>
+  </div>
+  
+  <div class="res-actions">
+    <button class="res-btn arch-btn" onclick="archiveResult(0)">🗃 Not This Person</button>
+    <button class="res-btn del-btn"  onclick="confirmDelete(0)">🗑 Delete Result</button>
+  </div>
+</details>
+<details class="rcard " id="rcard-1">
+  <summary class="rcard-hdr">
+    <span class="rnum">#2</span>
+    <span class="rname">Deborah Martie · Age 67 · Versailles, KY</span>
+    <span class="badge-group">
+      <span class="badge-tag">📞 9</span>
+      <span class="badge-tag">✉️ 1</span>
+    </span>
+    
+    <a href="https://www.fastpeoplesearch.com/deborah-martie_id_G-3566816156516124706" target="_blank" class="profile-btn" onclick="event.stopPropagation()">🔗 View Profile</a>
+    <span class="expand-indicator">▼ Expand</span>
+  </summary>
+  <div class="rcard-body">
+    <div class="rinfo">
+      <div class="frow"><span class="fl">Full Name:</span><span class="fv fname">Deborah Martie</span></div>
+      <div class="frow"><span class="fl">Age:</span><span class="fv">67</span></div>
+      <div class="frow"><span class="fl">City / State:</span><span class="fv">Versailles, KY</span></div>
+      <div class="frow"><span class="fl">Phone(s):</span><div class="addrs"><button class="copy-all-btn" onclick="copyList([&quot;(859) 433-1060&quot;, &quot;(502) 863-2777&quot;, &quot;(502) 370-4047&quot;, &quot;(859) 254-2611&quot;, &quot;(859) 433-1050&quot;, &quot;(763) 234-8375&quot;, &quot;(203) 248-8879&quot;, &quot;(203) 457-8794&quot;, &quot;(606) 254-2611&quot;], 'Phones'); event.stopPropagation();">📋 Copy All Phones (9)</button><div class="addr-row">📞 <span>(859) 433-1060</span> <button class="copy-item-btn" onclick="copySingle('(859) 433-1060', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(502) 863-2777</span> <button class="copy-item-btn" onclick="copySingle('(502) 863-2777', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(502) 370-4047</span> <button class="copy-item-btn" onclick="copySingle('(502) 370-4047', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(859) 254-2611</span> <button class="copy-item-btn" onclick="copySingle('(859) 254-2611', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(859) 433-1050</span> <button class="copy-item-btn" onclick="copySingle('(859) 433-1050', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(763) 234-8375</span> <button class="copy-item-btn" onclick="copySingle('(763) 234-8375', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(203) 248-8879</span> <button class="copy-item-btn" onclick="copySingle('(203) 248-8879', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(203) 457-8794</span> <button class="copy-item-btn" onclick="copySingle('(203) 457-8794', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(606) 254-2611</span> <button class="copy-item-btn" onclick="copySingle('(606) 254-2611', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div></div></div>
+      <div class="frow"><span class="fl">Email(s):</span><div class="addrs"><button class="copy-all-btn" onclick="copyList([&quot;dmartie@roadrunner.com&quot;], 'Emails'); event.stopPropagation();">📋 Copy All Emails (1)</button><div class="addr-row">✉️ <span>dmartie@roadrunner.com</span> <button class="copy-item-btn" onclick="copySingle('dmartie@roadrunner.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div></div></div>
+      <div class="frow"><span class="fl">Address(es):</span><div class="addrs"><div class="addr-row">📍 7042 Arbor Meadow Way · Versailles, KY</div><div class="addr-row">📍 169 Carriage Ln · Georgetown, KY</div><div class="addr-row">📍 133 Prestwick Dr · Georgetown, KY</div><div class="addr-row">📍 290 Browns Mill Rd · Lexington, KY</div><div class="addr-row">📍 1196 W Lake Ave · Guilford, CT</div><div class="addr-row">📍 290 Brown Ave · Lexington, KY</div><div class="addr-row">📍 16 Polpis Ln Unit 16 · Guilford, CT</div><div class="addr-row">📍 145 Forest St · Hamden, CT</div><div class="addr-row">📍 Po Box 658 · Northford, CT</div><div class="addr-row">📍 189 Evergreen Ave · Hamden, CT</div></div></div>
+      <div class="frow"><span class="fl">Relatives:</span><span class="fv">Charles Martie, Baker Martie, Caleb Martie, Gene Birch, Gerda Mandala</span></div>
+      <div class="frow"><span class="fl">AKA / Aliases:</span><span class="fv">Deborah Deborah Martie, Deborah Birch, Deborah C Martie, Debbie J Martie</span></div>
+      <div class="frow"><span class="fl">Profile URL:</span>
+        <a href="https://www.fastpeoplesearch.com/deborah-martie_id_G-3566816156516124706" target="_blank" class="url-link">https://www.fastpeoplesearch.com/deborah-martie_id_G-3566816156516124706</a></div>
+    </div>
+    <div class="ss-wrap">
+                <img src="Deb_Martie_result_2.png" class="ss-thumb"
+                     onclick="openModal('Deb_Martie_result_2.png')"
+                     title="Click to view profile detail screenshot">
+                <div class="ss-lbl">📸 Profile Detail Screenshot — click to zoom</div>
+            </div>
+  </div>
+  
+  <div class="res-actions">
+    <button class="res-btn arch-btn" onclick="archiveResult(1)">🗃 Not This Person</button>
+    <button class="res-btn del-btn"  onclick="confirmDelete(1)">🗑 Delete Result</button>
+  </div>
+</details>
+<details class="rcard " id="rcard-2">
+  <summary class="rcard-hdr">
+    <span class="rnum">#3</span>
+    <span class="rname">Debra Martie · Age 66 · Uniontown, OH</span>
+    <span class="badge-group">
+      <span class="badge-tag">📞 0</span>
+      <span class="badge-tag">✉️ 0</span>
+    </span>
+    
+    <a href="https://www.fastpeoplesearch.com/debra-martie_id_G5397064219265431688" target="_blank" class="profile-btn" onclick="event.stopPropagation()">🔗 View Profile</a>
+    <span class="expand-indicator">▼ Expand</span>
+  </summary>
+  <div class="rcard-body">
+    <div class="rinfo">
+      <div class="frow"><span class="fl">Full Name:</span><span class="fv fname">Debra Martie</span></div>
+      <div class="frow"><span class="fl">Age:</span><span class="fv">66</span></div>
+      <div class="frow"><span class="fl">City / State:</span><span class="fv">Uniontown, OH</span></div>
+      <div class="frow"><span class="fl">Phone(s):</span><div class="addrs"><div class="addr-row" style="color:#6b7280">📞 N/A — no phones listed</div></div></div>
+      <div class="frow"><span class="fl">Email(s):</span><div class="addrs"><div class="addr-row" style="color:#6b7280">✉️ N/A — no emails listed</div></div></div>
+      <div class="frow"><span class="fl">Address(es):</span><div class="addrs"><div class="addr-row">📍 558 Saturn Dr · Uniontown, OH</div></div></div>
+      <div class="frow"><span class="fl">Relatives:</span><span class="fv">N/A</span></div>
+      <div class="frow"><span class="fl">AKA / Aliases:</span><span class="fv">N/A</span></div>
+      <div class="frow"><span class="fl">Profile URL:</span>
+        <a href="https://www.fastpeoplesearch.com/debra-martie_id_G5397064219265431688" target="_blank" class="url-link">https://www.fastpeoplesearch.com/debra-martie_id_G5397064219265431688</a></div>
+    </div>
+    <div class="ss-wrap">
+                <img src="Deb_Martie_result_3.png" class="ss-thumb"
+                     onclick="openModal('Deb_Martie_result_3.png')"
+                     title="Click to view profile detail screenshot">
+                <div class="ss-lbl">📸 Profile Detail Screenshot — click to zoom</div>
+            </div>
+  </div>
+  
+  <div class="res-actions">
+    <button class="res-btn arch-btn" onclick="archiveResult(2)">🗃 Not This Person</button>
+    <button class="res-btn del-btn"  onclick="confirmDelete(2)">🗑 Delete Result</button>
+  </div>
+</details>
+<details class="rcard " id="rcard-3">
+  <summary class="rcard-hdr">
+    <span class="rnum">#4</span>
+    <span class="rname">Debra Martie · Age 66 · Stedman, NC</span>
+    <span class="badge-group">
+      <span class="badge-tag">📞 5</span>
+      <span class="badge-tag">✉️ 6</span>
+    </span>
+    
+    <a href="https://www.fastpeoplesearch.com/debra-martie_id_G-2032751244048286646" target="_blank" class="profile-btn" onclick="event.stopPropagation()">🔗 View Profile</a>
+    <span class="expand-indicator">▼ Expand</span>
+  </summary>
+  <div class="rcard-body">
+    <div class="rinfo">
+      <div class="frow"><span class="fl">Full Name:</span><span class="fv fname">Debra Martie</span></div>
+      <div class="frow"><span class="fl">Age:</span><span class="fv">66</span></div>
+      <div class="frow"><span class="fl">City / State:</span><span class="fv">Stedman, NC</span></div>
+      <div class="frow"><span class="fl">Phone(s):</span><div class="addrs"><button class="copy-all-btn" onclick="copyList([&quot;(910) 309-9073&quot;, &quot;(910) 323-9707&quot;, &quot;(941) 574-9243&quot;, &quot;(910) 309-9244&quot;, &quot;(239) 574-9243&quot;], 'Phones'); event.stopPropagation();">📋 Copy All Phones (5)</button><div class="addr-row">📞 <span>(910) 309-9073</span> <button class="copy-item-btn" onclick="copySingle('(910) 309-9073', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(910) 323-9707</span> <button class="copy-item-btn" onclick="copySingle('(910) 323-9707', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(941) 574-9243</span> <button class="copy-item-btn" onclick="copySingle('(941) 574-9243', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(910) 309-9244</span> <button class="copy-item-btn" onclick="copySingle('(910) 309-9244', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(239) 574-9243</span> <button class="copy-item-btn" onclick="copySingle('(239) 574-9243', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div></div></div>
+      <div class="frow"><span class="fl">Email(s):</span><div class="addrs"><button class="copy-all-btn" onclick="copyList([&quot;dmartie0714@aol.com&quot;, &quot;helaman5v12@aol.com&quot;, &quot;mymia59@aol.com&quot;, &quot;helaman5v12@nc.rr.com&quot;, &quot;helaman5v@aol.com&quot;, &quot;helamanv@aol.com&quot;], 'Emails'); event.stopPropagation();">📋 Copy All Emails (6)</button><div class="addr-row">✉️ <span>dmartie0714@aol.com</span> <button class="copy-item-btn" onclick="copySingle('dmartie0714@aol.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>helaman5v12@aol.com</span> <button class="copy-item-btn" onclick="copySingle('helaman5v12@aol.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>mymia59@aol.com</span> <button class="copy-item-btn" onclick="copySingle('mymia59@aol.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>helaman5v12@nc.rr.com</span> <button class="copy-item-btn" onclick="copySingle('helaman5v12@nc.rr.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>helaman5v@aol.com</span> <button class="copy-item-btn" onclick="copySingle('helaman5v@aol.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>helamanv@aol.com</span> <button class="copy-item-btn" onclick="copySingle('helamanv@aol.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div></div></div>
+      <div class="frow"><span class="fl">Address(es):</span><div class="addrs"><div class="addr-row">📍 6970 Blake Rd · Stedman, NC</div><div class="addr-row">📍 6952 Blake Rd · Stedman, NC</div><div class="addr-row">📍 15 Nw 7Th Ter Unit Te · Cape Coral, FL</div><div class="addr-row">📍 1424 Sw 49Th St · Cape Coral, FL</div><div class="addr-row">📍 Po Box 1652 · Sanibel, FL</div><div class="addr-row">📍 15 Ne 7Th Ter · Cape Coral, FL</div><div class="addr-row">📍 513 Se 5Th St Unit 2 · Cape Coral, FL</div><div class="addr-row">📍 15 Nw 7Th Ter · Fort Myers, FL</div><div class="addr-row">📍 Po Box 275 · Roseboro, NC</div></div></div>
+      <div class="frow"><span class="fl">Relatives:</span><span class="fv">Arkeasha Bailem, Gail Cena, Joseph Martie, Steve Martie, Acquinita Edwards</span></div>
+      <div class="frow"><span class="fl">AKA / Aliases:</span><span class="fv">Debra L Martie, Deborah L Martie, Debbie L Martie, Debral Martie</span></div>
+      <div class="frow"><span class="fl">Profile URL:</span>
+        <a href="https://www.fastpeoplesearch.com/debra-martie_id_G-2032751244048286646" target="_blank" class="url-link">https://www.fastpeoplesearch.com/debra-martie_id_G-2032751244048286646</a></div>
+    </div>
+    <div class="ss-wrap">
+                <img src="Deb_Martie_result_4.png" class="ss-thumb"
+                     onclick="openModal('Deb_Martie_result_4.png')"
+                     title="Click to view profile detail screenshot">
+                <div class="ss-lbl">📸 Profile Detail Screenshot — click to zoom</div>
+            </div>
+  </div>
+  
+  <div class="res-actions">
+    <button class="res-btn arch-btn" onclick="archiveResult(3)">🗃 Not This Person</button>
+    <button class="res-btn del-btn"  onclick="confirmDelete(3)">🗑 Delete Result</button>
+  </div>
+</details>
+<details class="rcard " id="rcard-4">
+  <summary class="rcard-hdr">
+    <span class="rnum">#5</span>
+    <span class="rname">Debra Martin · Age 59 · South Haven, MI</span>
+    <span class="badge-group">
+      <span class="badge-tag">📞 5</span>
+      <span class="badge-tag">✉️ 3</span>
+    </span>
+    
+    <a href="https://www.fastpeoplesearch.com/debra-martin_id_G-8686531695564539247" target="_blank" class="profile-btn" onclick="event.stopPropagation()">🔗 View Profile</a>
+    <span class="expand-indicator">▼ Expand</span>
+  </summary>
+  <div class="rcard-body">
+    <div class="rinfo">
+      <div class="frow"><span class="fl">Full Name:</span><span class="fv fname">Debra Martin</span></div>
+      <div class="frow"><span class="fl">Age:</span><span class="fv">59</span></div>
+      <div class="frow"><span class="fl">City / State:</span><span class="fv">South Haven, MI</span></div>
+      <div class="frow"><span class="fl">Phone(s):</span><div class="addrs"><button class="copy-all-btn" onclick="copyList([&quot;(269) 277-0885&quot;, &quot;(269) 637-3686&quot;, &quot;(269) 639-1856&quot;, &quot;(616) 637-3398&quot;, &quot;(269) 637-3398&quot;], 'Phones'); event.stopPropagation();">📋 Copy All Phones (5)</button><div class="addr-row">📞 <span>(269) 277-0885</span> <button class="copy-item-btn" onclick="copySingle('(269) 277-0885', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(269) 637-3686</span> <button class="copy-item-btn" onclick="copySingle('(269) 637-3686', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(269) 639-1856</span> <button class="copy-item-btn" onclick="copySingle('(269) 639-1856', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(616) 637-3398</span> <button class="copy-item-btn" onclick="copySingle('(616) 637-3398', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(269) 637-3398</span> <button class="copy-item-btn" onclick="copySingle('(269) 637-3398', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div></div></div>
+      <div class="frow"><span class="fl">Email(s):</span><div class="addrs"><button class="copy-all-btn" onclick="copyList([&quot;dmscorpio1228@gmail.com&quot;, &quot;dmscrpio1228@gmail.com&quot;, &quot;debra_martin6@yahoo.com&quot;], 'Emails'); event.stopPropagation();">📋 Copy All Emails (3)</button><div class="addr-row">✉️ <span>dmscorpio1228@gmail.com</span> <button class="copy-item-btn" onclick="copySingle('dmscorpio1228@gmail.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>dmscrpio1228@gmail.com</span> <button class="copy-item-btn" onclick="copySingle('dmscrpio1228@gmail.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>debra_martin6@yahoo.com</span> <button class="copy-item-btn" onclick="copySingle('debra_martin6@yahoo.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div></div></div>
+      <div class="frow"><span class="fl">Address(es):</span><div class="addrs"><div class="addr-row">📍 89 Aylworth Ave · South Haven, MI</div><div class="addr-row">📍 819 Indiana Ave Unit 2 · South Haven, MI</div><div class="addr-row">📍 829 Phillips St Unit 2 · South Haven, MI</div><div class="addr-row">📍 914 Center St · South Haven, MI</div><div class="addr-row">📍 1101 Kalamazoo St · South Haven, MI</div></div></div>
+      <div class="frow"><span class="fl">Relatives:</span><span class="fv">Aaron Cobbs, Aaron Cobbs, Aaron Cobbs, Adam Cobbs, Adam Cobbs</span></div>
+      <div class="frow"><span class="fl">AKA / Aliases:</span><span class="fv">Debra Marie Cobbs, Debra M Cobbs, Debra Cobbs, Deborah M Martin</span></div>
+      <div class="frow"><span class="fl">Profile URL:</span>
+        <a href="https://www.fastpeoplesearch.com/debra-martin_id_G-8686531695564539247" target="_blank" class="url-link">https://www.fastpeoplesearch.com/debra-martin_id_G-8686531695564539247</a></div>
+    </div>
+    <div class="ss-wrap">
+                <img src="Deb_Martie_result_5.png" class="ss-thumb"
+                     onclick="openModal('Deb_Martie_result_5.png')"
+                     title="Click to view profile detail screenshot">
+                <div class="ss-lbl">📸 Profile Detail Screenshot — click to zoom</div>
+            </div>
+  </div>
+  
+  <div class="res-actions">
+    <button class="res-btn arch-btn" onclick="archiveResult(4)">🗃 Not This Person</button>
+    <button class="res-btn del-btn"  onclick="confirmDelete(4)">🗑 Delete Result</button>
+  </div>
+</details>
+<details class="rcard " id="rcard-5">
+  <summary class="rcard-hdr">
+    <span class="rnum">#6</span>
+    <span class="rname">Debra Marty · Age 71 · Galesburg, IL</span>
+    <span class="badge-group">
+      <span class="badge-tag">📞 6</span>
+      <span class="badge-tag">✉️ 3</span>
+    </span>
+    
+    <a href="https://www.fastpeoplesearch.com/debra-marty_id_G-4226510497921232367" target="_blank" class="profile-btn" onclick="event.stopPropagation()">🔗 View Profile</a>
+    <span class="expand-indicator">▼ Expand</span>
+  </summary>
+  <div class="rcard-body">
+    <div class="rinfo">
+      <div class="frow"><span class="fl">Full Name:</span><span class="fv fname">Debra Marty</span></div>
+      <div class="frow"><span class="fl">Age:</span><span class="fv">71</span></div>
+      <div class="frow"><span class="fl">City / State:</span><span class="fv">Galesburg, IL</span></div>
+      <div class="frow"><span class="fl">Phone(s):</span><div class="addrs"><button class="copy-all-btn" onclick="copyList([&quot;(309) 342-9788&quot;, &quot;(309) 368-4567&quot;, &quot;(309) 342-5092&quot;, &quot;(309) 341-7171&quot;, &quot;(309) 333-3093&quot;, &quot;(309) 343-9788&quot;], 'Phones'); event.stopPropagation();">📋 Copy All Phones (6)</button><div class="addr-row">📞 <span>(309) 342-9788</span> <button class="copy-item-btn" onclick="copySingle('(309) 342-9788', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(309) 368-4567</span> <button class="copy-item-btn" onclick="copySingle('(309) 368-4567', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(309) 342-5092</span> <button class="copy-item-btn" onclick="copySingle('(309) 342-5092', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(309) 341-7171</span> <button class="copy-item-btn" onclick="copySingle('(309) 341-7171', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(309) 333-3093</span> <button class="copy-item-btn" onclick="copySingle('(309) 333-3093', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(309) 343-9788</span> <button class="copy-item-btn" onclick="copySingle('(309) 343-9788', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div></div></div>
+      <div class="frow"><span class="fl">Email(s):</span><div class="addrs"><button class="copy-all-btn" onclick="copyList([&quot;david.marty@cox.net&quot;, &quot;dlmarty@knox.edu&quot;, &quot;amarty23@yahoo.com&quot;], 'Emails'); event.stopPropagation();">📋 Copy All Emails (3)</button><div class="addr-row">✉️ <span>david.marty@cox.net</span> <button class="copy-item-btn" onclick="copySingle('david.marty@cox.net', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>dlmarty@knox.edu</span> <button class="copy-item-btn" onclick="copySingle('dlmarty@knox.edu', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>amarty23@yahoo.com</span> <button class="copy-item-btn" onclick="copySingle('amarty23@yahoo.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div></div></div>
+      <div class="frow"><span class="fl">Address(es):</span><div class="addrs"><div class="addr-row">📍 296 N Pleasant Ave · Galesburg, IL</div><div class="addr-row">📍 752 N Cherry St · Galesburg, IL</div><div class="addr-row">📍 955 Dayton Dr · Galesburg, IL</div></div></div>
+      <div class="frow"><span class="fl">Relatives:</span><span class="fv">David Marty, Andrea Marty, Britta Marty, Cole Marty, Brandon Stacey</span></div>
+      <div class="frow"><span class="fl">AKA / Aliases:</span><span class="fv">Debra L Marty, Debra Linn Marty, Debbie L Marty, Debbie G Marty</span></div>
+      <div class="frow"><span class="fl">Profile URL:</span>
+        <a href="https://www.fastpeoplesearch.com/debra-marty_id_G-4226510497921232367" target="_blank" class="url-link">https://www.fastpeoplesearch.com/debra-marty_id_G-4226510497921232367</a></div>
+    </div>
+    <div class="ss-wrap">
+                <img src="Deb_Martie_result_6.png" class="ss-thumb"
+                     onclick="openModal('Deb_Martie_result_6.png')"
+                     title="Click to view profile detail screenshot">
+                <div class="ss-lbl">📸 Profile Detail Screenshot — click to zoom</div>
+            </div>
+  </div>
+  
+  <div class="res-actions">
+    <button class="res-btn arch-btn" onclick="archiveResult(5)">🗃 Not This Person</button>
+    <button class="res-btn del-btn"  onclick="confirmDelete(5)">🗑 Delete Result</button>
+  </div>
+</details>
+<details class="rcard " id="rcard-6">
+  <summary class="rcard-hdr">
+    <span class="rnum">#7</span>
+    <span class="rname">Deborah Morris · Age N/A · Stanardsville, VA</span>
+    <span class="badge-group">
+      <span class="badge-tag">📞 2</span>
+      <span class="badge-tag">✉️ 0</span>
+    </span>
+    
+    <a href="https://www.fastpeoplesearch.com/deborah-morris_id_G6263662382099121323" target="_blank" class="profile-btn" onclick="event.stopPropagation()">🔗 View Profile</a>
+    <span class="expand-indicator">▼ Expand</span>
+  </summary>
+  <div class="rcard-body">
+    <div class="rinfo">
+      <div class="frow"><span class="fl">Full Name:</span><span class="fv fname">Deborah Morris</span></div>
+      <div class="frow"><span class="fl">Age:</span><span class="fv">N/A</span></div>
+      <div class="frow"><span class="fl">City / State:</span><span class="fv">Stanardsville, VA</span></div>
+      <div class="frow"><span class="fl">Phone(s):</span><div class="addrs"><button class="copy-all-btn" onclick="copyList([&quot;(434) 985-8648&quot;, &quot;(804) 985-8648&quot;], 'Phones'); event.stopPropagation();">📋 Copy All Phones (2)</button><div class="addr-row">📞 <span>(434) 985-8648</span> <button class="copy-item-btn" onclick="copySingle('(434) 985-8648', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(804) 985-8648</span> <button class="copy-item-btn" onclick="copySingle('(804) 985-8648', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div></div></div>
+      <div class="frow"><span class="fl">Email(s):</span><div class="addrs"><div class="addr-row" style="color:#6b7280">✉️ N/A — no emails listed</div></div></div>
+      <div class="frow"><span class="fl">Address(es):</span><div class="addrs"><div class="addr-row">📍 1546 Bull Yearling Rd Unit R · Stanardsville, VA</div><div class="addr-row">📍 120 Deborah Ln · Stanardsville, VA</div><div class="addr-row">📍 1536 Bull Yearling Rd · Stanardsville, VA</div><div class="addr-row">📍 563 Horsehead Rd · Grottoes, VA</div><div class="addr-row">📍 Po Box 254 · Stanardsville, VA</div><div class="addr-row">📍 Po Box 6405 · Charlottesville, VA</div><div class="addr-row">📍 Po Box 85 · Stanardsville, VA</div><div class="addr-row">📍 Po Box 6405 · Charlottesvle, VA</div><div class="addr-row">📍 19302 Ashlawn Dr Unit 1 · Gordonsville, VA</div></div></div>
+      <div class="frow"><span class="fl">Relatives:</span><span class="fv">Bobbi Smith, Chelsea Miller, Christina Riley, Cole Morris, Deborah Morris</span></div>
+      <div class="frow"><span class="fl">AKA / Aliases:</span><span class="fv">Deborah I Morris, Deborah M Morris, Deborah L Morris, Deborah T Morris</span></div>
+      <div class="frow"><span class="fl">Profile URL:</span>
+        <a href="https://www.fastpeoplesearch.com/deborah-morris_id_G6263662382099121323" target="_blank" class="url-link">https://www.fastpeoplesearch.com/deborah-morris_id_G6263662382099121323</a></div>
+    </div>
+    <div class="ss-wrap">
+                <img src="Deb_Martie_result_7.png" class="ss-thumb"
+                     onclick="openModal('Deb_Martie_result_7.png')"
+                     title="Click to view profile detail screenshot">
+                <div class="ss-lbl">📸 Profile Detail Screenshot — click to zoom</div>
+            </div>
+  </div>
+  
+  <div class="res-actions">
+    <button class="res-btn arch-btn" onclick="archiveResult(6)">🗃 Not This Person</button>
+    <button class="res-btn del-btn"  onclick="confirmDelete(6)">🗑 Delete Result</button>
+  </div>
+</details>
+<details class="rcard " id="rcard-7">
+  <summary class="rcard-hdr">
+    <span class="rnum">#8</span>
+    <span class="rname">Deborah Pritchett · Age 64 · Athens, GA</span>
+    <span class="badge-group">
+      <span class="badge-tag">📞 12</span>
+      <span class="badge-tag">✉️ 10</span>
+    </span>
+    
+    <a href="https://www.fastpeoplesearch.com/deborah-pritchett_id_G2997472952652039671" target="_blank" class="profile-btn" onclick="event.stopPropagation()">🔗 View Profile</a>
+    <span class="expand-indicator">▼ Expand</span>
+  </summary>
+  <div class="rcard-body">
+    <div class="rinfo">
+      <div class="frow"><span class="fl">Full Name:</span><span class="fv fname">Deborah Pritchett</span></div>
+      <div class="frow"><span class="fl">Age:</span><span class="fv">64</span></div>
+      <div class="frow"><span class="fl">City / State:</span><span class="fv">Athens, GA</span></div>
+      <div class="frow"><span class="fl">Phone(s):</span><div class="addrs"><button class="copy-all-btn" onclick="copyList([&quot;(706) 351-3374&quot;, &quot;(678) 721-6349&quot;, &quot;(706) 369-9950&quot;, &quot;(706) 354-0692&quot;, &quot;(706) 201-7491&quot;, &quot;(706) 369-4495&quot;, &quot;(706) 850-5311&quot;, &quot;(706) 254-0947&quot;, &quot;(706) 369-4463&quot;, &quot;(706) 613-2579&quot;, &quot;(404) 367-4813&quot;, &quot;(706) 850-8757&quot;], 'Phones'); event.stopPropagation();">📋 Copy All Phones (12)</button><div class="addr-row">📞 <span>(706) 351-3374</span> <button class="copy-item-btn" onclick="copySingle('(706) 351-3374', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(678) 721-6349</span> <button class="copy-item-btn" onclick="copySingle('(678) 721-6349', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(706) 369-9950</span> <button class="copy-item-btn" onclick="copySingle('(706) 369-9950', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(706) 354-0692</span> <button class="copy-item-btn" onclick="copySingle('(706) 354-0692', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(706) 201-7491</span> <button class="copy-item-btn" onclick="copySingle('(706) 201-7491', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(706) 369-4495</span> <button class="copy-item-btn" onclick="copySingle('(706) 369-4495', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(706) 850-5311</span> <button class="copy-item-btn" onclick="copySingle('(706) 850-5311', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(706) 254-0947</span> <button class="copy-item-btn" onclick="copySingle('(706) 254-0947', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(706) 369-4463</span> <button class="copy-item-btn" onclick="copySingle('(706) 369-4463', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(706) 613-2579</span> <button class="copy-item-btn" onclick="copySingle('(706) 613-2579', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(404) 367-4813</span> <button class="copy-item-btn" onclick="copySingle('(404) 367-4813', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(706) 850-8757</span> <button class="copy-item-btn" onclick="copySingle('(706) 850-8757', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div></div></div>
+      <div class="frow"><span class="fl">Email(s):</span><div class="addrs"><button class="copy-all-btn" onclick="copyList([&quot;sexyann1107@bellsouth.net&quot;, &quot;derekb2@adelphia.net&quot;, &quot;derekb8@adelphia.net&quot;, &quot;derekb@adelphia.net&quot;, &quot;derekb8@rochester.rr.com&quot;, &quot;derekb8@sbcglobal.net&quot;, &quot;derekb1@adelphia.net&quot;, &quot;deb.pritchett@hotmail.com&quot;, &quot;derekb@sbcglobal.net&quot;, &quot;derekb@rochester.rr.com&quot;], 'Emails'); event.stopPropagation();">📋 Copy All Emails (10)</button><div class="addr-row">✉️ <span>sexyann1107@bellsouth.net</span> <button class="copy-item-btn" onclick="copySingle('sexyann1107@bellsouth.net', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>derekb2@adelphia.net</span> <button class="copy-item-btn" onclick="copySingle('derekb2@adelphia.net', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>derekb8@adelphia.net</span> <button class="copy-item-btn" onclick="copySingle('derekb8@adelphia.net', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>derekb@adelphia.net</span> <button class="copy-item-btn" onclick="copySingle('derekb@adelphia.net', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>derekb8@rochester.rr.com</span> <button class="copy-item-btn" onclick="copySingle('derekb8@rochester.rr.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>derekb8@sbcglobal.net</span> <button class="copy-item-btn" onclick="copySingle('derekb8@sbcglobal.net', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>derekb1@adelphia.net</span> <button class="copy-item-btn" onclick="copySingle('derekb1@adelphia.net', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>deb.pritchett@hotmail.com</span> <button class="copy-item-btn" onclick="copySingle('deb.pritchett@hotmail.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>derekb@sbcglobal.net</span> <button class="copy-item-btn" onclick="copySingle('derekb@sbcglobal.net', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>derekb@rochester.rr.com</span> <button class="copy-item-btn" onclick="copySingle('derekb@rochester.rr.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div></div></div>
+      <div class="frow"><span class="fl">Address(es):</span><div class="addrs"><div class="addr-row">📍 445 Catalpa Ct Unit A · Athens, GA</div><div class="addr-row">📍 16 Running Deer Trl Nw · Cartersville, GA</div><div class="addr-row">📍 14 Running Deer Trl Nw · Cartersville, GA</div><div class="addr-row">📍 705 Spring Valley Rd · Athens, GA</div><div class="addr-row">📍 17 Golden Eagle Dr · Adairsville, GA</div><div class="addr-row">📍 440 Catalpa Ct · Athens, GA</div><div class="addr-row">📍 5100 Highway 411 Ne · Fairmount, GA</div><div class="addr-row">📍 325 Rivermont Rd · Athens, GA</div><div class="addr-row">📍 192 Ashmore Dr · Athens, GA</div><div class="addr-row">📍 764 Old Pendergrass Rd · Jefferson, GA</div></div></div>
+      <div class="frow"><span class="fl">Relatives:</span><span class="fv">Anna Pritchett, Antolin Marin, Arthur Hunter, Debra Oxford, Derek Bass</span></div>
+      <div class="frow"><span class="fl">AKA / Aliases:</span><span class="fv">Deborah A Bass, Deborah Ann Bass, Deborah A Pritchett, Deborah Bass</span></div>
+      <div class="frow"><span class="fl">Profile URL:</span>
+        <a href="https://www.fastpeoplesearch.com/deborah-pritchett_id_G2997472952652039671" target="_blank" class="url-link">https://www.fastpeoplesearch.com/deborah-pritchett_id_G2997472952652039671</a></div>
+    </div>
+    <div class="ss-wrap">
+                <img src="Deb_Martie_result_8.png" class="ss-thumb"
+                     onclick="openModal('Deb_Martie_result_8.png')"
+                     title="Click to view profile detail screenshot">
+                <div class="ss-lbl">📸 Profile Detail Screenshot — click to zoom</div>
+            </div>
+  </div>
+  
+  <div class="res-actions">
+    <button class="res-btn arch-btn" onclick="archiveResult(7)">🗃 Not This Person</button>
+    <button class="res-btn del-btn"  onclick="confirmDelete(7)">🗑 Delete Result</button>
+  </div>
+</details>
+<details class="rcard " id="rcard-8">
+  <summary class="rcard-hdr">
+    <span class="rnum">#9</span>
+    <span class="rname">Debra Oxford · Age 66 · Cumming, GA</span>
+    <span class="badge-group">
+      <span class="badge-tag">📞 11</span>
+      <span class="badge-tag">✉️ 3</span>
+    </span>
+    
+    <a href="https://www.fastpeoplesearch.com/debra-oxford_id_G8025295951813226561" target="_blank" class="profile-btn" onclick="event.stopPropagation()">🔗 View Profile</a>
+    <span class="expand-indicator">▼ Expand</span>
+  </summary>
+  <div class="rcard-body">
+    <div class="rinfo">
+      <div class="frow"><span class="fl">Full Name:</span><span class="fv fname">Debra Oxford</span></div>
+      <div class="frow"><span class="fl">Age:</span><span class="fv">66</span></div>
+      <div class="frow"><span class="fl">City / State:</span><span class="fv">Cumming, GA</span></div>
+      <div class="frow"><span class="fl">Phone(s):</span><div class="addrs"><button class="copy-all-btn" onclick="copyList([&quot;(770) 886-8091&quot;, &quot;(770) 740-7030&quot;, &quot;(678) 513-2364&quot;, &quot;(706) 850-5311&quot;, &quot;(678) 446-8192&quot;, &quot;(706) 354-0692&quot;, &quot;(706) 369-4463&quot;, &quot;(404) 552-0834&quot;, &quot;(706) 552-0834&quot;, &quot;(706) 886-8091&quot;, &quot;(770) 552-0834&quot;], 'Phones'); event.stopPropagation();">📋 Copy All Phones (11)</button><div class="addr-row">📞 <span>(770) 886-8091</span> <button class="copy-item-btn" onclick="copySingle('(770) 886-8091', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(770) 740-7030</span> <button class="copy-item-btn" onclick="copySingle('(770) 740-7030', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(678) 513-2364</span> <button class="copy-item-btn" onclick="copySingle('(678) 513-2364', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(706) 850-5311</span> <button class="copy-item-btn" onclick="copySingle('(706) 850-5311', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(678) 446-8192</span> <button class="copy-item-btn" onclick="copySingle('(678) 446-8192', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(706) 354-0692</span> <button class="copy-item-btn" onclick="copySingle('(706) 354-0692', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(706) 369-4463</span> <button class="copy-item-btn" onclick="copySingle('(706) 369-4463', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(404) 552-0834</span> <button class="copy-item-btn" onclick="copySingle('(404) 552-0834', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(706) 552-0834</span> <button class="copy-item-btn" onclick="copySingle('(706) 552-0834', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(706) 886-8091</span> <button class="copy-item-btn" onclick="copySingle('(706) 886-8091', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(770) 552-0834</span> <button class="copy-item-btn" onclick="copySingle('(770) 552-0834', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div></div></div>
+      <div class="frow"><span class="fl">Email(s):</span><div class="addrs"><button class="copy-all-btn" onclick="copyList([&quot;oxfordd@comcast.net&quot;, &quot;oxford@fulton.k12.ga.us&quot;, &quot;debraaoxford@cs.com&quot;], 'Emails'); event.stopPropagation();">📋 Copy All Emails (3)</button><div class="addr-row">✉️ <span>oxfordd@comcast.net</span> <button class="copy-item-btn" onclick="copySingle('oxfordd@comcast.net', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>oxford@fulton.k12.ga.us</span> <button class="copy-item-btn" onclick="copySingle('oxford@fulton.k12.ga.us', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>debraaoxford@cs.com</span> <button class="copy-item-btn" onclick="copySingle('debraaoxford@cs.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div></div></div>
+      <div class="frow"><span class="fl">Address(es):</span><div class="addrs"><div class="addr-row">📍 5325 Castlebrooke Crossing Dr Unit D · Cumming, GA</div><div class="addr-row">📍 4200 Ga Highway 85 E · Manchester, GA</div><div class="addr-row">📍 4200 White House Pkwy · Warm Springs, GA</div><div class="addr-row">📍 6145 Falls Landing Dr · Cumming, GA</div><div class="addr-row">📍 484 Mathew St · Gibson, GA</div><div class="addr-row">📍 6935 Treeline Dr · Cumming, GA</div><div class="addr-row">📍 1036 Sasha Ln · Roswell, GA</div><div class="addr-row">📍 6934 Treeline Dr · Cumming, GA</div><div class="addr-row">📍 440 Catalpa Ct · Athens, GA</div><div class="addr-row">📍 515 Meadow Cir · Athens, GA</div></div></div>
+      <div class="frow"><span class="fl">Relatives:</span><span class="fv">Steven Oxford, Ann McConville, Anna Pritchett, Antolin Marin, Deborah Pritchett</span></div>
+      <div class="frow"><span class="fl">AKA / Aliases:</span><span class="fv">Debra A Oxford, Debra A McConville, Deborah A Oxford, Debra A Pritchard</span></div>
+      <div class="frow"><span class="fl">Profile URL:</span>
+        <a href="https://www.fastpeoplesearch.com/debra-oxford_id_G8025295951813226561" target="_blank" class="url-link">https://www.fastpeoplesearch.com/debra-oxford_id_G8025295951813226561</a></div>
+    </div>
+    <div class="ss-wrap">
+                <img src="Deb_Martie_result_9.png" class="ss-thumb"
+                     onclick="openModal('Deb_Martie_result_9.png')"
+                     title="Click to view profile detail screenshot">
+                <div class="ss-lbl">📸 Profile Detail Screenshot — click to zoom</div>
+            </div>
+  </div>
+  
+  <div class="res-actions">
+    <button class="res-btn arch-btn" onclick="archiveResult(8)">🗃 Not This Person</button>
+    <button class="res-btn del-btn"  onclick="confirmDelete(8)">🗑 Delete Result</button>
+  </div>
+</details>
+</div>
+<div class="toast" id="toast"></div>
+<div class="modal" id="modal" onclick="if(event.target===this)this.classList.remove('open')">
+  <span class="modal-x" onclick="document.getElementById('modal').classList.remove('open')">✕</span>
+  <img id="modal-img" src="" class="modal-img" onclick="event.stopPropagation()">
+</div>
+<div class="confirm-overlay" id="confirm-overlay">
+  <div class="confirm-box">
+    <h3>🗑 Delete This Result?</h3>
+    <p>This will permanently remove the result and its screenshot.<br>This <strong>cannot be undone</strong>.</p>
+    <div class="confirm-btns">
+      <button class="cb-cancel" onclick="closeConfirm()">Cancel</button>
+      <button class="cb-delete" id="cb-confirm-btn" onclick="doDelete()">Delete Permanently</button>
+    </div>
+  </div>
+</div>
+<script>
+const JOB_ID   = 'FF9B86F8';
+const LEAD_IDX = 6;
+const API      = (window.location.protocol.startsWith('http') ? window.location.origin : 'http://localhost:5050');
+let _pendingDeleteIdx = null;
+
+function copySingle(val, label) {
+  navigator.clipboard.writeText(val).then(() => {
+    showToast(label + ' copied to clipboard!', 'ok');
+  }).catch(() => {
+    const ta = document.createElement('textarea');
+    ta.value = val;
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    showToast(label + ' copied!', 'ok');
+  });
+}
+
+function copyList(arr, label) {
+  if (!arr || !arr.length) return;
+  const text = arr.join('\\n');
+  navigator.clipboard.writeText(text).then(() => {
+    showToast(arr.length + ' ' + label + ' copied to clipboard!', 'ok');
+  }).catch(() => {
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    showToast(arr.length + ' ' + label + ' copied!', 'ok');
+  });
+}
+
+function openModal(src){
+  document.getElementById('modal-img').src=src;
+  document.getElementById('modal').classList.add('open');
+}
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape'){
+    document.getElementById('modal').classList.remove('open');
+    closeConfirm();
+  }
+});
+
+function showToast(msg, type='ok'){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast ' + type + ' show';
+  setTimeout(()=>t.classList.remove('show'), 3500);
+}
+
+function confirmDelete(idx){
+  _pendingDeleteIdx = idx;
+  document.getElementById('confirm-overlay').classList.add('open');
+}
+function closeConfirm(){
+  document.getElementById('confirm-overlay').classList.remove('open');
+  _pendingDeleteIdx = null;
+}
+async function doDelete(){
+  const idx = _pendingDeleteIdx;
+  closeConfirm();
+  if (idx === null || !JOB_ID) return;
+  await deleteResult(idx);
+}
+async function deleteResult(idx){
+  if (!JOB_ID) { showToast('No job ID — open via dashboard', 'err'); return; }
+  const card = document.getElementById('rcard-' + idx);
+  if (card) card.classList.add('removing');
+  try {
+    const r = await fetch(`${API}/api/jobs/${JOB_ID}/leads/${LEAD_IDX}/results/${idx}/delete`,
+                          {method:'POST'});
+    const d = await r.json();
+    if (r.ok) {
+      setTimeout(()=>{ if(card) card.remove(); updateCount(-1); }, 250);
+      showToast('Result deleted permanently', 'ok');
+    } else {
+      if (card) card.classList.remove('removing');
+      showToast(d.error || 'Delete failed', 'err');
+    }
+  } catch(e) {
+    if (card) card.classList.remove('removing');
+    showToast('Network error: ' + (e.message || e), 'err');
+  }
+}
+async function archiveResult(idx){
+  if (!JOB_ID) { showToast('No job ID — open via dashboard', 'err'); return; }
+  const card = document.getElementById('rcard-' + idx);
+  if (card) {
+    card.style.transition = '0.25s all';
+    card.style.opacity = '0.3';
+    card.style.transform = 'scale(0.98)';
+  }
+  showToast('Updating status...', 'ok');
+  try {
+    const r = await fetch(`${API}/api/jobs/${JOB_ID}/leads/${LEAD_IDX}/results/${idx}/archive`,
+                          {method:'POST'});
+    const d = await r.json();
+    if (r.ok) {
+      showToast('Marked as Not This Person', 'ok');
+      setTimeout(()=>{
+        const u = new URL(window.location.href);
+        u.searchParams.set('_t', Date.now());
+        window.location.replace(u.href);
+      }, 300);
+    } else {
+      if (card) { card.style.opacity = '1'; card.style.transform = 'none'; }
+      showToast(d.error || 'Archive failed', 'err');
+    }
+  } catch(e) {
+    if (card) { card.style.opacity = '1'; card.style.transform = 'none'; }
+    showToast('Network error: ' + (e.message || e), 'err');
+  }
+}
+async function unarchiveResult(idx){
+  if (!JOB_ID) return;
+  const card = document.getElementById('rcard-' + idx);
+  if (card) {
+    card.style.transition = '0.25s all';
+    card.style.opacity = '0.3';
+  }
+  showToast('Restoring result...', 'ok');
+  try {
+    const r = await fetch(`${API}/api/jobs/${JOB_ID}/leads/${LEAD_IDX}/results/${idx}/unarchive`,
+                          {method:'POST'});
+    const d = await r.json();
+    if (r.ok) {
+      showToast('Result restored', 'ok');
+      setTimeout(()=>{
+        const u = new URL(window.location.href);
+        u.searchParams.set('_t', Date.now());
+        window.location.replace(u.href);
+      }, 300);
+    } else {
+      if (card) { card.style.opacity = '1'; card.style.transform = 'none'; }
+      showToast(d.error || 'Restore failed', 'err');
+    }
+  } catch(e) {
+    if (card) { card.style.opacity = '1'; card.style.transform = 'none'; }
+    showToast('Network error: ' + (e.message || e), 'err');
+  }
+}
+function setAllCards(expanded) {
+  document.querySelectorAll('details.rcard:not(.archived-card)').forEach(d => d.open = expanded);
+}
+function setDefaultPref(pref) {
+  localStorage.setItem('leadsosint_default_view', pref);
+  showToast('Default view saved: ' + (pref === 'expanded' ? 'Expanded' : 'Collapsed'), 'ok');
+  setAllCards(pref === 'expanded');
+}
+(function() {
+  const pref = localStorage.getItem('leadsosint_default_view') || 'collapsed';
+  if (pref === 'expanded') {
+    const el = document.getElementById('pref-expanded');
+    if (el) el.checked = true;
+    setAllCards(true);
+  } else {
+    const el = document.getElementById('pref-collapsed');
+    if (el) el.checked = true;
+    setAllCards(false);
+  }
+})();
+function updateCount(delta){
+  const el = document.getElementById('active-count');
+  if (el) el.textContent = Math.max(0, parseInt(el.textContent||'0') + delta);
+}
+async function redoReportLead(jobId, idx){
+  if (!confirm('Re-run search for this lead now?')) return;
+  try {
+    const r = await fetch(`${API}/api/jobs/${jobId}/leads/${idx}/retry`, {method:'POST'});
+    if (r.ok) {
+      showToast('Re-starting search...', 'ok');
+      setTimeout(()=>location.reload(), 2000);
+    } else {
+      const d = await r.json().catch(()=>({}));
+      showToast(d.error || 'Retry error', 'err');
+    }
+  } catch(e) {
+    showToast('Network error: ' + (e.message || e), 'err');
+  }
+}
+</script>
+</body></html>

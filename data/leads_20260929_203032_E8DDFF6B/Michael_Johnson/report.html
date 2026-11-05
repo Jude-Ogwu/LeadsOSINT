@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Michael Johnson — LeadsOSINT</title>
+<style>
+:root{--bg:#0d0f1a;--surface:#1a1d3a;--surface2:#22264a;--border:#3a3f7a;--accent:#a78bfa;--accent2:#6d28d9;--text:#e0e6ff;--muted:#8b95c4;--green:#34d399;--red:#f87171}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:"Segoe UI",system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+a{color:var(--accent);text-decoration:none}
+
+/* Header */
+.top-bar{background:linear-gradient(135deg,#1a1d3a,#0d0f1a);border-bottom:1px solid var(--border);padding:20px 40px;display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.back-btn{background:var(--surface2);border:1px solid var(--border);color:var(--accent);padding:10px 20px;border-radius:10px;display:inline-flex;align-items:center;gap:8px;transition:.2s;font-size:.9rem}
+.back-btn:hover{border-color:var(--accent);background:var(--accent2);color:#fff}
+.top-title{flex:1}
+.top-title h1{font-size:1.6rem;color:#fff;font-weight:700}
+.top-title p{color:var(--muted);font-size:.85rem;margin-top:4px}
+
+/* Stats */
+.stats-row{display:flex;gap:16px;padding:24px 40px;flex-wrap:wrap;background:var(--surface);border-bottom:1px solid var(--border)}
+.stat-pill{background:var(--bg);border:1px solid var(--border);border-radius:12px;padding:14px 24px;text-align:center;min-width:110px}
+.stat-pill.highlight{border-color:var(--accent);background:rgba(167,139,250,.08)}
+.sp-val{font-size:1.6rem;font-weight:800;color:var(--accent)}
+.sp-lbl{font-size:.75rem;color:var(--muted);margin-top:3px;text-transform:uppercase;letter-spacing:.5px}
+
+/* Content */
+.content{padding:32px 40px;max-width:1400px;margin:0 auto}
+
+/* Result cards */
+.rcard{background:var(--surface);border:1px solid var(--border);border-radius:18px;margin-bottom:28px;overflow:hidden;transition:.25s all}
+.rcard:hover{border-color:var(--accent);transform:translateY(-3px);box-shadow:0 12px 40px rgba(109,40,217,.2)}
+.rcard-header{background:linear-gradient(135deg,var(--surface2),var(--surface));padding:16px 28px;display:flex;align-items:center;gap:16px;border-bottom:1px solid var(--border);flex-wrap:wrap}
+.rnum{background:linear-gradient(135deg,var(--accent2),var(--accent));color:#fff;font-size:.8rem;font-weight:700;padding:5px 14px;border-radius:20px;letter-spacing:.5px}
+.rname{font-size:1.2rem;font-weight:700;color:#fff;flex:1}
+.profile-btn{background:linear-gradient(135deg,#4c3d8f,var(--accent2));color:#fff;padding:10px 22px;border-radius:10px;font-size:.875rem;font-weight:600;transition:.2s;white-space:nowrap}
+.profile-btn:hover{background:linear-gradient(135deg,var(--accent2),var(--accent));transform:translateY(-1px);box-shadow:0 6px 20px rgba(109,40,217,.4);color:#fff}
+.rcard-body{display:flex;gap:32px;padding:28px;flex-wrap:wrap}
+.rinfo{flex:1;min-width:280px}
+.field-row{margin-bottom:16px;display:flex;gap:12px;align-items:flex-start}
+.fl{color:var(--muted);font-size:.75rem;text-transform:uppercase;letter-spacing:.5px;min-width:100px;padding-top:3px}
+.fv{color:var(--text);font-size:1rem;font-weight:500}
+.fname{font-size:1.15rem;font-weight:700;color:#fff}
+.addrs{display:flex;flex-direction:column;gap:6px}
+.addr-item{color:#c4caf0;font-size:.9rem;padding:5px 10px;background:rgba(255,255,255,.04);border-radius:8px;border:1px solid var(--border)}
+.url-link{color:#60a5fa;font-size:.85rem;word-break:break-all;text-decoration:underline}
+.url-link:hover{color:var(--accent)}
+
+/* Screenshot */
+.ss-wrap{flex:0 0 340px;display:flex;flex-direction:column;align-items:center}
+.ss-thumb{width:100%;border-radius:12px;border:2px solid var(--border);cursor:pointer;transition:.2s;display:block}
+.ss-thumb:hover{border-color:var(--accent);transform:scale(1.02);box-shadow:0 8px 30px rgba(167,139,250,.3)}
+.ss-label{color:var(--muted);font-size:.8rem;margin-top:10px;text-align:center}
+.ss-btn{margin-top:12px;background:var(--surface2);border:1px solid var(--border);color:var(--accent);padding:10px 20px;border-radius:10px;cursor:pointer;font-size:.85rem;transition:.2s;width:100%;text-align:center}
+.ss-btn:hover{border-color:var(--accent);background:rgba(167,139,250,.1)}
+
+.empty-state{background:var(--surface);border:2px dashed var(--border);border-radius:18px;padding:60px;text-align:center;color:var(--muted);font-size:1.1rem}
+
+/* Modal */
+.modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.95);z-index:9999;justify-content:center;align-items:center;padding:20px;cursor:zoom-out}
+.modal.open{display:flex}
+.modal-img{max-width:95vw;max-height:90vh;border-radius:14px;border:2px solid var(--accent);box-shadow:0 0 60px rgba(167,139,250,.3);cursor:default}
+.modal-x{position:fixed;top:20px;right:30px;color:var(--accent);font-size:2.5rem;cursor:pointer;z-index:10000;line-height:1;transition:.2s}
+.modal-x:hover{color:#fff;transform:scale(1.1)}
+</style>
+</head>
+<body>
+<div class="top-bar">
+    <a href="../index.html" class="back-btn">← All Leads</a>
+    <div class="top-title">
+        <h1>🔍 Michael Johnson</h1>
+        <p>Location: Not specified &nbsp;·&nbsp; September 29, 2026 · 08:35 PM</p>
+    </div>
+</div>
+
+<div class="stats-row">
+    <div class="stat-pill highlight">
+        <div class="sp-val">10</div>
+        <div class="sp-lbl">Results Found</div>
+    </div>
+    <div class="stat-pill">
+        <div class="sp-val" style="color:var(--green)">
+            ✓ Found</div>
+        <div class="sp-lbl">Status</div>
+    </div>
+    <div class="stat-pill">
+        <div class="sp-val" style="font-size:1rem">N/A</div>
+        <div class="sp-lbl">Location</div>
+    </div>
+</div>
+
+<div class="content">
+
+        <div class="rcard" id="result-1">
+            <div class="rcard-header">
+                <span class="rnum">#1</span>
+                <span class="rname">Michael Johnson</span>
+                <a href="https://www.fastpeoplesearch.com/michael-johnson_id_G-7368341828805218967" target="_blank" class="profile-btn">🔗 View Profile</a>
+            </div>
+            <div class="rcard-body">
+                <div class="rinfo">
+                    <div class="field-row"><span class="fl">Full Name</span><span class="fv fname">Michael Johnson</span></div>
+                    <div class="field-row"><span class="fl">Age</span><span class="fv">N/A</span></div>
+                    <div class="field-row"><span class="fl">City / State</span><span class="fv">N/A</span></div>
+                    <div class="field-row"><span class="fl">Address(es)</span>
+                        <div class="addrs"><div class="addr-item">📍 562 Metomen St, RIPON WI 54971</div><div class="addr-item">📍 718 E Rosewood St, WATSEKA IL 60970</div><div class="addr-item">📍 W2940 County Road Cc, GREEN LAKE WI 54941</div><div class="addr-item">📍 2200 N Vermilion St Unit 305, DANVILLE IL 61832</div></div></div>
+                    <div class="field-row"><span class="fl">Phone</span><span class="fv">N/A</span></div>
+                    <div class="field-row"><span class="fl">Profile URL</span>
+                        <a href="https://www.fastpeoplesearch.com/michael-johnson_id_G-7368341828805218967" target="_blank" class="url-link">https://www.fastpeoplesearch.com/michael-johnson_id_G-7368341828805218967</a></div>
+                </div>
+                <div class="ss-wrap">
+                <img src="result_1.png" class="ss-thumb" onclick="openModal('result_1.png')" title="Click to view full screenshot">
+                <div class="ss-label">📸 Click to view full screenshot</div>
+            </div>
+            </div>
+        </div>
+        <div class="rcard" id="result-2">
+            <div class="rcard-header">
+                <span class="rnum">#2</span>
+                <span class="rname">Michael Johnson</span>
+                <a href="https://www.fastpeoplesearch.com/michael-johnson_id_G-4954163803068876403" target="_blank" class="profile-btn">🔗 View Profile</a>
+            </div>
+            <div class="rcard-body">
+                <div class="rinfo">
+                    <div class="field-row"><span class="fl">Full Name</span><span class="fv fname">Michael Johnson</span></div>
+                    <div class="field-row"><span class="fl">Age</span><span class="fv">N/A</span></div>
+                    <div class="field-row"><span class="fl">City / State</span><span class="fv">N/A</span></div>
+                    <div class="field-row"><span class="fl">Address(es)</span>
+                        <div class="addrs"><div class="addr-item">📍 68 Covert St, KEARNEYSVILLE WV 25430</div><div class="addr-item">📍 530 Bradford St, BROOKLYN NY 11207</div><div class="addr-item">📍 530 Herzl St Unit A1, BROOKLYN NY 11212</div><div class="addr-item">📍 6480 Kissena Blvd, FLUSHING NY 11367</div></div></div>
+                    <div class="field-row"><span class="fl">Phone</span><span class="fv">N/A</span></div>
+                    <div class="field-row"><span class="fl">Profile URL</span>
+                        <a href="https://www.fastpeoplesearch.com/michael-johnson_id_G-4954163803068876403" target="_blank" class="url-link">https://www.fastpeoplesearch.com/michael-johnson_id_G-4954163803068876403</a></div>
+                </div>
+                <div class="ss-wrap">
+                <img src="result_2.png" class="ss-thumb" onclick="openModal('result_2.png')" title="Click to view full screenshot">
+                <div class="ss-label">📸 Click to view full screenshot</div>
+            </div>
+            </div>
+        </div>
+        <div class="rcard" id="result-3">
+            <div class="rcard-header">
+                <span class="rnum">#3</span>
+                <span class="rname">Michael Johnson</span>
+                <a href="https://www.fastpeoplesearch.com/michael-johnson_id_G-3436838361796014391" target="_blank" class="profile-btn">🔗 View Profile</a>
+            </div>
+            <div class="rcard-body">
+                <div class="rinfo">
+                    <div class="field-row"><span class="fl">Full Name</span><span class="fv fname">Michael Johnson</span></div>
+                    <div class="field-row"><span class="fl">Age</span><span class="fv">N/A</span></div>
+                    <div class="field-row"><span class="fl">City / State</span><span class="fv">N/A</span></div>
+                    <div class="field-row"><span class="fl">Address(es)</span>
+                        <div class="addrs"><div class="addr-item">📍 717 Mavor St, SPRINGFIELD OH 45505</div><div class="addr-item">📍 1441 Obenchain Ave, SPRINGFIELD OH 45503</div><div class="addr-item">📍 3650 E National Rd Unit 10, SPRINGFIELD OH 45505</div><div class="addr-item">📍 3650 E National Rd Unit 14, SPRINGFIELD OH 45505</div></div></div>
+                    <div class="field-row"><span class="fl">Phone</span><span class="fv">N/A</span></div>
+                    <div class="field-row"><span class="fl">Profile URL</span>
+                        <a href="https://www.fastpeoplesearch.com/michael-johnson_id_G-3436838361796014391" target="_blank" class="url-link">https://www.fastpeoplesearch.com/michael-johnson_id_G-3436838361796014391</a></div>
+                </div>
+                <div class="ss-wrap">
+                <img src="result_3.png" class="ss-thumb" onclick="openModal('result_3.png')" title="Click to view full screenshot">
+                <div class="ss-label">📸 Click to view full screenshot</div>
+            </div>
+            </div>
+        </div>
+        <div class="rcard" id="result-4">
+            <div class="rcard-header">
+                <span class="rnum">#4</span>
+                <span class="rname">Michael Johnson</span>
+                <a href="https://www.fastpeoplesearch.com/michael-johnson_id_G-1258050182917987989" target="_blank" class="profile-btn">🔗 View Profile</a>
+            </div>
+            <div class="rcard-body">
+                <div class="rinfo">
+                    <div class="field-row"><span class="fl">Full Name</span><span class="fv fname">Michael Johnson</span></div>
+                    <div class="field-row"><span class="fl">Age</span><span class="fv">N/A</span></div>
+                    <div class="field-row"><span class="fl">City / State</span><span class="fv">N/A</span></div>
+                    <div class="field-row"><span class="fl">Address(es)</span>
+                        <div class="addrs"><div class="addr-item">📍 4525 Golf Dr, WATERFORD WI 53185</div><div class="addr-item">📍 2444 S 6Th St, MILWAUKEE WI 53215</div><div class="addr-item">📍 7919 Daniel Ct, MOUNT PLEASANT WI 53406</div><div class="addr-item">📍 2538 S 7Th St, MILWAUKEE WI 53215</div></div></div>
+                    <div class="field-row"><span class="fl">Phone</span><span class="fv">N/A</span></div>
+                    <div class="field-row"><span class="fl">Profile URL</span>
+                        <a href="https://www.fastpeoplesearch.com/michael-johnson_id_G-1258050182917987989" target="_blank" class="url-link">https://www.fastpeoplesearch.com/michael-johnson_id_G-1258050182917987989</a></div>
+                </div>
+                <div class="ss-wrap">
+                <img src="result_4.png" class="ss-thumb" onclick="openModal('result_4.png')" title="Click to view full screenshot">
+                <div class="ss-label">📸 Click to view full screenshot</div>
+            </div>
+            </div>
+        </div>
+        <div class="rcard" id="result-5">
+            <div class="rcard-header">
+                <span class="rnum">#5</span>
+                <span class="rname">Michael Johnson</span>
+                <a href="https://www.fastpeoplesearch.com/michael-johnson_id_G8330319912250275718" target="_blank" class="profile-btn">🔗 View Profile</a>
+            </div>
+            <div class="rcard-body">
+                <div class="rinfo">
+                    <div class="field-row"><span class="fl">Full Name</span><span class="fv fname">Michael Johnson</span></div>
+                    <div class="field-row"><span class="fl">Age</span><span class="fv">N/A</span></div>
+                    <div class="field-row"><span class="fl">City / State</span><span class="fv">N/A</span></div>
+                    <div class="field-row"><span class="fl">Address(es)</span>
+                        <div class="addrs"><div class="addr-item">📍 37 N Randolphville Rd, PISCATAWAY NJ 08854</div><div class="addr-item">📍 115 Stanton Ave, PISCATAWAY NJ 08854</div><div class="addr-item">📍 173 Forest Dr, PISCATAWAY NJ 08854</div><div class="addr-item">📍 1049 Brentwood Dr Unit 105, DAYTONA BEACH FL 32117</div></div></div>
+                    <div class="field-row"><span class="fl">Phone</span><span class="fv">N/A</span></div>
+                    <div class="field-row"><span class="fl">Profile URL</span>
+                        <a href="https://www.fastpeoplesearch.com/michael-johnson_id_G8330319912250275718" target="_blank" class="url-link">https://www.fastpeoplesearch.com/michael-johnson_id_G8330319912250275718</a></div>
+                </div>
+                <div class="ss-wrap">
+                <img src="result_5.png" class="ss-thumb" onclick="openModal('result_5.png')" title="Click to view full screenshot">
+                <div class="ss-label">📸 Click to view full screenshot</div>
+            </div>
+            </div>
+        </div>
+        <div class="rcard" id="result-6">
+            <div class="rcard-header">
+                <span class="rnum">#6</span>
+                <span class="rname">Michael Johnson</span>
+                <a href="https://www.fastpeoplesearch.com/michael-johnson_id_G1697603886831299138" target="_blank" class="profile-btn">🔗 View Profile</a>
+            </div>
+            <div class="rcard-body">
+                <div class="rinfo">
+                    <div class="field-row"><span class="fl">Full Name</span><span class="fv fname">Michael Johnson</span></div>
+                    <div class="field-row"><span class="fl">Age</span><span class="fv">N/A</span></div>
+                    <div class="field-row"><span class="fl">City / State</span><span class="fv">N/A</span></div>
+                    <div class="field-row"><span class="fl">Address(es)</span>
+                        <div class="addrs"><div class="addr-item">📍 1736 Harmony Grove Church Rd, ACWORTH GA 30101</div><div class="addr-item">📍 725 Harmony Grove Church Rd, ACWORTH GA 30101</div><div class="addr-item">📍 31 Evening Mist Dr, ACWORTH GA 30101</div><div class="addr-item">📍 1356 Bentwater Dr, ACWORTH GA 30101</div></div></div>
+                    <div class="field-row"><span class="fl">Phone</span><span class="fv">N/A</span></div>
+                    <div class="field-row"><span class="fl">Profile URL</span>
+                        <a href="https://www.fastpeoplesearch.com/michael-johnson_id_G1697603886831299138" target="_blank" class="url-link">https://www.fastpeoplesearch.com/michael-johnson_id_G1697603886831299138</a></div>
+                </div>
+                <div class="ss-wrap">
+                <img src="result_6.png" class="ss-thumb" onclick="openModal('result_6.png')" title="Click to view full screenshot">
+                <div class="ss-label">📸 Click to view full screenshot</div>
+            </div>
+            </div>
+        </div>
+        <div class="rcard" id="result-7">
+            <div class="rcard-header">
+                <span class="rnum">#7</span>
+                <span class="rname">Michaele Johnson</span>
+                <a href="https://www.fastpeoplesearch.com/michaele-johnson_id_G-4133347658580477121" target="_blank" class="profile-btn">🔗 View Profile</a>
+            </div>
+            <div class="rcard-body">
+                <div class="rinfo">
+                    <div class="field-row"><span class="fl">Full Name</span><span class="fv fname">Michaele Johnson</span></div>
+                    <div class="field-row"><span class="fl">Age</span><span class="fv">N/A</span></div>
+                    <div class="field-row"><span class="fl">City / State</span><span class="fv">N/A</span></div>
+                    <div class="field-row"><span class="fl">Address(es)</span>
+                        <div class="addrs"><div class="addr-item">📍 1751 Firehouse Ln Unit 201, ORLANDO FL 32814</div><div class="addr-item">📍 3110 W Napoleon Ave, TAMPA FL 33611</div><div class="addr-item">📍 2291 Snow Rd Unit 4, ORLANDO FL 32814</div><div class="addr-item">📍 2415 Upper Park Rd, ORLANDO FL 32814</div></div></div>
+                    <div class="field-row"><span class="fl">Phone</span><span class="fv">N/A</span></div>
+                    <div class="field-row"><span class="fl">Profile URL</span>
+                        <a href="https://www.fastpeoplesearch.com/michaele-johnson_id_G-4133347658580477121" target="_blank" class="url-link">https://www.fastpeoplesearch.com/michaele-johnson_id_G-4133347658580477121</a></div>
+                </div>
+                <div class="ss-wrap">
+                <img src="result_7.png" class="ss-thumb" onclick="openModal('result_7.png')" title="Click to view full screenshot">
+                <div class="ss-label">📸 Click to view full screenshot</div>
+            </div>
+            </div>
+        </div>
+        <div class="rcard" id="result-8">
+            <div class="rcard-header">
+                <span class="rnum">#8</span>
+                <span class="rname">Mickey Johnson</span>
+                <a href="https://www.fastpeoplesearch.com/mickey-johnson_id_G-1717237583277543246" target="_blank" class="profile-btn">🔗 View Profile</a>
+            </div>
+            <div class="rcard-body">
+                <div class="rinfo">
+                    <div class="field-row"><span class="fl">Full Name</span><span class="fv fname">Mickey Johnson</span></div>
+                    <div class="field-row"><span class="fl">Age</span><span class="fv">N/A</span></div>
+                    <div class="field-row"><span class="fl">City / State</span><span class="fv">N/A</span></div>
+                    <div class="field-row"><span class="fl">Address(es)</span>
+                        <div class="addrs"><div class="addr-item">📍 8 Wilson Ln, RAY CITY GA 31645</div><div class="addr-item">📍 35 Knowles Rd, RAY CITY GA 31645</div><div class="addr-item">📍 273 Bear Creek Rd, NORMAN PARK GA 31771</div><div class="addr-item">📍 4075 Hempstead Church Rd, MOULTRIE GA 31788</div></div></div>
+                    <div class="field-row"><span class="fl">Phone</span><span class="fv">N/A</span></div>
+                    <div class="field-row"><span class="fl">Profile URL</span>
+                        <a href="https://www.fastpeoplesearch.com/mickey-johnson_id_G-1717237583277543246" target="_blank" class="url-link">https://www.fastpeoplesearch.com/mickey-johnson_id_G-1717237583277543246</a></div>
+                </div>
+                <div class="ss-wrap">
+                <img src="result_8.png" class="ss-thumb" onclick="openModal('result_8.png')" title="Click to view full screenshot">
+                <div class="ss-label">📸 Click to view full screenshot</div>
+            </div>
+            </div>
+        </div>
+        <div class="rcard" id="result-9">
+            <div class="rcard-header">
+                <span class="rnum">#9</span>
+                <span class="rname">Mikel Johnson</span>
+                <a href="https://www.fastpeoplesearch.com/mikel-johnson_id_G160468158084379325" target="_blank" class="profile-btn">🔗 View Profile</a>
+            </div>
+            <div class="rcard-body">
+                <div class="rinfo">
+                    <div class="field-row"><span class="fl">Full Name</span><span class="fv fname">Mikel Johnson</span></div>
+                    <div class="field-row"><span class="fl">Age</span><span class="fv">N/A</span></div>
+                    <div class="field-row"><span class="fl">City / State</span><span class="fv">N/A</span></div>
+                    <div class="field-row"><span class="fl">Address(es)</span>
+                        <div class="addrs"><div class="addr-item">📍 860 S High School Rd, INDIANAPOLIS IN 46241</div><div class="addr-item">📍 1760 Brassica Ln, INDIANAPOLIS IN 46217</div><div class="addr-item">📍 8720 Legion Ln, INDIANAPOLIS IN 46231</div><div class="addr-item">📍 202 S Spring St, GREENCASTLE IN 46135</div></div></div>
+                    <div class="field-row"><span class="fl">Phone</span><span class="fv">N/A</span></div>
+                    <div class="field-row"><span class="fl">Profile URL</span>
+                        <a href="https://www.fastpeoplesearch.com/mikel-johnson_id_G160468158084379325" target="_blank" class="url-link">https://www.fastpeoplesearch.com/mikel-johnson_id_G160468158084379325</a></div>
+                </div>
+                <div class="ss-wrap">
+                <img src="result_9.png" class="ss-thumb" onclick="openModal('result_9.png')" title="Click to view full screenshot">
+                <div class="ss-label">📸 Click to view full screenshot</div>
+            </div>
+            </div>
+        </div>
+        <div class="rcard" id="result-10">
+            <div class="rcard-header">
+                <span class="rnum">#10</span>
+                <span class="rname">Michael Watts</span>
+                <a href="https://www.fastpeoplesearch.com/michael-watts_id_G-7883688060392071069" target="_blank" class="profile-btn">🔗 View Profile</a>
+            </div>
+            <div class="rcard-body">
+                <div class="rinfo">
+                    <div class="field-row"><span class="fl">Full Name</span><span class="fv fname">Michael Watts</span></div>
+                    <div class="field-row"><span class="fl">Age</span><span class="fv">N/A</span></div>
+                    <div class="field-row"><span class="fl">City / State</span><span class="fv">N/A</span></div>
+                    <div class="field-row"><span class="fl">Address(es)</span>
+                        <div class="addrs"><div class="addr-item">📍 1615 S Clinton Ave, DALLAS TX 75224</div><div class="addr-item">📍 1924 Rosa Parks Blvd, LANCASTER TX 75146</div><div class="addr-item">📍 603 Seagaze Dr Unit 727, OCEANSIDE CA 92054</div><div class="addr-item">📍 6004 Kimberly Ln, BRENHAM TX 77833</div></div></div>
+                    <div class="field-row"><span class="fl">Phone</span><span class="fv">N/A</span></div>
+                    <div class="field-row"><span class="fl">Profile URL</span>
+                        <a href="https://www.fastpeoplesearch.com/michael-watts_id_G-7883688060392071069" target="_blank" class="url-link">https://www.fastpeoplesearch.com/michael-watts_id_G-7883688060392071069</a></div>
+                </div>
+                <div class="ss-wrap">
+                <img src="result_10.png" class="ss-thumb" onclick="openModal('result_10.png')" title="Click to view full screenshot">
+                <div class="ss-label">📸 Click to view full screenshot</div>
+            </div>
+            </div>
+        </div>
+</div>
+
+<div class="modal" id="modal" onclick="closeModal(event)">
+    <span class="modal-x" onclick="document.getElementById('modal').classList.remove('open')">✕</span>
+    <img id="modal-img" src="" class="modal-img" onclick="event.stopPropagation()">
+</div>
+
+<script>
+function openModal(src){
+    document.getElementById('modal-img').src = src;
+    document.getElementById('modal').classList.add('open');
+}
+function closeModal(e){
+    if(e.target===document.getElementById('modal'))
+        document.getElementById('modal').classList.remove('open');
+}
+document.addEventListener('keydown', e => {
+    if(e.key==='Escape') document.getElementById('modal').classList.remove('open');
+});
+</script>
+</body>
+</html>

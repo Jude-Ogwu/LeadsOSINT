@@ -10,7 +10,7 @@ import hashlib
 import uuid
 from datetime import datetime, timedelta
 
-DB_DIR = os.environ.get("DB_DIR", r"C:\Users\JUDE\OSINT_Reports" if os.name == 'nt' else os.path.join(os.path.dirname(__file__), 'data'))
+DB_DIR = os.environ.get("DB_DIR", os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data'))
 os.makedirs(DB_DIR, exist_ok=True)
 DB_PATH = os.path.join(DB_DIR, "leadsosint.db")
 
@@ -176,6 +176,37 @@ def init_db():
             # Ensure admin has access_key populated
             cursor.execute("UPDATE users SET access_key = 'AdminOSINT2026!' WHERE username = 'admin' AND (access_key IS NULL OR access_key = '')")
             conn.commit()
+
+        # Seed beta/tester users from beta_users.json if present
+        beta_seed_path = os.path.join(os.path.dirname(__file__), 'beta_users.json')
+        if os.path.exists(beta_seed_path):
+            import json as _json
+            try:
+                with open(beta_seed_path, 'r') as _f:
+                    beta_users = _json.load(_f)
+                for bu in beta_users:
+                    _uname = bu.get('username', '').strip()
+                    _pw    = bu.get('password', '').strip()
+                    _leads = int(bu.get('leads', 50))
+                    _role  = bu.get('role', 'user')
+                    _plan  = bu.get('plan', f'{_leads} Leads')
+                    if not _uname or not _pw:
+                        continue
+                    cursor.execute("SELECT id FROM users WHERE username = ?", (_uname,))
+                    if cursor.fetchone():
+                        continue  # already exists, skip
+                    _now = datetime.now()
+                    _exp = (_now + timedelta(days=3650)).isoformat()
+                    cursor.execute('''
+                        INSERT INTO users (username, password_hash, access_key, role, plan, status, created_at, expires_at,
+                                           daily_limit, per_job_limit, plan_total_limit, total_usage, today_usage, last_usage_date)
+                        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0, 0, ?)
+                    ''', (_uname, hash_pw(_pw), _pw, _role, _plan, 'active',
+                          _now.isoformat(), _exp, _leads, _leads, _leads,
+                          _now.strftime('%Y-%m-%d')))
+                conn.commit()
+            except Exception:
+                pass  # never crash startup due to bad seed file
 
 def create_user(username, password, leads_allocated=50, role='user', plan=None):
     """Admin function to create a new user with a specific lead allowance."""

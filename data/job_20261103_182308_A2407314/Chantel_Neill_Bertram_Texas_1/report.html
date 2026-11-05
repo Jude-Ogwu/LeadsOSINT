@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Chantel Neill — LeadsOSINT</title>
+<style>
+:root{--bg:#0d0f1a;--s:#1a1d3a;--s2:#22264a;--bd:#3a3f7a;--ac:#a78bfa;--ac2:#6d28d9;
+      --tx:#e0e6ff;--mt:#8b95c4;--gn:#34d399;--rd:#f87171;--bl:#60a5fa;--yw:#fbbf24}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:"Segoe UI",system-ui,sans-serif;background:var(--bg);color:var(--tx);min-height:100vh}
+.topbar{background:linear-gradient(135deg,#1a1d3a,#0d0f1a);border-bottom:1px solid var(--bd);
+         padding:18px 40px;display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.back{background:var(--s2);border:1px solid var(--bd);color:var(--ac);padding:9px 18px;
+       border-radius:9px;font-size:.85rem;text-decoration:none;transition:.2s}
+.back:hover{border-color:var(--ac);background:var(--ac2);color:#fff}
+.ttl h1{font-size:1.5rem;color:#fff;font-weight:700}
+.ttl p{color:var(--mt);font-size:.8rem;margin-top:3px}
+.social-top-btn{background:linear-gradient(135deg,#2563eb,#60a5fa);color:#fff;padding:8px 16px;border-radius:9px;font-size:.82rem;font-weight:700;text-decoration:none;transition:.2s;box-shadow:0 4px 14px rgba(37,99,235,.3)}
+.social-top-btn:hover{transform:translateY(-1px);color:#fff;box-shadow:0 6px 20px rgba(96,165,250,.4)}
+.stats{display:flex;gap:14px;padding:20px 40px;background:var(--s);border-bottom:1px solid var(--bd);flex-wrap:wrap}
+.sp{background:var(--bg);border:1px solid var(--bd);border-radius:10px;
+     padding:12px 20px;text-align:center}
+.sp.hi{border-color:var(--ac);background:rgba(167,139,250,.07)}
+.sv{font-size:1.4rem;font-weight:800;color:var(--ac)}
+.sl{font-size:.7rem;color:var(--mt);text-transform:uppercase;letter-spacing:.5px;margin-top:2px}
+.content{padding:28px 40px;max-width:1400px;margin:0 auto}
+.rcard{background:var(--s);border:1px solid var(--bd);border-radius:16px;
+        margin-bottom:24px;overflow:hidden;transition:.4s all}
+.rcard:hover{border-color:var(--ac);transform:translateY(-2px);
+              box-shadow:0 10px 36px rgba(109,40,217,.2)}
+.rcard.removing{opacity:0;transform:translateY(-12px) scale(.97);pointer-events:none}
+.archived-card{opacity:.55;border-style:dashed;filter:grayscale(.3)}
+.rcard-hdr{background:linear-gradient(135deg,var(--s2),var(--s));padding:16px 24px;
+            display:flex;align-items:center;gap:14px;border-bottom:1px solid var(--bd);flex-wrap:wrap;cursor:pointer;list-style:none}
+.rcard-hdr::-webkit-details-marker{display:none}
+.rnum{background:linear-gradient(135deg,var(--ac2),var(--ac));color:#fff;
+       font-size:.78rem;font-weight:700;padding:4px 12px;border-radius:16px;flex-shrink:0}
+.rname{font-size:1.15rem;font-weight:700;color:#fff;flex:1}
+.rcard-hdr-top{display:flex;align-items:center;justify-content:space-between;width:100%;gap:10px}
+.rname-person{font-size:1.15rem;font-weight:800;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rcard-hdr-meta{display:flex;align-items:center;justify-content:space-between;width:100%;gap:8px;flex-wrap:wrap}
+.rcard-meta-left{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.rcard-meta-pill{font-size:.78rem;color:var(--mt);font-weight:600;display:inline-flex;align-items:center;gap:4px}
+.badge-group{display:flex;gap:6px;align-items:center}
+.badge-tag{background:rgba(167,139,250,.15);border:1px solid rgba(167,139,250,.3);color:var(--ac);font-size:.75rem;padding:3px 8px;border-radius:6px;font-weight:600}
+.expand-indicator{color:var(--ac);font-size:.8rem;font-weight:700;margin-left:8px}
+.arch-tag{background:rgba(251,191,36,.15);border:1px solid rgba(251,191,36,.3);
+           color:var(--yw);font-size:.72rem;padding:3px 10px;border-radius:10px;flex-shrink:0}
+.profile-btn{background:linear-gradient(135deg,#4c3d8f,var(--ac2));color:#fff;
+              padding:8px 16px;border-radius:9px;font-size:.8rem;
+              font-weight:600;text-decoration:none;transition:.2s;flex-shrink:0}
+.profile-btn:hover{background:linear-gradient(135deg,var(--ac2),var(--ac));
+                    transform:translateY(-1px);color:#fff}
+.copy-all-btn{background:linear-gradient(135deg,var(--ac2),var(--ac3));color:#fff;border:none;padding:5px 12px;border-radius:6px;font-size:.75rem;font-weight:600;cursor:pointer;margin-bottom:6px;display:inline-block}
+.copy-all-btn:hover{background:var(--ac2)}
+.copy-item-btn{background:transparent;border:none;color:var(--mt);cursor:pointer;font-size:.8rem;padding:0 4px;margin-left:auto}
+.copy-item-btn:hover{color:var(--ac)}
+.addr-row{color:#c4caf0;font-size:.88rem;padding:6px 12px;
+           background:rgba(255,255,255,.03);border-radius:7px;border:1px solid var(--bd);display:flex;align-items:center;gap:8px}
+.url-link{color:var(--bl);font-size:.82rem;word-break:break-all;text-decoration:underline}
+.url-link:hover{color:var(--ac)}
+.rcard-body{padding:24px 28px;display:flex;gap:24px;align-items:flex-start;flex-wrap:wrap}
+.rinfo{flex:1;min-width:320px;display:flex;flex-direction:column;gap:14px}
+.frow{display:grid;grid-template-columns:140px 1fr;gap:12px;align-items:start;font-size:.92rem}
+.fl{font-weight:700;color:var(--mt);font-size:.85rem;letter-spacing:.3px;padding-top:4px}
+.fv{color:#fff;font-weight:600;line-height:1.5}
+.fname{font-size:1.15rem;color:var(--ac);font-weight:700}
+.bg-report-row{align-items:start}
+.bg-report-box{background:var(--s2);border:1px solid var(--bd);border-radius:10px;padding:12px 14px;display:flex;flex-direction:column;gap:10px}
+.bg-report-hdr{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.bg-report-title{font-weight:700;color:var(--ac);font-size:.88rem;display:flex;align-items:center;gap:6px}
+.bg-report-text{color:var(--tx);font-size:.86rem;line-height:1.6;user-select:text;background:rgba(13,15,26,0.6);padding:10px 12px;border-radius:8px;border:1px solid rgba(255,255,255,0.05);word-break:break-word}
+.ss-wrap{flex:0 0 320px;display:flex;flex-direction:column;align-items:center}
+.ss-thumb{width:100%;border-radius:10px;border:2px solid var(--bd);cursor:pointer;
+           transition:.2s;display:block}
+.ss-thumb:hover{border-color:var(--ac);transform:scale(1.02);
+                 box-shadow:0 6px 24px rgba(167,139,250,.3)}
+.ss-lbl{color:var(--mt);font-size:.78rem;margin-top:8px;text-align:center}
+.ss-missing{color:var(--mt);font-size:.82rem;padding:20px;text-align:center;
+             background:var(--s2);border-radius:10px;border:1px dashed var(--bd)}
+.res-actions{padding:14px 24px;border-top:1px solid var(--bd);
+              display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.res-actions.arch-mode{background:rgba(251,191,36,.04)}
+.res-btn{padding:8px 16px;border-radius:8px;font-size:.8rem;font-weight:600;
+          cursor:pointer;transition:.2s;border:1px solid;background:transparent}
+.arch-btn{border-color:rgba(251,191,36,.5);color:var(--yw);}
+.arch-btn:hover{background:rgba(251,191,36,.1)}
+.del-btn{border-color:rgba(248,113,113,.5);color:var(--rd);}
+.del-btn:hover{background:rgba(248,113,113,.1)}
+.unarch-btn{border-color:rgba(96,165,250,.5);color:var(--bl);}
+.unarch-btn:hover{background:rgba(96,165,250,.1)}
+.arch-label{font-size:.8rem;color:var(--yw);flex:1}
+.arch-section{margin-top:10px;border-radius:14px;border:1px dashed var(--bd);overflow:hidden}
+.arch-section summary{padding:14px 20px;cursor:pointer;color:var(--mt);font-size:.9rem;
+                       font-weight:600;list-style:none;background:var(--s2);
+                       display:flex;align-items:center;gap:8px}
+.arch-section summary:hover{color:var(--tx)}
+.arch-section summary span{font-size:.75rem;font-weight:400;margin-left:auto;color:var(--mt)}
+.arch-inner{padding:16px}
+.empty{background:var(--s);border:2px dashed var(--bd);border-radius:14px;
+        padding:50px;text-align:center;color:var(--mt);font-size:1rem}
+.search-ss-card{background:var(--s);border:1px solid var(--bd);border-radius:16px;margin-bottom:28px;overflow:hidden;box-shadow:0 4px 20px rgba(0,0,0,0.3)}
+.search-ss-hdr{background:linear-gradient(135deg,var(--s2),var(--s));padding:16px 24px;border-bottom:1px solid var(--bd);display:flex;justify-content:space-between;align-items:center}
+.search-ss-title{font-weight:700;color:#fff;font-size:1.05rem}
+.search-ss-sub{font-size:.78rem;color:var(--mt);margin-top:2px}
+.search-ss-body{position:relative;cursor:pointer;max-height:380px;overflow:hidden;background:#0d0f1a}
+.search-ss-img{width:100%;display:block;opacity:.88;transition:.3s all}
+.search-ss-body:hover .search-ss-img{opacity:1;transform:scale(1.005)}
+.search-ss-overlay{position:absolute;bottom:16px;left:50%;transform:translateX(-50%);background:rgba(13,15,26,.88);border:1px solid var(--ac);color:var(--ac);padding:8px 20px;border-radius:20px;font-size:.8rem;font-weight:700;backdrop-filter:blur(6px);pointer-events:none;box-shadow:0 4px 14px rgba(109,40,217,.3)}
+.toast{position:fixed;bottom:24px;right:24px;background:var(--s);
+        border:1px solid var(--bd);border-radius:12px;padding:12px 20px;
+        font-size:.85rem;z-index:999;transform:translateY(60px);opacity:0;
+        transition:.3s;max-width:280px}
+.toast.show{transform:translateY(0);opacity:1}
+.toast.ok{border-color:rgba(52,211,153,.4);color:var(--gn)}
+.toast.err{border-color:rgba(248,113,113,.4);color:var(--rd)}
+.modal{display:none;position:fixed;inset:0;background:#060813;z-index:99999;
+        overflow-y:auto;overflow-x:hidden;padding:70px 20px 40px 20px;-webkit-overflow-scrolling:touch}
+.modal.open{display:block}
+.modal-bar{position:fixed;top:0;left:0;right:0;height:56px;background:rgba(19,23,46,0.96);border-bottom:1px solid var(--bd);display:flex;align-items:center;justify-content:space-between;padding:0 24px;z-index:100000}
+.modal-bar-ttl{font-size:.92rem;font-weight:700;color:#fff;display:flex;align-items:center;gap:8px}
+.modal-bar-actions{display:flex;align-items:center;gap:12px}
+.modal-bar-btn{background:var(--s2);border:1px solid var(--bd);color:var(--tx);padding:7px 16px;border-radius:7px;font-size:.82rem;font-weight:600;cursor:pointer;text-decoration:none;transition:.2s;display:inline-flex;align-items:center;gap:6px}
+.modal-bar-btn:hover{background:var(--ac2);color:#fff;border-color:var(--ac)}
+.modal-wrap{max-width:1040px;margin:10px auto 40px auto;text-align:center;position:relative}
+.modal-img{width:100%;max-width:1040px;height:auto;margin:0 auto;display:none;border-radius:8px;border:1px solid var(--bd);box-shadow:0 12px 48px rgba(0,0,0,0.9);background:#fff}
+.modal-loading{display:none;padding:40px 20px;color:var(--ac);font-weight:700;font-size:1rem}
+.confirm-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.8);
+                  z-index:8888;justify-content:center;align-items:center}
+.confirm-overlay.open{display:flex}
+.confirm-box{background:var(--s);border:1px solid var(--rd);border-radius:18px;
+              padding:32px 36px;max-width:380px;text-align:center}
+.confirm-box h3{color:#fff;margin-bottom:10px;font-size:1.1rem}
+.confirm-box p{color:var(--mt);font-size:.88rem;margin-bottom:24px;line-height:1.6}
+.confirm-btns{display:flex;gap:12px;justify-content:center}
+.cb-cancel{padding:10px 24px;border-radius:9px;border:1px solid var(--bd);
+            background:var(--s2);color:var(--tx);cursor:pointer;font-size:.9rem}
+.cb-delete{padding:10px 24px;border-radius:9px;border:none;
+            background:linear-gradient(135deg,#b91c1c,var(--rd));color:#fff;
+            cursor:pointer;font-size:.9rem;font-weight:700}
+.collapse-toolbar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:18px;flex-wrap:wrap;background:var(--s);padding:12px 20px;border-radius:12px;border:1px solid var(--bd)}
+.tool-btn{background:var(--s2);border:1px solid var(--bd);color:var(--ac);padding:7px 15px;border-radius:8px;font-size:.82rem;font-weight:700;cursor:pointer;transition:.2s}
+.tool-btn:hover{background:var(--ac2);color:#fff;border-color:var(--ac)}
+.view-pref{display:flex;align-items:center;gap:12px;font-size:.82rem;color:var(--mt)}
+.view-pref label{display:inline-flex;align-items:center;gap:6px;cursor:pointer;color:var(--tx);font-weight:600}
+.view-pref input[type="radio"]{accent-color:var(--ac);cursor:pointer}
+.back-to-top{position:fixed;bottom:28px;right:28px;z-index:999;background:linear-gradient(135deg,var(--ac2),var(--ac));color:#fff;border:none;padding:11px 18px;border-radius:30px;font-size:.85rem;font-weight:700;cursor:pointer;box-shadow:0 6px 20px rgba(109,40,217,.4);transition:all .3s ease;opacity:0;pointer-events:none;display:flex;align-items:center;gap:6px}
+.back-to-top.visible{opacity:1;pointer-events:auto;transform:translateY(0)}
+.back-to-top:hover{transform:translateY(-3px);box-shadow:0 10px 25px rgba(109,40,217,.6)}
+.share-modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:99999;justify-content:center;align-items:center;padding:20px;backdrop-filter:blur(6px)}
+.share-modal.open{display:flex}
+.share-box{background:var(--s);border:1px solid var(--bd);border-radius:18px;padding:26px;max-width:480px;width:100%;box-shadow:0 10px 30px rgba(0,0,0,.5)}
+.share-hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.share-hdr h3{color:#fff;font-size:1.15rem}
+.share-close{color:var(--mt);font-size:1.4rem;cursor:pointer}
+.share-close:hover{color:#fff}
+.share-box p{color:var(--mt);font-size:.85rem;margin-bottom:18px;line-height:1.5}
+.share-input-wrap{display:flex;gap:8px;margin-bottom:20px}
+.share-input-wrap input{flex:1;background:var(--s2);border:1px solid var(--bd);border-radius:8px;padding:10px 14px;color:#fff;font-size:.85rem;outline:none}
+.share-copy-btn{background:linear-gradient(135deg,var(--ac2),var(--ac));color:#fff;border:none;border-radius:8px;padding:0 18px;font-weight:700;cursor:pointer;font-size:.85rem}
+.share-socials{display:flex;gap:10px;flex-wrap:wrap}
+.soc-btn{flex:1;min-width:110px;text-align:center;padding:10px;border-radius:8px;font-size:.82rem;font-weight:700;color:#fff;text-decoration:none;transition:.2s}
+.soc-wa{background:#16a34a}
+.soc-tg{background:#0284c7}
+.soc-x{background:#0f172a;border:1px solid var(--bd)}
+.soc-btn:hover{opacity:.9;transform:translateY(-1px)}
+@media (max-width:768px){
+  .topbar{flex-direction:column;align-items:stretch;gap:12px;padding:14px 16px}
+  .topbar > div:last-child{width:100%;justify-content:flex-start;display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:6px}
+  .social-top-btn{width:100%;text-align:center;justify-content:center;padding:7px 10px;font-size:.78rem}
+  /* Compact & beautiful stats bar on mobile */
+  .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(105px,1fr));gap:6px;padding:10px 12px}
+  .sp{padding:8px 10px}
+  .sv{font-size:1.15rem}
+  .sl{font-size:.65rem}
+  .content{padding:14px 10px}
+  .search-ss-hdr{padding:12px 14px}
+  .search-ss-title{font-size:.92rem}
+  .search-ss-body{max-height:180px}
+  .search-ss-overlay{font-size:.72rem;padding:6px 12px;width:90%;text-align:center}
+  .rcard{margin-bottom:14px;border-radius:12px}
+  .rcard-hdr{padding:12px 14px;gap:8px;flex-direction:column;align-items:stretch}
+  .rname-person{font-size:1.05rem}
+  .rcard-meta-pill{font-size:.74rem}
+  .badge-tag{font-size:.7rem;padding:2px 6px}
+  .expand-indicator{font-size:.75rem}
+  .rcard-body{flex-direction:column;padding:14px 12px;gap:14px}
+  .rinfo{min-width:100%}
+  .frow{grid-template-columns:1fr;gap:4px}
+  .fl{font-size:.76rem}
+  .fv{font-size:.85rem}
+  .ss-wrap{width:100%;flex:1 1 100%}
+  .modal{padding:54px 8px 24px 8px}
+  .modal-bar{padding:0 10px;height:48px}
+  .modal-bar-ttl span{display:none}
+  .modal-bar-btn{padding:6px 8px;font-size:.72rem}
+  .modal-wrap{max-width:100%;margin:4px auto 16px auto}
+  .modal-img{width:100%;max-width:100%}
+}
+
+</style></head><body>
+<div class="topbar">
+  <a href="/results/A2407314" class="back" onclick="if(window.location.protocol==='file:'){this.href='../index.html'}">← Back to Job</a>
+  <div class="ttl"><h1>🔍 Chantel Neill</h1>
+    <p>Location: Bertram Texas · November 03, 2026 · 06:24 PM</p></div>
+  <div style="display:flex;gap:8px;margin-left:auto;flex-wrap:wrap">
+    
+    <button class="social-top-btn" style="background:linear-gradient(135deg,#0284c7,#38bdf8);color:#fff;cursor:pointer;border:none" onclick="openShareModal()" title="Share Result">🔗 Share</button>
+    <button class="social-top-btn" style="background:linear-gradient(135deg,#6d28d9,#a78bfa);color:#fff;cursor:pointer;border:none" onclick="redoReportLead('A2407314', 0)" title="Re-run search for this lead">🔄 Re-do Search</button>
+    
+    
+    
+  </div>
+</div>
+<div class="stats">
+  <div class="sp hi"><div class="sv" id="active-count">1</div><div class="sl">Active Results</div></div>
+  <div class="sp"><div class="sv" style="color:var(--gn)">
+    ✓ Found</div><div class="sl">Status</div></div>
+  <div class="sp"><div class="sv" style="font-size:.9rem">Bertram Texas</div>
+    <div class="sl">Location</div></div>
+  <div class="sp"><div class="sv" style="font-size:.85rem"><span style="color:var(--mt)">N/A</span></div>
+    <div class="sl">Social Link</div></div>
+  <div class="sp"><div class="sv" style="font-size:.85rem"><span style="color:var(--mt)">N/A</span></div>
+    <div class="sl">Input Email</div></div>
+  <div class="sp"><div class="sv" style="font-size:.85rem"><span style="color:var(--mt)">N/A</span></div>
+    <div class="sl">Input Phone</div></div>
+</div>
+<div class="content">
+
+<div class="search-ss-card">
+  <div class="search-ss-hdr">
+    <div>
+      <div class="search-ss-title">🌐 Live Public Records Overview</div>
+      <div class="search-ss-sub">Live search results overview for "Chantel Neill" (Bertram Texas)</div>
+    </div>
+  </div>
+  <div class="search-ss-body" onclick="openModal('Chantel_Neill_Bertram_Texas_1_search_page.png')">
+    <img src="Chantel_Neill_Bertram_Texas_1_search_page.png" class="search-ss-img" title="Click to view full search page screenshot">
+    <div class="search-ss-overlay">🔍 Click to View Full Search Page Screenshot</div>
+  </div>
+</div>
+<div class="collapse-toolbar">
+  <div style="display:flex;align-items:center;gap:10px">
+    <button class="tool-btn" onclick="setAllCards(false)">▸ Collapse All</button>
+    <button class="tool-btn" onclick="setAllCards(true)">▾ Expand All</button>
+  </div>
+  <div class="view-pref">
+    <span>Default View:</span>
+    <label><input type="radio" name="default_view_pref" value="collapsed" id="pref-collapsed" onchange="setDefaultPref('collapsed')"> Collapsed</label>
+    <label><input type="radio" name="default_view_pref" value="expanded" id="pref-expanded" onchange="setDefaultPref('expanded')"> Expanded</label>
+  </div>
+</div>
+
+<details class="rcard " id="rcard-0">
+  <summary class="rcard-hdr">
+    <div class="rcard-hdr-top">
+      <div style="display:flex;align-items:center;gap:8px;min-width:0">
+        <span class="rnum">#1</span>
+        <span class="rname-person">Chantel Neill</span>
+        
+      </div>
+      <span class="expand-indicator">▼ Expand</span>
+    </div>
+    <div class="rcard-hdr-meta">
+      <div class="rcard-meta-left">
+        <span class="rcard-meta-pill">🎂 Age 51</span>
+        <span class="rcard-meta-pill">📍 Bertram, TX</span>
+      </div>
+      <div class="badge-group">
+        <span class="badge-tag">📞 7</span>
+        <span class="badge-tag">✉️ 6</span>
+      </div>
+    </div>
+  </summary>
+  <div class="rcard-body">
+    <div class="rinfo">
+      <div class="frow"><span class="fl">Full Name:</span><span class="fv fname">Chantel Neill</span></div>
+      <div class="frow"><span class="fl">Age:</span><span class="fv">51</span></div>
+      <div class="frow"><span class="fl">City / State:</span><span class="fv">Bertram, TX</span></div>
+      <div class="frow"><span class="fl">Phone(s):</span><div class="addrs"><button class="copy-all-btn" onclick="copyList([&quot;(512) 431-8465&quot;, &quot;(512) 983-5651&quot;, &quot;(817) 863-5627&quot;, &quot;(254) 399-0729&quot;, &quot;(254) 863-5627&quot;, &quot;(512) 399-0729&quot;, &quot;(817) 399-0729&quot;], 'Phones'); event.stopPropagation();">📋 Copy All Phones (7)</button><div class="addr-row">📞 <span>(512) 431-8465</span> <button class="copy-item-btn" onclick="copySingle('(512) 431-8465', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(512) 983-5651</span> <button class="copy-item-btn" onclick="copySingle('(512) 983-5651', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(817) 863-5627</span> <button class="copy-item-btn" onclick="copySingle('(817) 863-5627', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(254) 399-0729</span> <button class="copy-item-btn" onclick="copySingle('(254) 399-0729', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(254) 863-5627</span> <button class="copy-item-btn" onclick="copySingle('(254) 863-5627', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(512) 399-0729</span> <button class="copy-item-btn" onclick="copySingle('(512) 399-0729', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div><div class="addr-row">📞 <span>(817) 399-0729</span> <button class="copy-item-btn" onclick="copySingle('(817) 399-0729', 'Phone'); event.stopPropagation();" title="Copy phone">📋</button></div></div></div>
+      <div class="frow"><span class="fl">Email(s):</span><div class="addrs"><button class="copy-all-btn" onclick="copyList([&quot;cneill2@yahoo.com&quot;, &quot;chantel.neill@aol.com&quot;, &quot;chantel.neill@yahoo.com&quot;, &quot;blue4338@yahoo.com&quot;, &quot;chantel.neill6@yahoo.com&quot;, &quot;cneill@frontiernet.net&quot;], 'Emails'); event.stopPropagation();">📋 Copy All Emails (6)</button><div class="addr-row">✉️ <span>cneill2@yahoo.com</span> <button class="copy-item-btn" onclick="copySingle('cneill2@yahoo.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>chantel.neill@aol.com</span> <button class="copy-item-btn" onclick="copySingle('chantel.neill@aol.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>chantel.neill@yahoo.com</span> <button class="copy-item-btn" onclick="copySingle('chantel.neill@yahoo.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>blue4338@yahoo.com</span> <button class="copy-item-btn" onclick="copySingle('blue4338@yahoo.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>chantel.neill6@yahoo.com</span> <button class="copy-item-btn" onclick="copySingle('chantel.neill6@yahoo.com', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div><div class="addr-row">✉️ <span>cneill@frontiernet.net</span> <button class="copy-item-btn" onclick="copySingle('cneill@frontiernet.net', 'Email'); event.stopPropagation();" title="Copy email">📋</button></div></div></div>
+      <div class="frow"><span class="fl">Address(es):</span><div class="addrs"><div class="addr-row">📍 206 Flying B Ranch Rd · Bertram, TX</div><div class="addr-row">📍 Po Box 855 · Bertram, TX</div><div class="addr-row">📍 15450 Fm 1325 Unit 2627 · Austin, TX</div><div class="addr-row">📍 2835 Highway 31 Unit 1716 · Axtell, TX</div><div class="addr-row">📍 6607 Brodie Ln Unit 824 · Austin, TX</div><div class="addr-row">📍 8600 Brodie Ln Unit 335 · Austin, TX</div><div class="addr-row">📍 3014 W William Cannon Dr Unit 1716 · Austin, TX</div><div class="addr-row">📍 8217 Shoal Creek Blvd Unit 104 · Austin, TX</div><div class="addr-row">📍 15450 Fm 1325 Unit 2628 · Austin, TX</div><div class="addr-row">📍 6607 Brodie Ln Unit 1022 · Austin, TX</div></div></div>
+      <div class="frow"><span class="fl">Relatives:</span><span class="fv">Earl Clemons, Diana Clemons, Sheila Nelson, Albert Garcia, Alvin Garcia</span></div>
+      <div class="frow"><span class="fl">AKA / Aliases:</span><span class="fv">Chantel Leann Neill, Chantel Neill 4th, Chantel E Neill, Chantel L Meill 4th</span></div>
+      
+      <div class="frow bg-report-row">
+        <span class="fl">Background:</span>
+        <div class="bg-report-box">
+          <div class="bg-report-hdr">
+            <span class="bg-report-title">📄 FREE Background Report</span>
+            <button class="copy-all-btn" onclick="copyBgReport(0); event.stopPropagation();">📋 Copy Report Text</button>
+          </div>
+          <div class="bg-report-text" id="bg-report-0">Chantel L Neill 4TH is 51 years old and was born in April of 1975. Currently Chantel lives at the address 206 Flying B Ranch Rd, Bertram TX 78605 . Chantel has lived at this Bertram, TX address for about 10 years, after moving in around February of 2016. Chantel previously lived at PO Box 855, Bertram TX 78605 for 6 years, starting in February of 2013. Going further back, starting in June of 2006, Chantel lived at 15450 Fm 1325, Unit 2627, Austin TX 78728 for 5 years. It is likely that Chantel Neill is married to 61 year old Earl Lee Clemons , and they have lived together in at least 22 different locations. The following people are relatives or close associates of Chantel: Diana Clemons (62), Sheila Nelson (61), Albert Garcia (56), Alvin Garcia (77), Anne Bishop (61), Anthony Garcia (45), Barbara Clemons (72), Bill Nelson (99), Bishop Mire (56) and Blake Bishop (25). Chantel&#x27;s current phone number is (512) 431-8465 . This Wireless number was issued by &#x27;New Cingular Wireless PCS LLC - IL&#x27;, first reported in public records on August of 2010. Past phone numbers for Chantel include (512) 983-5651 , (817) 863-5627 and (254) 399-0729 . The primary email address for Chantel is cneill2@yahoo.com . Chantel has also used the following email accounts: chantel.neill@aol.com , chantel.neill@yahoo.com , blue4338@yahoo.com , chantel.neill6@yahoo.com and cneill@frontiernet.net .</div>
+        </div>
+      </div>
+    </div>
+    <div class="ss-wrap">
+                <img src="Chantel_Neill_Bertram_Texas_1_result_1.png" class="ss-thumb"
+                     onclick="openModal('Chantel_Neill_Bertram_Texas_1_result_1.png')"
+                     title="Click to view profile detail screenshot">
+                <div class="ss-lbl">📸 Profile Detail Screenshot — click to zoom</div>
+            </div>
+  </div>
+  
+  <div class="res-actions">
+    <button class="res-btn arch-btn" onclick="archiveResult(0)">🗃 Not This Person</button>
+    <button class="res-btn del-btn"  onclick="confirmDelete(0)">🗑 Delete Result</button>
+  </div>
+</details>
+</div>
+<div class="toast" id="toast"></div>
+<div class="modal" id="modal" onclick="if(event.target===this||event.target.classList.contains('modal-wrap'))closeModal()">
+  <div class="modal-bar">
+    <div class="modal-bar-ttl">📸 <span>Verified Public Record Intelligence Screenshot</span></div>
+    <div class="modal-bar-actions">
+      <a id="modal-dl-btn" href="#" download="screenshot.png" class="modal-bar-btn" target="_blank">⬇ Download Original</a>
+      <button class="modal-bar-btn" onclick="closeModal()" style="background:#dc2626;border-color:#ef4444;color:#fff">✕ Close</button>
+    </div>
+  </div>
+  <div class="modal-wrap">
+    <div id="modal-loading" class="modal-loading">⏳ Loading authentic screenshot...</div>
+    <img id="modal-img" src="" class="modal-img" onclick="event.stopPropagation()">
+  </div>
+</div>
+
+<div class="confirm-overlay" id="confirm-overlay">
+  <div class="confirm-box">
+    <h3>🗑 Delete This Result?</h3>
+    <p>This will permanently remove the result and its screenshot.<br>This <strong>cannot be undone</strong>.</p>
+    <div class="confirm-btns">
+      <button class="cb-cancel" onclick="closeConfirm()">Cancel</button>
+      <button class="cb-delete" id="cb-confirm-btn" onclick="doDelete()">Delete Permanently</button>
+    </div>
+  </div>
+</div>
+
+<div class="share-modal" id="share-modal" onclick="if(event.target===this)closeShareModal()">
+  <div class="share-box">
+    <div class="share-hdr">
+      <h3>🔗 Share Result Link</h3>
+      <span class="share-close" onclick="closeShareModal()">✕</span>
+    </div>
+    <p>Anyone with this direct link can view these results in read-only mode.<br><strong style="color:var(--ac)">⚡ Active while account is in good standing. Automatically freezes if account is paused or leads are depleted.</strong></p>
+    <div class="share-input-wrap">
+      <input type="text" id="share-url-input" readonly value="" placeholder="Generating link...">
+      <button class="share-copy-btn" onclick="copyShareLink()">Copy</button>
+    </div>
+    <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap">
+      <button class="res-btn" onclick="resetLeadShareLink()" style="flex:1;background:rgba(239,68,68,0.15);border:1px solid #ef4444;color:#fca5a5;padding:8px 12px;border-radius:8px;font-size:.82rem;font-weight:700;cursor:pointer" title="Revokes old share link and generates a brand new one">🔄 Reset / Revoke Link</button>
+    </div>
+    <div class="share-socials">
+      <a id="share-wa" href="#" target="_blank" class="soc-btn soc-wa">📱 WhatsApp</a>
+      <a id="share-tg" href="#" target="_blank" class="soc-btn soc-tg">✈️ Telegram</a>
+    </div>
+  </div>
+</div>
+
+<script>
+const JOB_ID   = 'A2407314';
+const LEAD_IDX = 0;
+const API      = (window.location.protocol.startsWith('http') ? window.location.origin : 'http://localhost:5050');
+let _pendingDeleteIdx = null;
+
+window.addEventListener('scroll', () => {
+  const b = document.getElementById('back-to-top-btn');
+  if (b) {
+    if (window.scrollY > 280) b.classList.add('visible');
+    else b.classList.remove('visible');
+  }
+});
+
+let _reportShareToken = '';
+
+async function openShareModal() {
+  document.getElementById('share-modal').classList.add('open');
+  updateLeadShareLink();
+  const inp = document.getElementById('share-url-input');
+  if (!_reportShareToken) {
+    inp.value = 'Generating secure share link...';
+    try {
+      const r = await fetch(API + '/api/jobs/' + JOB_ID + '/share', {method: 'POST'});
+      const d = await r.json();
+      if (d.share_token) {
+        _reportShareToken = d.share_token;
+        updateLeadShareLink();
+      }
+    } catch(e) {}
+  }
+}
+
+function updateLeadShareLink() {
+  const inp = document.getElementById('share-url-input');
+  let url = window.location.href;
+  if (_reportShareToken) {
+    const folder = 'Chantel_Neill_Bertram_Texas_1';
+    url = window.location.origin + '/share/lead/' + _reportShareToken + '/' + folder + '/report.html';
+  }
+  inp.value = url;
+  const encodedUrl = encodeURIComponent(url);
+  const text = encodeURIComponent('LeadsOSINT Report: Chantel Neill');
+  document.getElementById('share-wa').href = 'https://api.whatsapp.com/send?text=' + text + '%20' + encodedUrl;
+  document.getElementById('share-tg').href = 'https://t.me/share/url?url=' + encodedUrl + '&text=' + text;
+}
+
+async function resetLeadShareLink() {
+  if (!confirm('Are you sure you want to reset this share link?\n\n⚠️ Anyone with the old share link will immediately lose access (404). A brand new link will be generated.')) return;
+  const inp = document.getElementById('share-url-input');
+  inp.value = 'Revoking & generating new link...';
+  try {
+    const r = await fetch(API + '/api/jobs/' + JOB_ID + '/share/reset', {method: 'POST'});
+    const d = await r.json();
+    if (d.share_token) {
+      _reportShareToken = d.share_token;
+      updateLeadShareLink();
+      showToast('Old share link revoked! New secure link active.', 'ok');
+    } else {
+      showToast(d.error || 'Failed to reset link', 'err');
+      updateLeadShareLink();
+    }
+  } catch(e) {
+    showToast('Network error resetting link', 'err');
+    updateLeadShareLink();
+  }
+}
+function closeShareModal() {
+  document.getElementById('share-modal').classList.remove('open');
+}
+function copyShareLink() {
+  const input = document.getElementById('share-url-input');
+  copySingle(input.value, 'Share Link');
+}
+
+function copySingle(val, label) {
+  navigator.clipboard.writeText(val).then(() => {
+    showToast(label + ' copied to clipboard!', 'ok');
+  }).catch(() => {
+    const ta = document.createElement('textarea');
+    ta.value = val;
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    showToast(label + ' copied!', 'ok');
+  });
+}
+
+function copyList(arr, label) {
+  if (!arr || !arr.length) return;
+  const text = arr.join('\\n');
+  navigator.clipboard.writeText(text).then(() => {
+    showToast(arr.length + ' ' + label + ' copied to clipboard!', 'ok');
+  }).catch(() => {
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    showToast(arr.length + ' ' + label + ' copied!', 'ok');
+  });
+}
+
+function copyBgReport(idx) {
+  const el = document.getElementById('bg-report-' + idx);
+  if (el) {
+    copySingle(el.innerText || el.textContent, 'Free Background Report');
+  }
+}
+
+function openModal(src){
+  const m = document.getElementById('modal');
+  const img = document.getElementById('modal-img');
+  const loader = document.getElementById('modal-loading');
+  const dl = document.getElementById('modal-dl-btn');
+  
+  if (dl) dl.href = src;
+  loader.textContent = '⏳ Loading authentic screenshot...';
+  loader.style.display = 'block';
+  img.style.display = 'none';
+  m.classList.add('open');
+  document.body.style.overflow = 'hidden';
+  
+  img.onload = () => {
+    loader.style.display = 'none';
+    img.style.display = 'block';
+  };
+  img.onerror = () => {
+    loader.textContent = '⚠️ Screenshot could not be loaded.';
+  };
+  img.src = src;
+}
+
+function closeModal(){
+  const m = document.getElementById('modal');
+  if (m) m.classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape'){
+    closeModal();
+    closeConfirm();
+  }
+});
+
+function showToast(msg, type='ok'){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast ' + type + ' show';
+  setTimeout(()=>t.classList.remove('show'), 3500);
+}
+
+function confirmDelete(idx){
+  _pendingDeleteIdx = idx;
+  document.getElementById('confirm-overlay').classList.add('open');
+}
+function closeConfirm(){
+  document.getElementById('confirm-overlay').classList.remove('open');
+  _pendingDeleteIdx = null;
+}
+async function doDelete(){
+  const idx = _pendingDeleteIdx;
+  closeConfirm();
+  if (idx === null || !JOB_ID) return;
+  await deleteResult(idx);
+}
+async function deleteResult(idx){
+  if (!JOB_ID) { showToast('No job ID — open via dashboard', 'err'); return; }
+  const card = document.getElementById('rcard-' + idx);
+  if (card) card.classList.add('removing');
+  try {
+    const r = await fetch(`${API}/api/jobs/${JOB_ID}/leads/${LEAD_IDX}/results/${idx}/delete`,
+                          {method:'POST'});
+    const d = await r.json();
+    if (r.ok) {
+      setTimeout(()=>{ if(card) card.remove(); updateCount(-1); }, 250);
+      showToast('Result deleted permanently', 'ok');
+    } else {
+      if (card) card.classList.remove('removing');
+      showToast(d.error || 'Delete failed', 'err');
+    }
+  } catch(e) {
+    if (card) card.classList.remove('removing');
+    showToast('Network error: ' + (e.message || e), 'err');
+  }
+}
+async function archiveResult(idx){
+  if (!JOB_ID) { showToast('No job ID — open via dashboard', 'err'); return; }
+  const card = document.getElementById('rcard-' + idx);
+  if (card) {
+    card.style.transition = '0.25s all';
+    card.style.opacity = '0.3';
+    card.style.transform = 'scale(0.98)';
+  }
+  showToast('Updating status...', 'ok');
+  try {
+    const r = await fetch(`${API}/api/jobs/${JOB_ID}/leads/${LEAD_IDX}/results/${idx}/archive`,
+                          {method:'POST'});
+    const d = await r.json();
+    if (r.ok) {
+      showToast('Marked as Not This Person', 'ok');
+      setTimeout(()=>{
+        const u = new URL(window.location.href);
+        u.searchParams.set('_t', Date.now());
+        window.location.replace(u.href);
+      }, 300);
+    } else {
+      if (card) { card.style.opacity = '1'; card.style.transform = 'none'; }
+      showToast(d.error || 'Archive failed', 'err');
+    }
+  } catch(e) {
+    if (card) { card.style.opacity = '1'; card.style.transform = 'none'; }
+    showToast('Network error: ' + (e.message || e), 'err');
+  }
+}
+async function unarchiveResult(idx){
+  if (!JOB_ID) return;
+  const card = document.getElementById('rcard-' + idx);
+  if (card) {
+    card.style.transition = '0.25s all';
+    card.style.opacity = '0.3';
+  }
+  showToast('Restoring result...', 'ok');
+  try {
+    const r = await fetch(`${API}/api/jobs/${JOB_ID}/leads/${LEAD_IDX}/results/${idx}/unarchive`,
+                          {method:'POST'});
+    const d = await r.json();
+    if (r.ok) {
+      showToast('Result restored', 'ok');
+      setTimeout(()=>{
+        const u = new URL(window.location.href);
+        u.searchParams.set('_t', Date.now());
+        window.location.replace(u.href);
+      }, 300);
+    } else {
+      if (card) { card.style.opacity = '1'; card.style.transform = 'none'; }
+      showToast(d.error || 'Restore failed', 'err');
+    }
+  } catch(e) {
+    if (card) { card.style.opacity = '1'; card.style.transform = 'none'; }
+    showToast('Network error: ' + (e.message || e), 'err');
+  }
+}
+function setAllCards(expanded) {
+  document.querySelectorAll('details.rcard:not(.archived-card)').forEach(d => d.open = expanded);
+}
+function setDefaultPref(pref) {
+  localStorage.setItem('leadsosint_default_view', pref);
+  showToast('Default view saved: ' + (pref === 'expanded' ? 'Expanded' : 'Collapsed'), 'ok');
+  setAllCards(pref === 'expanded');
+}
+(function() {
+  const pref = localStorage.getItem('leadsosint_default_view') || 'collapsed';
+  if (pref === 'expanded') {
+    const el = document.getElementById('pref-expanded');
+    if (el) el.checked = true;
+    setAllCards(true);
+  } else {
+    const el = document.getElementById('pref-collapsed');
+    if (el) el.checked = true;
+    setAllCards(false);
+  }
+})();
+function updateCount(delta){
+  const el = document.getElementById('active-count');
+  if (el) el.textContent = Math.max(0, parseInt(el.textContent||'0') + delta);
+}
+async function redoReportLead(jobId, idx){
+  if (!confirm('Re-run search for this lead now?')) return;
+  try {
+    const r = await fetch(`${API}/api/jobs/${jobId}/leads/${idx}/retry`, {method:'POST'});
+    if (r.ok) {
+      showToast('Re-starting search...', 'ok');
+      setTimeout(()=>location.reload(), 2000);
+    } else {
+      const d = await r.json().catch(()=>({}));
+      showToast(d.error || 'Retry error', 'err');
+    }
+  } catch(e) {
+    showToast('Network error: ' + (e.message || e), 'err');
+  }
+}
+window.addEventListener('scroll', () => {
+  const b = document.getElementById('btt-btn');
+  if (b) b.style.display = (window.scrollY > 200) ? 'inline-flex' : 'none';
+});
+</script>
+<button id="btt-btn" style="position:fixed;bottom:24px;right:24px;z-index:999;background:rgba(30,41,59,.92);border:1px solid var(--ac);color:#fff;padding:9px 16px;border-radius:30px;font-size:.8rem;font-weight:700;display:none;align-items:center;gap:6px;cursor:pointer;box-shadow:0 8px 24px rgba(0,0,0,.6);backdrop-filter:blur(8px);transition:.2s" onclick="window.scrollTo({top:0,behavior:'smooth'})" title="Back to top">↑ Back to Top</button>
+</body></html>
