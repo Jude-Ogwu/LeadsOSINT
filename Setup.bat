@@ -9,11 +9,11 @@ echo    LeadsOSINT - Windows Setup ^& Launcher
 echo  ============================================
 echo.
 
-:: ── Set install directory ───────────────────────────────────
+rem -- Set install directory
 set "INSTALL_DIR=%USERPROFILE%\LeadsOSINT"
 set "APP_URL=http://localhost:5050"
 
-:: ── Step 1: Check Python ────────────────────────────────────
+rem -- Step 1: Check Python
 echo [1/5] Checking Python...
 python --version >nul 2>&1
 if %errorlevel% neq 0 (
@@ -33,8 +33,6 @@ if %errorlevel% neq 0 (
     echo  Installing Python silently...
     "%TEMP%\python_installer.exe" /quiet InstallAllUsers=0 PrependPath=1 Include_test=0
     del "%TEMP%\python_installer.exe" >nul 2>&1
-    :: Refresh PATH
-    call refreshenv >nul 2>&1
     python --version >nul 2>&1
     if %errorlevel% neq 0 (
         echo.
@@ -46,26 +44,24 @@ if %errorlevel% neq 0 (
 )
 for /f "tokens=*" %%v in ('python --version 2^>^&1') do echo  Found: %%v
 
-:: ── Step 2: Check/Install Git or use ZIP download ───────────
+rem -- Step 2: Get LeadsOSINT files
 echo.
 echo [2/5] Getting LeadsOSINT files...
 if exist "%INSTALL_DIR%\app.py" (
-    echo  Already installed - updating to latest version...
+    echo  Already installed - checking for updates...
     cd /d "%INSTALL_DIR%"
     git pull origin main >nul 2>&1
     if %errorlevel% neq 0 (
-        echo  Could not update - will use existing version.
+        echo  Could not auto-update - will use existing version.
     ) else (
         echo  Updated to latest version!
     )
 ) else (
-    :: Try git first
     git --version >nul 2>&1
     if %errorlevel% equ 0 (
         echo  Cloning LeadsOSINT repository...
         git clone https://github.com/Jude-Ogwu/LeadsOSINT.git "%INSTALL_DIR%"
     ) else (
-        :: No git - download as ZIP
         echo  Downloading LeadsOSINT as ZIP...
         curl -L -o "%TEMP%\leadsosint.zip" "https://github.com/Jude-Ogwu/LeadsOSINT/archive/refs/heads/main.zip"
         if %errorlevel% neq 0 (
@@ -92,7 +88,7 @@ if not exist "%INSTALL_DIR%\app.py" (
     exit /b 1
 )
 
-:: ── Step 3: Set up virtual environment ──────────────────────
+rem -- Step 3: Python virtual environment
 echo.
 echo [3/5] Setting up Python environment...
 cd /d "%INSTALL_DIR%"
@@ -101,14 +97,19 @@ if not exist "venv\Scripts\python.exe" (
     python -m venv venv
 )
 echo  Installing required packages (first run takes 2-3 mins)...
-venv\Scripts\pip install --upgrade pip -q
-venv\Scripts\pip install -r requirements.txt -q
+venv\Scripts\python -m pip install --timeout 120 --retries 5 -r requirements.txt -q
 if %errorlevel% neq 0 (
-    echo  WARNING: Some packages may have failed. Trying again...
-    venv\Scripts\pip install -r requirements.txt
+    echo  First attempt had issues. Retrying...
+    venv\Scripts\python -m pip install --timeout 180 --retries 5 -r requirements.txt
+    if %errorlevel% neq 0 (
+        echo.
+        echo  WARNING: Some packages may not have installed correctly.
+        echo  The app may still work. Continuing...
+    )
 )
+echo  Packages ready!
 
-:: ── Step 4: Install Playwright browser ──────────────────────
+rem -- Step 4: Playwright browser
 echo.
 echo [4/5] Setting up browser engine...
 if not exist "%USERPROFILE%\AppData\Local\ms-playwright" (
@@ -118,7 +119,7 @@ if not exist "%USERPROFILE%\AppData\Local\ms-playwright" (
     echo  Browser engine already installed.
 )
 
-:: ── Step 5: Create .env if missing ──────────────────────────
+rem -- Step 5: Create .env if missing
 echo.
 echo [5/5] Configuring app...
 if not exist ".env" (
@@ -133,7 +134,7 @@ if not exist ".env" (
     echo  Configuration already exists.
 )
 
-:: ── Launch App ───────────────────────────────────────────────
+rem -- Launch App
 echo.
 echo  ============================================
 echo    Setup complete! Launching LeadsOSINT...
@@ -146,10 +147,10 @@ echo  To stop the app: close this window.
 echo  To restart: double-click Setup.bat again.
 echo.
 
-:: Open browser after 4 seconds
+rem Open browser after 4 seconds
 start "" /B powershell -Command "Start-Sleep 4; Start-Process '%APP_URL%'"
 
-:: Start Flask
+rem Start Flask
 venv\Scripts\python app.py
 
 echo.
