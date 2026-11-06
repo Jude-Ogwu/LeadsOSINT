@@ -2161,7 +2161,7 @@
         <!-- Live Logs Console (Only visible to Admin) -->
         <div class="logs-console-wrap" id="logs-console-wrap">
           <div class="logs-hdr">
-            <div class="logs-title">💻 Live Execution Logs (Admin Only)</div>
+            <div class="logs-title">💻 Live Execution Logs</div>
             <div class="logs-actions">
               <button class="logs-btn" onclick="clearLogsUI()">Clear</button>
               <button class="logs-btn" id="logs-toggle-btn" onclick="toggleLogsUI()">Collapse</button>
@@ -2880,18 +2880,16 @@
         renderUserBar(currentUser);
         startCountdownTimer(currentUser.seconds_left);
 
+        const logsWrap = document.getElementById('logs-console-wrap');
+        if (logsWrap) logsWrap.style.display = 'flex';
+        setInterval(fetchLogs, 1500);
+        fetchLogs();
+
         if (currentUser.role === 'admin') {
-          const logsWrap = document.getElementById('logs-console-wrap');
-          if (logsWrap) logsWrap.style.display = 'flex';
           const adminBtn = document.getElementById('admin-panel-btn');
           if (adminBtn) adminBtn.style.display = 'inline-flex';
           const adminBtnMobile = document.getElementById('admin-panel-btn-mobile');
           if (adminBtnMobile) adminBtnMobile.style.display = 'flex';
-          setInterval(fetchLogs, 1500);
-          fetchLogs();
-        } else {
-          const logsWrap = document.getElementById('logs-console-wrap');
-          if (logsWrap) logsWrap.style.display = 'none';
         }
         checkNewMessages();
         setInterval(checkNewMessages, 20000);
@@ -3265,9 +3263,16 @@
       });
     }
 
+    function ensurePolling(jobId) {
+      if (!jobId || jobId !== currentJobId) return;
+      if (!pollTimer) {
+        pollTimer = setInterval(() => pollJobStatus(jobId), 1500);
+      }
+    }
+
     async function loadJobDetail(jobId) {
       try {
-        const res = await fetch(`/api/jobs/${jobId}`);
+        const res = await fetch(`/api/jobs/${jobId}?_t=${Date.now()}`);
         if (!res.ok) return;
         _consecutiveNetworkErrors = 0;
         currentJob = await res.json();
@@ -3283,11 +3288,11 @@
     async function pollJobStatus(jobId) {
       if (jobId !== currentJobId) return;
       try {
-        const res = await fetch(`/api/jobs/${jobId}/status`);
+        const res = await fetch(`/api/jobs/${jobId}/status?_t=${Date.now()}`);
         if (!res.ok) return;
         _consecutiveNetworkErrors = 0;
         const s = await res.json();
-        if (currentJob) {
+        if (currentJob && s && s.id === currentJobId) {
           Object.assign(currentJob, s);
           renderJobDetail(currentJob);
           // If job has concluded or paused, stop polling to avoid unnecessary network & DOM churn
@@ -3296,7 +3301,7 @@
               clearInterval(pollTimer);
               pollTimer = null;
             }
-            // Force one final full reload so lead statuses reflect server truth
+            refreshJobsList();
             loadJobDetail(jobId);
           }
         }
@@ -3311,6 +3316,15 @@
     function renderJobDetail(job) {
       hideJobLoadingSkeleton();
       document.getElementById('job-title-edit').value = job.name || job.id;
+
+      if (job.status === 'running' || job.status === 'queued') {
+        ensurePolling(job.id);
+      } else if (job.status === 'complete' || job.status === 'cancelled' || job.status === 'failed' || job.status === 'paused') {
+        if (pollTimer) {
+          clearInterval(pollTimer);
+          pollTimer = null;
+        }
+      }
 
       const pct = job.total ? Math.round(job.done / job.total * 100) : 0;
       document.getElementById('prog-bar').style.width = `${pct}%`;
@@ -3447,8 +3461,10 @@
     }
     async function redoAll() {
       if (!confirm('Re-run all searches for this job?')) return;
+      showToast('Re-running all searches...', 'ok');
       await fetch(`/api/jobs/${currentJobId}/redo-all`, { method: 'POST' });
-      loadJobDetail(currentJobId);
+      await loadJobDetail(currentJobId);
+      ensurePolling(currentJobId);
     }
     async function deleteJob() {
       if (!confirm('⚠️ Are you sure you want to permanently delete this job and all associated search records? This action cannot be undone.')) return;

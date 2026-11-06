@@ -3877,10 +3877,12 @@ def index():
     return render_template('index.html')
 
 @app.route('/api/logs', methods=['GET'])
-@admin_required
+@login_required
 def get_logs_api():
     with LOG_LOCK:
-        return jsonify(list(LOG_BUFFER))
+        resp = jsonify(list(LOG_BUFFER))
+        resp.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+        return resp
 
 @app.route('/api/jobs', methods=['GET'])
 @login_required
@@ -4154,7 +4156,7 @@ def job_status_api(job_id):
               'social_link': l.get('social_link',''), 'email': l.get('email',''), 'phone': l.get('phone',''),
               'status': l['status'], 'count': l['count'], 'error': l.get('error',''),
               'folder_name': l.get('folder_name','')} for l in job.get('leads',[])]
-    return jsonify({
+    resp = jsonify({
         'id': job_id, 'name': job.get('name', job_id),
         'status': job['status'], 'total': job.get('total',0),
         'done': job.get('done',0), 'percent': pct,
@@ -4162,6 +4164,8 @@ def job_status_api(job_id):
         'eta': job.get('eta', 'Calculating...'),
         'speed': job.get('speed', '—'),
     })
+    resp.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+    return resp
 
 
 @app.route('/api/jobs/<job_id>/retry-failed', methods=['POST'])
