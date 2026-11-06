@@ -1293,7 +1293,7 @@ def _screenshot_profile_html(html, output_path, result):
                     // Remove elements with Enformion or CRA disclaimer text
                     document.querySelectorAll('div, section, footer, p').forEach(el => {
                         const txt = el.innerText || '';
-                        if (txt.includes('NEED MORE DATA IN REAL-TIME?') || 
+                        if (txt.includes('NEED MORE DATA IN REAL-TIME?') || txt.includes('Search Properties Near Me') || txt.includes('Searching Your Location') || txt.includes('Geolocation') || 
                             txt.includes('EnformionGO') || 
                             txt.includes('Consumer Reporting Agency (CRA)')) {
                             el.remove();

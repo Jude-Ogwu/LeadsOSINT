@@ -8,7 +8,6 @@ output/
 *.sqlite
 venv/
 .venv/
-fsp_real_app.css
 scratch_*.py
 test_bd_output.html
 test_phoenix_output.html
