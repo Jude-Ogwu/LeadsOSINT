@@ -2935,34 +2935,36 @@ def regenerate_index(job_id):
     if not job.get('folder'):
         return
     jfolder = job.get('folder', '')
-    for lead in job.get('leads', []):
-        lfolder = lead.get('folder_name', '')
-        if jfolder and lfolder:
-            djson = os.path.join(jfolder, lfolder, 'data.json')
-            if not os.path.exists(djson) and os.path.exists(OUT_DIR):
-                for entry in os.listdir(OUT_DIR):
-                    if job_id in entry:
-                        c = os.path.join(OUT_DIR, entry, lfolder, 'data.json')
-                        if os.path.exists(c):
-                            djson = c
-                            break
-            if os.path.exists(djson):
-                try:
-                    with open(djson, 'r', encoding='utf-8') as f:
-                        dj = json.load(f)
-                        res_list = dj.get('results', [])
-                        lead['count'] = len(res_list)
-                        lead['status'] = 'done' if len(res_list) > 0 else 'none'
-                except Exception:
-                    pass
-            elif os.path.exists(os.path.join(jfolder, lfolder, 'report.html')):
-                if lead.get('status') in ('running', 'queued'):
-                    lead['status'] = 'done' if lead.get('count', 0) > 0 else 'none'
-    
-    all_done = all(l.get('status') in ('done', 'none', 'failed', 'cancelled') for l in job.get('leads', []))
-    if all_done and len(job.get('leads', [])) > 0:
-        job['done'] = len(job['leads'])
-        job['status'] = 'complete'
+    # If job is actively running or queued, DO NOT hijack live lead statuses from disk!
+    if job.get('status') not in ('running', 'queued'):
+        for lead in job.get('leads', []):
+            lfolder = lead.get('folder_name', '')
+            if jfolder and lfolder:
+                djson = os.path.join(jfolder, lfolder, 'data.json')
+                if not os.path.exists(djson) and os.path.exists(OUT_DIR):
+                    for entry in os.listdir(OUT_DIR):
+                        if job_id in entry:
+                            c = os.path.join(OUT_DIR, entry, lfolder, 'data.json')
+                            if os.path.exists(c):
+                                djson = c
+                                break
+                if os.path.exists(djson):
+                    try:
+                        with open(djson, 'r', encoding='utf-8') as f:
+                            dj = json.load(f)
+                            res_list = dj.get('results', [])
+                            lead['count'] = len(res_list)
+                            lead['status'] = 'done' if len(res_list) > 0 else 'none'
+                    except Exception:
+                        pass
+                elif os.path.exists(os.path.join(jfolder, lfolder, 'report.html')):
+                    if lead.get('status') in ('running', 'queued'):
+                        lead['status'] = 'done' if lead.get('count', 0) > 0 else 'none'
+        
+        all_done = all(l.get('status') in ('done', 'none', 'failed', 'cancelled') for l in job.get('leads', []))
+        if all_done and len(job.get('leads', [])) > 0:
+            job['done'] = len(job['leads'])
+            job['status'] = 'complete'
 
     html = build_job_index(job)
     idx  = os.path.join(job['folder'], 'index.html')
@@ -3072,12 +3074,6 @@ def process_lead(job_id, lead_idx):
         elif len(results) == 1:
             _enrich_single_result(results[0])
 
-        # Save raw data (excluding large HTML blobs)
-        with open(os.path.join(lead_folder, 'data.json'), 'w', encoding='utf-8') as f:
-            save_results = [{k: v for k, v in r.items() if k not in ('_profile_html', '_search_html')} for r in results]
-            json.dump({'name': lead['name'], 'location': lead['location'],
-                       'results': save_results}, f, indent=2)
-
         # Screenshots
         # -- 1. Single Full Search Page Screenshot (1x per lead overview) ----------
         search_ss_file = f"{lead_safe}_search_page.png"
@@ -3149,7 +3145,15 @@ def process_lead(job_id, lead_idx):
         except Exception as rpt_e:
             log_event(f"Report generation warning: {rpt_e}", "WARN")
 
-        # Commit status NOW — before screenshots — so a screenshot crash doesn't erase results
+        # Save raw data after screenshots & report are fully captured
+        try:
+            with open(os.path.join(lead_folder, 'data.json'), 'w', encoding='utf-8') as f:
+                save_results = [{k: v for k, v in r.items() if k not in ('_profile_html', '_search_html')} for r in results]
+                json.dump({'name': lead['name'], 'location': lead['location'],
+                           'results': save_results}, f, indent=2)
+        except Exception as data_e:
+            log_event(f"data.json write warning: {data_e}", "WARN")
+
         if results:
             lead['status'] = 'done'
         else:

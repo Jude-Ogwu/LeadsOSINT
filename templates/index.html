@@ -3247,19 +3247,18 @@
 
     function selectJob(jobId) {
       currentJobId = jobId;
+      currentJob = null; // Reset currentJob so previous job data doesn't flash
       closeSidebarOnMobile();
       showJobPanel();
       document.querySelectorAll('.job-item').forEach(el => {
         el.classList.toggle('active', el.dataset.id === jobId);
       });
-      if (pollTimer) clearInterval(pollTimer);
+      if (pollTimer) { clearInterval(pollTimer); pollTimer = null; }
       // Show skeleton immediately, load detail in background
       const _activeItem = document.querySelector(`.job-item[data-id='${jobId}']`); const _jName = _activeItem ? _activeItem.dataset.name : ''; showJobLoadingSkeleton(_jName);
       loadJobDetail(jobId).then(() => {
         hideJobLoadingSkeleton();
-        if (currentJob && (currentJob.status === 'running' || currentJob.status === 'queued')) {
-          pollTimer = setInterval(() => pollJobStatus(jobId), 2500);
-        }
+        ensurePolling(jobId);
       });
     }
 
